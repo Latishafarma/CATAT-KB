@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
+
     <title>Aplikasi CATAT KB</title>
-=======
+
     <title>Aplikasi Pelayanan Keluarga Berencana (APD KB)</title>
->>>>>>> f40c59201a5dd24dc9b256ea15c035b7140b5b26
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -18,11 +18,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<<<<<<< HEAD
     <!-- SheetJS (XLSX) CDN untuk Impor & Ekspor Excel -->
-=======
+
     <!-- SheetJS (XLSX) CDN untuk Impor Excel -->
->>>>>>> f40c59201a5dd24dc9b256ea15c035b7140b5b26
+
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         tailwind.config = {
@@ -354,11 +353,10 @@
                                 <i class="fa-solid fa-file-excel"></i><span>Impor Excel</span>
                                 <input type="file" id="import-excel-file" accept=".xlsx, .xls, .csv" onchange="importAkseptorExcel(event)" class="hidden">
                             </label>
-<<<<<<< HEAD
+
                             <!-- Tombol Ekspor Excel Data Akseptor Terinput -->
                             <button onclick="exportAkseptorExcel()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2 rounded-xl shadow transition flex items-center space-x-2"><i class="fa-solid fa-file-arrow-down"></i><span>Ekspor Excel</span></button>
-=======
->>>>>>> f40c59201a5dd24dc9b256ea15c035b7140b5b26
+
                             <button onclick="printReport('akseptor')" class="bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm px-4 py-2 rounded-xl shadow transition flex items-center space-x-2"><i class="fa-solid fa-print"></i><span>Cetak Daftar</span></button>
                         </div>
                     </div>
@@ -425,11 +423,11 @@
                     </div>
                 </div>
 
-<<<<<<< HEAD
+
                 <!-- 4. LAPORAN ABSENSI -->
-=======
+
                 <!-- 4. LAPORAN ABSENSI (Terhubung Langsung dengan Apps Script & CORS Bypass) -->
->>>>>>> f40c59201a5dd24dc9b256ea15c035b7140b5b26
+
                 <div id="tab-absensi" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto flex-1">
@@ -1289,7 +1287,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-<<<<<<< HEAD
+
         // FUNGSI EKSPOR DATA AKSEPTOR KE EXCEL (.xlsx)
         function exportAkseptorExcel() {
             if (!db.akseptor || db.akseptor.length === 0) {
@@ -1320,8 +1318,7 @@
             XLSX.writeFile(workbook, fileName);
         }
 
-=======
->>>>>>> f40c59201a5dd24dc9b256ea15c035b7140b5b26
+
         function printAkseptorCard(idx) {
             const a = db.akseptor[idx];
             const umur = calculateAge(a.tglLahir);
