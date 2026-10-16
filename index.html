@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Pelayanan KB & Kefarmasian (LATISHA)</title>
+    <title>Aplikasi LATISHA - Pelayanan Kesehatan & KB</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -62,7 +62,7 @@
                     </div>
                     <div>
                         <h1 class="font-bold text-white text-lg tracking-wide">LATISHA</h1>
-                        <p class="text-xs text-slate-400">Pelayanan KB dan Kefarmasian</p>
+                        <p class="text-xs text-slate-400">Pelayanan Kesehatan & KB</p>
                     </div>
                 </div>
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -89,9 +89,10 @@
                 <a href="#" onclick="switchTab('farmasi-cpp')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-cpp"><i class="fa-solid fa-book-medical w-5 text-sm mr-2 text-teal-400"></i> Catatan Pengobatan Pasien</a>
 
                 <div class="pt-2 pb-1"><div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-500">Administrasi</div></div>
+                <a href="#" onclick="switchTab('kalender-praktik')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="kalender-jadwal"><i class="fa-solid fa-calendar-days w-6 text-base mr-2 text-emerald-400"></i> Kalender Jadwal Dokter</a>
                 <a href="#" onclick="switchTab('absensi')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="absensi"><i class="fa-solid fa-clipboard-user w-6 text-base mr-2"></i> Laporan Absensi</a>
                 <a href="#" onclick="switchTab('obat')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="obat"><i class="fa-solid fa-pills w-6 text-base mr-2"></i> Daftar Obat KB</a>
-                <a href="#" onclick="switchTab('petugas')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="petugas"><i class="fa-solid fa-user-doctor w-6 text-base mr-2"></i> Data Petugas Medis</a>
+                <a href="#" onclick="switchTab('petugas')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="petugas"><i class="fa-solid fa-user-doctor w-6 text-base mr-2"></i> Data Petugas</a>
                 <a href="#" onclick="switchTab('laporan')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="laporan"><i class="fa-solid fa-file-invoice w-6 text-base mr-2"></i> Laporan Resmi</a>
                 <a href="#" onclick="switchTab('faskes')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="faskes"><i class="fa-solid fa-hospital w-6 text-base mr-2"></i> Data Faskes</a>
                 <a href="#" onclick="switchTab('backup')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="backup"><i class="fa-solid fa-database w-6 text-base mr-2"></i> Backup & Restore DB</a>
@@ -106,11 +107,10 @@
                     <button onclick="toggleSidebar()" class="text-slate-600 md:hidden"><i class="fa-solid fa-bars text-xl"></i></button>
                     <div>
                         <h2 id="page-title" class="text-lg font-bold text-slate-800">Dashboard Utama</h2>
-                        <p id="page-subtitle" class="text-xs text-slate-500">Ringkasan operasional pelayanan KB</p>
+                        <p id="page-subtitle" class="text-xs text-slate-500">Ringkasan operasional pelayanan kesehatan</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
-                    
                     <div class="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-semibold">
                         <i class="fa-solid fa-cloud text-emerald-600 animate-pulse"></i><span id="cloud-sync-text">Cloud Terhubung</span>
                     </div>
@@ -123,10 +123,10 @@
                     <div class="kb-hero-banner rounded-3xl p-6 md:p-8 text-white shadow-lg relative flex flex-col md:flex-row items-center justify-between">
                         <div class="space-y-2 z-10">
                             <div class="inline-flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                                <i class="fa-solid fa-heart-pulse text-emerald-300"></i><span>Program Keluarga Berencana dan Layanan Kefarmasian</span>
+                                <i class="fa-solid fa-heart-pulse text-emerald-300"></i><span>support by LATISHA</span>
                             </div>
-                            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">PORTAL PENCATATAN PELAYANAN</h2>
-                            <p class="text-emerald-100 text-sm max-w-xl">Kelola pelayanan KB dan Layanan Farmasi Klinis lengkap</p>
+                            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">PORTAL PENCATATAN KB DAN FARMASI</h2>
+                            <p class="text-emerald-100 text-sm max-w-xl">Kelola pelayanan kesehatan, rekam medis, serta layanan farmasi klinis lengkap.</p>
                         </div>
                         <div class="z-10 mt-4 md:mt-0">
                             <button onclick="switchTab('kunjungan'); openKunjunganModal();" class="bg-white text-brand-800 hover:bg-emerald-50 font-bold text-sm px-5 py-3 rounded-2xl shadow transition flex items-center space-x-2">
@@ -135,12 +135,12 @@
                         </div>
                     </div>
 
-                    <!-- KOMPONEN NOTIFIKASI JADWAL SUNTIK KB HARI INI S/D 3 HARI KE DEPAN -->
+                    <!-- KONTROL PENGINGAT JADWAL KONTROL/SUNTIK KB HARI INI S/D 3 HARI KE DEPAN -->
                     <div class="bg-white rounded-2xl border-l-4 border-l-rose-500 border border-slate-200 shadow-sm overflow-hidden">
                         <div class="p-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
                             <div class="flex items-center space-x-2 text-rose-700 font-bold text-sm md:text-base">
                                 <i class="fa-solid fa-bell text-rose-600 animate-bounce"></i>
-                                <span>Pengingat Jadwal Suntik KB (Pekan Ini) (<span id="notif-kb-count">0</span>)</span>
+                                <span>Pengingat Jadwal Kontrol/Suntik KB (Hari Ini s/d 3 Hari ke Depan)</span>
                             </div>
                             <button onclick="switchTab('kunjungan')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center space-x-1">
                                 <span>Lihat Semua</span>
@@ -280,7 +280,37 @@
                 <div id="tab-farmasi-meso" class="tab-content hidden space-y-6"><div class="bg-white p-6 rounded-2xl border shadow-sm flex justify-between items-center"><div><h3 class="font-bold text-base">MESO</h3></div><button onclick="openGenericModal('MESO')" class="bg-brand-600 text-white text-sm px-4 py-2 rounded-xl"><i class="fa-solid fa-plus mr-1"></i> Tambah</button></div><div class="bg-white rounded-2xl border shadow-sm overflow-hidden p-4"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 border-b text-xs font-semibold"><th>Tanggal</th><th>Pasien</th><th>Obat</th><th>Efek Samping</th><th>Aksi</th></tr></thead><tbody id="table-meso-body" class="divide-y text-sm"></tbody></table></div></div>
                 <div id="tab-farmasi-cpp" class="tab-content hidden space-y-6"><div class="bg-white p-6 rounded-2xl border shadow-sm flex justify-between items-center"><div><h3 class="font-bold text-base">Catatan Pengobatan Pasien</h3></div><button onclick="openGenericModal('CPP')" class="bg-brand-600 text-white text-sm px-4 py-2 rounded-xl"><i class="fa-solid fa-plus mr-1"></i> Tambah</button></div><div class="bg-white rounded-2xl border shadow-sm overflow-hidden p-4"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50 border-b text-xs font-semibold"><th>Tanggal</th><th>Pasien</th><th>Alergi</th><th>Riwayat & Obat</th><th>Aksi</th></tr></thead><tbody id="table-cpp-body" class="divide-y text-sm"></tbody></table></div></div>
 
-                <!-- 4. ABSENSI -->
+                <!-- 4. Kalender Jadwal Dokter (TAMPILAN GRID KALENDER VISUAL) -->
+                <div id="tab-kalender-praktik" class="tab-content hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-slate-100 rounded-xl transition text-slate-600"><i class="fa-solid fa-chevron-left"></i></button>
+                            <h3 id="calendar-month-year-title" class="font-extrabold text-xl text-slate-800 tracking-wide min-w-[180px] text-center">Oktober 2026</h3>
+                            <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-slate-100 rounded-xl transition text-slate-600"><i class="fa-solid fa-chevron-right"></i></button>
+                            <button onclick="resetCalendarToCurrentMonth()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-semibold text-slate-600 ml-2">Hari Ini</button>
+                        </div>
+                        <button onclick="openJadwalPraktikModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow transition flex items-center space-x-2">
+                            <i class="fa-solid fa-plus-circle"></i><span>Tambah Jadwal Dokter</span>
+                        </button>
+                    </div>
+
+                    <!-- TAMPILAN GRID KALENDER BULANAN -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4">
+                        <div class="grid grid-cols-7 gap-1 text-center font-bold text-xs text-slate-500 uppercase pb-3 border-b mb-2">
+                            <div class="text-rose-600">Ming</div>
+                            <div>Sen</div>
+                            <div>Sel</div>
+                            <div>Rab</div>
+                            <div>Kam</div>
+                            <div>Jum</div>
+                            <div class="text-emerald-600">Sab</div>
+                        </div>
+                        <!-- Kontainer Kotak Tanggal Kalender -->
+                        <div id="calendar-days-grid" class="grid grid-cols-7 gap-2 min-h-[500px]"></div>
+                    </div>
+                </div>
+
+                <!-- 5. ABSENSI -->
                 <div id="tab-absensi" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-3 w-full sm:w-auto flex-1">
@@ -304,7 +334,7 @@
                     </div>
                 </div>
 
-                <!-- 5. OBAT -->
+                <!-- 6. OBAT -->
                 <div id="tab-obat" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="relative w-full sm:w-72">
@@ -325,7 +355,7 @@
                     </div>
                 </div>
 
-                <!-- 6. PETUGAS MEDIS -->
+                <!-- 7. PETUGAS MEDIS -->
                 <div id="tab-petugas" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border shadow-sm flex items-center justify-between">
                         <div class="relative w-full sm:w-72">
@@ -342,7 +372,7 @@
                     </div>
                 </div>
 
-                <!-- 7. LAPORAN RESMI -->
+                <!-- 8. LAPORAN RESMI -->
                 <div id="tab-laporan" class="tab-content hidden space-y-6">
                     <div class="border-b border-slate-200">
                         <nav class="-mb-px flex space-x-8">
@@ -382,33 +412,43 @@
                             <div class="flex items-center space-x-3 flex-wrap">
                                 <span class="text-xs font-semibold text-slate-600">Periode:</span>
                                 <select id="report-period-type" onchange="toggleReportPeriodOptions()" class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
-                                    <option value="all">Semua Waktu</option>
-                                    <option value="month">Per Bulan</option>
-                                    <option value="year">Per Tahun</option>
-                                </select>
-                                <select id="report-select-month" onchange="renderCurrentReportView()" class="hidden px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
-                                    <option value="01">Januari</option>
-                                    <option value="02">Februari</option>
-                                    <option value="03">Maret</option>
-                                    <option value="04">April</option>
-                                    <option value="05">Mei</option>
-                                    <option value="06">Juni</option>
-                                    <option value="07">Juli</option>
-                                    <option value="08">Agustus</option>
-                                    <option value="09">September</option>
-                                    <option value="10">Oktober</option>
-                                    <option value="11">November</option>
-                                    <option value="12">Desember</option>
-                                </select>
-                                <select id="report-select-year" onchange="renderCurrentReportView()" class="hidden px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
-                                    <option value="2026">2026</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2024">2024</option>
-                                    <option value="2027">2027</option>
-                                    <option value="2028">2028</option>
-                                    <option value="2029">2029</option>
-                                    <option value="2030">2030</option>
-                                </select>
+    <option value="all">Semua Waktu</option>
+    <option value="custom">Per Tanggal (Rentang)</option>
+    <option value="month">Per Bulan</option>
+    <option value="year">Per Tahun</option>
+</select>
+
+<!-- Input Rentang Tanggal -->
+<div id="report-custom-date-container" class="hidden flex items-center space-x-1.5">
+    <input type="date" id="report-start-date" onchange="renderCurrentReportView()" class="px-2.5 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
+    <span class="text-xs font-semibold text-slate-500">s/d</span>
+    <input type="date" id="report-end-date" onchange="renderCurrentReportView()" class="px-2.5 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
+</div>
+
+<select id="report-select-month" onchange="renderCurrentReportView()" class="hidden px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
+    <option value="01">Januari</option>
+    <option value="02">Februari</option>
+    <option value="03">Maret</option>
+    <option value="04">April</option>
+    <option value="05">Mei</option>
+    <option value="06">Juni</option>
+    <option value="07">Juli</option>
+    <option value="08">Agustus</option>
+    <option value="09">September</option>
+    <option value="10">Oktober</option>
+    <option value="11">November</option>
+    <option value="12">Desember</option>
+</select>
+
+<select id="report-select-year" onchange="renderCurrentReportView()" class="hidden px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
+    <option value="2026">2026</option>
+    <option value="2025">2025</option>
+    <option value="2024">2024</option>
+    <option value="2027">2027</option>
+    <option value="2028">2028</option>
+    <option value="2029">2029</option>
+    <option value="2030">2030</option>
+</select>
                             </div>
                             <div class="relative w-full sm:w-64">
                                 <input type="text" id="report-search-input" oninput="renderCurrentReportView()" placeholder="Cari data laporan..." class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white">
@@ -420,7 +460,7 @@
                     <div id="report-document-container" class="bg-white border border-slate-200 p-8 md:p-12 max-w-5xl mx-auto overflow-x-auto"></div>
                 </div>
 
-                <!-- 8. FASKES -->
+                <!-- 9. FASKES -->
                 <div id="tab-faskes" class="tab-content hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm p-6 max-w-2xl mx-auto">
                         <h3 class="font-bold text-lg mb-4"><i class="fa-solid fa-hospital text-brand-600"></i> PROFIL FASKES</h3>
@@ -436,7 +476,7 @@
                     </div>
                 </div>
 
-                <!-- 9. BACKUP & RESTORE -->
+                <!-- 10. BACKUP & RESTORE -->
                 <div id="tab-backup" class="tab-content hidden space-y-6">
                     <div class="bg-white rounded-2xl border shadow-sm p-6 max-w-2xl mx-auto space-y-6">
                         <h3 class="font-bold text-lg mb-2"><i class="fa-solid fa-database text-brand-600"></i> Backup & Restore Database</h3>
@@ -502,10 +542,10 @@
                     <div><label class="block text-xs font-semibold mb-1">Status</label><select id="k-status" class="w-full px-3 py-2 border rounded-xl text-sm"><option value="Baru">Baru</option><option value="Lama">Lama</option></select></div>
                 </div>
                 <div>
-    <label class="block text-xs font-semibold mb-1">Akseptor (Ketik Nama / NIK)</label>
-    <input type="text" id="k-akseptor" list="list-akseptor" required placeholder="Ketik nama atau NIK akseptor..." class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-    <datalist id="list-akseptor"></datalist>
-</div>
+                    <label class="block text-xs font-semibold mb-1">Akseptor (Ketik Nama / NIK)</label>
+                    <input type="text" id="k-akseptor" list="list-akseptor" required placeholder="Ketik nama atau NIK akseptor..." class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                    <datalist id="list-akseptor"></datalist>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="block text-xs font-semibold mb-1">Petugas</label><select id="k-petugas" required class="w-full px-3 py-2 border rounded-xl text-sm"></select></div>
                     <div><label class="block text-xs font-semibold mb-1">Obat KB</label><select id="k-obat" required class="w-full px-3 py-2 border rounded-xl text-sm"></select></div>
@@ -515,6 +555,43 @@
                     <div><label class="block text-xs font-semibold mb-1">Anamnesa</label><input type="text" id="k-anamnesa" required class="w-full px-3 py-2 border rounded-xl text-sm"></div>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2"><button type="button" onclick="closeKunjunganModal()" class="px-4 py-2 bg-slate-100 rounded-xl text-sm">Batal</button><button type="submit" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm">Simpan</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL JADWAL PRAKTIK DOKTER -->
+    <div id="modal-jadwal-praktik" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 id="modal-jadwal-title" class="font-bold text-base">Tambah Jadwal Praktik</h3>
+                <button onclick="closeJadwalPraktikModal()"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="form-jadwal-praktik" onsubmit="saveJadwalPraktik(event)" class="space-y-4">
+                <input type="hidden" id="jadwal-index">
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Tanggal</label>
+                    <input type="date" id="jp-tgl" required class="w-full px-3 py-2 border rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Jam</label>
+                    <input type="text" id="jp-jam" required placeholder="Contoh: 08:00 - 14:00 WIB" class="w-full px-3 py-2 border rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Nama Dokter</label>
+                    <select id="jp-petugas" required class="w-full px-3 py-2 border rounded-xl text-sm bg-white"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Spesialisasi</label>
+                    <input type="text" id="jp-poli" required placeholder="Contoh: dr. Umum " class="w-full px-3 py-2 border rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Keterangan</label>
+                    <input type="text" id="jp-ket" placeholder="Contoh: Hadir Tepat Waktu" class="w-full px-3 py-2 border rounded-xl text-sm">
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeJadwalPraktikModal()" class="px-4 py-2 bg-slate-100 rounded-xl text-sm">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-sm">Simpan</button>
+                </div>
             </form>
         </div>
     </div>
@@ -581,6 +658,9 @@
                 { nama: "Cyclofem Injek 1 Bulan", komposisi: "Injeksi 1 Bulan", harga: 35000 }
             ],
             kunjungan: [],
+            jadwalPraktik: [
+                { tgl: "2026-10-16", jam: "08:00 - 14:00 WIB", petugas: "dr. Anis Prima Dewi", poli: "Poli KIA / KB", ket: "Hadir Tepat Waktu" }
+            ],
             absensi: [],
             farmasi: { konseling: [], pio: [], pto: [], swamedikasi: [], meso: [], cpp: [] }
         };
@@ -588,6 +668,10 @@
         let akseptorSortOrder = 'asc';
         let kbChartInstance = null;
         let activeReportSubTab = 'kunjungan-akseptor';
+
+        // Variabel untuk Navigasi Kalender
+        let currentCalYear = new Date().getFullYear();
+        let currentCalMonth = new Date().getMonth(); // 0 = Jan, 9 = Okt, dst.
 
         async function initApp() {
             await loadFromSupabase();
@@ -603,6 +687,7 @@
                 if (data && data.value) {
                     db = data.value;
                     if(!db.farmasi) db.farmasi = { konseling: [], pio: [], pto: [], swamedikasi: [], meso: [], cpp: [] };
+                    if(!db.jadwalPraktik) db.jadwalPraktik = [];
                 }
             } catch (err) { console.warn("Fallback lokal"); }
         }
@@ -621,6 +706,7 @@
                     if (payload.new && payload.new.key === 'apd_kb_main_db') {
                         db = payload.new.value;
                         if(!db.farmasi) db.farmasi = { konseling: [], pio: [], pto: [], swamedikasi: [], meso: [], cpp: [] };
+                        if(!db.jadwalPraktik) db.jadwalPraktik = [];
                         updateFaskesDisplay();
                         refreshCurrentActiveTab();
                     }
@@ -659,7 +745,7 @@
             if (activeNav) activeNav.classList.add('bg-slate-800', 'text-white', 'shadow');
 
             const titles = {
-                dashboard: ["Dashboard Utama", "Ringkasan operasional pelayanan KB"],
+                dashboard: ["Dashboard Utama", "Ringkasan operasional pelayanan kesehatan"],
                 akseptor: ["Data Akseptor KB", "Kelola data peserta KB aktif"],
                 kunjungan: ["Transaksi Kunjungan", "Catat pelayanan dan obat KB"],
                 'farmasi-konseling': ["Konseling", "Pencatatan sesi konseling obat pasien"],
@@ -668,10 +754,11 @@
                 'farmasi-swamedikasi': ["Swamedikasi", "Pengobatan mandiri pasien"],
                 'farmasi-meso': ["MESO", "Monitoring Efek Samping Obat"],
                 'farmasi-cpp': ["Catatan Pengobatan Pasien", "Profil riwayat obat komprehensif"],
+                'kalender-praktik': ["Kalender Jadwal Dokter", "Jadwal jaga dan layanan tenaga medis"],
                 absensi: ["Laporan Absensi Pegawai", "Presensi harian staf"],
                 obat: ["Daftar Obat KB", "Inventaris obat"],
-                petugas: ["Data Petugas Medis", "Bidan dan dokter"],
-                laporan: ["LAPORAN", "suppord by LATISHA"],
+                petugas: ["Data Petugas", ""],
+                laporan: ["LAPORAN", "Arsip klinis siap cetak"],
                 faskes: ["Data Faskes", "Profil FasKes"],
                 backup: ["Backup & Restore DB", "Cadangkan data JSON"]
             };
@@ -692,6 +779,7 @@
             if(id === 'dashboard') renderDashboard();
             if(id === 'akseptor') renderAkseptorTable();
             if(id === 'kunjungan') renderKunjunganTable();
+            if(id === 'kalender-praktik') renderCalendarView();
             if(id === 'absensi') renderAbsensiTable();
             if(id === 'obat') renderObatTable();
             if(id === 'petugas') renderPetugasTable();
@@ -739,38 +827,28 @@
             renderKbTrendChart();
         }
 
-        /* FUNGSI UTAMA: RENDER NOTIFIKASI JADWAL KONTROL (BESOK S/D 1 MINGGU KE DEPAN) + KIRIM WA */
         function renderNotifJadwalKB() {
             const tbody = document.getElementById('notif-kb-body');
-            const countEl = document.getElementById('notif-kb-count');
-            if(!tbody || !countEl) return;
-
+            if(!tbody) return;
             tbody.innerHTML = '';
 
             const today = new Date();
             today.setHours(0,0,0,0);
 
-            // Mulai besok (+1 hari)
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            
-            // Sampai 1 minggu ke depan (+7 hari dari hari ini)
-            const nextWeek = new Date(today);
-            nextWeek.setDate(today.getDate() + 7);
+            const limitDate = new Date(today);
+            limitDate.setDate(today.getDate() + 3);
 
             let upcoming = db.kunjungan.filter(k => {
                 if(!k.tglKembali) return false;
                 let kbDate = new Date(k.tglKembali);
                 kbDate.setHours(0,0,0,0);
-                return kbDate >= tomorrow && kbDate <= nextWeek;
+                return kbDate >= today && kbDate <= limitDate;
             });
 
             upcoming.sort((a,b) => new Date(a.tglKembali) - new Date(b.tglKembali));
 
-            countEl.innerText = upcoming.length;
-
             if (upcoming.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada jadwal kontrol/suntik KB untuk rentang besok s/d 1 minggu ke depan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada jadwal kontrol/suntik KB untuk rentang hari ini s/d 3 hari ke depan.</td></tr>`;
                 return;
             }
 
@@ -779,12 +857,10 @@
                 const nameDisplay = ak.nama ? `${ak.nama}` : (k.akseptorNik || '-');
                 const phone = ak.telp || '';
 
-                // Format pesan WhatsApp
                 let faskesName = db.faskes ? db.faskes.nama : 'Faskes';
-                let msg = `Halo Bu ${ak.nama || 'Pelanggan'}, ini adalah pengingat dari ${faskesName}. Jadwal suntik KB Anda * jatuh pada tanggal *${k.tglKembali}*. Ibu bisa datang langsung ke Apotek Latisha Farma sesuai tanggal tersebut. Terima kasih & sehat selalu.`;
+                let msg = `Halo ${ak.nama || 'Pelanggan'}, ini adalah pengingat dari ${faskesName}. Jadwal kontrol / suntik KB Anda untuk obat *${k.obatNama}* jatuh pada tanggal *${k.tglKembali}*. Mohon hadir tepat waktu. Terima kasih.`;
                 let encodedMsg = encodeURIComponent(msg);
                 
-                // Format nomor telepon (ubah 08... menjadi 628...)
                 let formattedPhone = phone.replace(/[^0-9]/g, '');
                 if(formattedPhone.startsWith('0')) {
                     formattedPhone = '62' + formattedPhone.slice(1);
@@ -899,14 +975,14 @@
                 if(fEnd && k.tanggal > fEnd) return false;
                 let ak = db.akseptor.find(a => a.nik === k.akseptorNik) || {};
                 let name = (ak.nama || '').toLowerCase();
-                return name.includes(q) || k.obatNama.toLowerCase().includes(q) || k.petugasNama.toLowerCase().includes(q);
+                return name.includes(q) || k.obatNama.toLowerCase().includes(q) || k.petugasNama.toLowerCase().includes(q) || k.akseptorNik.includes(q);
             });
 
             if(filtered.length === 0) { tb.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400">Tidak ada kunjungan ditemukan.</td></tr>`; return; }
             filtered.forEach(k => {
                 let idx = db.kunjungan.indexOf(k);
                 let ak = db.akseptor.find(a => a.nik === k.akseptorNik) || {};
-                tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-3 px-4">${k.tanggal}</td><td class="py-3 px-4 font-semibold">${ak.nama || '-'}</td><td class="py-3 px-4">${k.petugasNama}</td><td class="py-3 px-4">${k.obatNama}</td><td class="py-3 px-4">${k.anamnesa}</td><td class="py-3 px-4">${k.tglKembali}</td><td class="py-3 px-4">${k.status}</td><td class="py-3 px-4 text-center space-x-1"><button onclick="editKunjungan(${idx})" class="text-blue-600 p-1.5"><i class="fa-solid fa-pen"></i></button><button onclick="deleteKunjungan(${idx})" class="text-red-600 p-1.5"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-3 px-4">${k.tanggal}</td><td class="py-3 px-4 font-semibold">${ak.nama || k.akseptorNik}</td><td class="py-3 px-4">${k.petugasNama}</td><td class="py-3 px-4">${k.obatNama}</td><td class="py-3 px-4">${k.anamnesa}</td><td class="py-3 px-4">${k.tglKembali}</td><td class="py-3 px-4">${k.status}</td><td class="py-3 px-4 text-center space-x-1"><button onclick="editKunjungan(${idx})" class="text-blue-600 p-1.5"><i class="fa-solid fa-pen"></i></button><button onclick="deleteKunjungan(${idx})" class="text-red-600 p-1.5"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
         function resetKunjunganDateFilter() {
@@ -916,10 +992,12 @@
         }
         function openKunjunganModal(idx = null) {
             document.getElementById('modal-kunjungan').classList.remove('hidden');
+            
             let datalistA = document.getElementById('list-akseptor'); datalistA.innerHTML = '';
-db.akseptor.forEach(a => {
-    datalistA.innerHTML += `<option value="${a.nik}">${a.nama} - NIK: ${a.nik}</option>`;
-});
+            db.akseptor.forEach(a => {
+                datalistA.innerHTML += `<option value="${a.nik}">${a.nama} - NIK: ${a.nik}</option>`;
+            });
+
             let selP = document.getElementById('k-petugas'); selP.innerHTML = '';
             db.petugas.forEach(p => selP.innerHTML += `<option value="${p.nama}">${p.nama}</option>`);
             let selO = document.getElementById('k-obat'); selO.innerHTML = '';
@@ -983,6 +1061,139 @@ db.akseptor.forEach(a => {
                 });
                 saveDB(); alert("Impor data kunjungan berhasil!");
             }; r.readAsArrayBuffer(e.target.files[0]);
+        }
+
+        /* LOGIKA PEMBUATAN KALENDER VISUAL (MONTHLY GRID) */
+        function changeCalendarMonth(offset) {
+            currentCalMonth += offset;
+            if (currentCalMonth > 11) {
+                currentCalMonth = 0;
+                currentCalYear++;
+            } else if (currentCalMonth < 0) {
+                currentCalMonth = 11;
+                currentCalYear--;
+            }
+            renderCalendarView();
+        }
+
+        function resetCalendarToCurrentMonth() {
+            currentCalYear = new Date().getFullYear();
+            currentCalMonth = new Date().getMonth();
+            renderCalendarView();
+        }
+
+        function renderCalendarView() {
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const titleEl = document.getElementById('calendar-month-year-title');
+            if (titleEl) titleEl.innerText = `${monthNames[currentCalMonth]} ${currentCalYear}`;
+
+            const grid = document.getElementById('calendar-days-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const firstDayIndex = new Date(currentCalYear, currentCalMonth, 1).getDay(); // 0 = Minggu
+            const totalDaysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+
+            // Tanggal Hari Ini
+            const todayObj = new Date();
+            const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
+
+            // 1. Kotak Kosong untuk Hari Sebelum Tanggal 1 Bulan Ini
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="bg-slate-50/50 rounded-xl border border-slate-100 min-h-[100px] opacity-40"></div>`;
+            }
+
+            // 2. Rendering Kotak Tanggal Bulan Ini (1 s/d Total Hari)
+            for (let day = 1; day <= totalDaysInMonth; day++) {
+                const dateStr = `${currentCalYear}-${String(currentCalMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = dateStr === todayStr;
+
+                // Cari Jadwal Dokter pada Tanggal Ini
+                const daySchedules = (db.jadwalPraktik || []).filter(jp => jp.tgl === dateStr);
+
+                let scheduleBadgesHTML = '';
+                daySchedules.forEach(jp => {
+                    let realIdx = db.jadwalPraktik.indexOf(jp);
+                    scheduleBadgesHTML += `
+                        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg p-1.5 text-xs shadow-sm flex flex-col justify-between group relative hover:shadow-md transition mb-1">
+                            <div>
+                                <p class="font-bold text-[11px] truncate">${jp.petugas}</p>
+                                <p class="text-[10px] text-emerald-600 font-mono">${jp.jam}</p>
+                                <span class="inline-block bg-emerald-200 text-emerald-900 text-[9px] px-1.5 py-0.5 rounded font-semibold mt-0.5">${jp.poli}</span>
+                            </div>
+                            <div class="flex justify-end space-x-1 mt-1 opacity-80 group-hover:opacity-100">
+                                <button onclick="event.stopPropagation(); editJadwalPraktik(${realIdx})" class="text-blue-600 hover:text-blue-800 p-0.5"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                <button onclick="event.stopPropagation(); deleteJadwalPraktik(${realIdx})" class="text-rose-600 hover:text-rose-800 p-0.5"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML += `
+                    <div onclick="openJadwalPraktikModal(null, '${dateStr}')" class="bg-white rounded-xl border ${isToday ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-slate-200'} p-2 min-h-[110px] flex flex-col justify-between hover:border-emerald-400 transition cursor-pointer group">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-xs ${isToday ? 'bg-emerald-600 text-white w-6 h-6 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>
+                            <i class="fa-solid fa-plus text-[10px] text-slate-300 group-hover:text-emerald-600 transition"></i>
+                        </div>
+                        <div class="flex-1 overflow-y-auto space-y-1 max-h-[80px]">
+                            ${scheduleBadgesHTML}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function openJadwalPraktikModal(idx = null, defaultDate = null) {
+            document.getElementById('modal-jadwal-praktik').classList.remove('hidden');
+            let selP = document.getElementById('jp-petugas'); selP.innerHTML = '';
+            db.petugas.forEach(p => selP.innerHTML += `<option value="${p.nama}">${p.nama}</option>`);
+
+            if(idx !== null) {
+                document.getElementById('modal-jadwal-title').innerText = "Edit Jadwal Dokter";
+                document.getElementById('jadwal-index').value = idx;
+                let jp = db.jadwalPraktik[idx];
+                document.getElementById('jp-tgl').value = jp.tgl;
+                document.getElementById('jp-jam').value = jp.jam;
+                document.getElementById('jp-petugas').value = jp.petugas;
+                document.getElementById('jp-poli').value = jp.poli;
+                document.getElementById('jp-ket').value = jp.ket || '';
+            } else {
+                document.getElementById('modal-jadwal-title').innerText = "Tambah Jadwal";
+                document.getElementById('form-jadwal-praktik').reset();
+                document.getElementById('jadwal-index').value = '';
+                document.getElementById('jp-tgl').value = defaultDate || new Date().toISOString().split('T')[0];
+                document.getElementById('jp-jam').value = '07:00 - 14:00 WIB';
+                document.getElementById('jp-poli').value = '';
+            }
+        }
+
+        function closeJadwalPraktikModal() {
+            document.getElementById('modal-jadwal-praktik').classList.add('hidden');
+        }
+
+        function saveJadwalPraktik(e) {
+            e.preventDefault();
+            let idx = document.getElementById('jadwal-index').value;
+            let data = {
+                tgl: document.getElementById('jp-tgl').value,
+                jam: document.getElementById('jp-jam').value,
+                petugas: document.getElementById('jp-petugas').value,
+                poli: document.getElementById('jp-poli').value,
+                ket: document.getElementById('jp-ket').value
+            };
+            if(!db.jadwalPraktik) db.jadwalPraktik = [];
+            if(idx === "") db.jadwalPraktik.push(data);
+            else db.jadwalPraktik[idx] = data;
+            saveDB();
+            closeJadwalPraktikModal();
+        }
+
+        function editJadwalPraktik(idx) { openJadwalPraktikModal(idx); }
+        function deleteJadwalPraktik(idx) {
+            if(confirm("Hapus jadwal dokter ini?")) {
+                db.jadwalPraktik.splice(idx, 1);
+                saveDB();
+            }
         }
 
         let currentFarmasiType = '';
@@ -1138,43 +1349,56 @@ db.akseptor.forEach(a => {
         }
 
         function toggleReportPeriodOptions() {
-            const pType = document.getElementById('report-period-type').value;
-            const selMonth = document.getElementById('report-select-month');
-            const selYear = document.getElementById('report-select-year');
-            
-            if (pType === 'month') {
-                selMonth.classList.remove('hidden');
-                selYear.classList.remove('hidden');
-            } else if (pType === 'year') {
-                selMonth.classList.add('hidden');
-                selYear.classList.remove('hidden');
-            } else {
-                selMonth.classList.add('hidden');
-                selYear.classList.add('hidden');
-            }
-            renderCurrentReportView();
-        }
+    const pType = document.getElementById('report-period-type').value;
+    const customDateContainer = document.getElementById('report-custom-date-container');
+    const selMonth = document.getElementById('report-select-month');
+    const selYear = document.getElementById('report-select-year');
+    
+    if (pType === 'custom') {
+        customDateContainer.classList.remove('hidden');
+        selMonth.classList.add('hidden');
+        selYear.classList.add('hidden');
+    } else if (pType === 'month') {
+        customDateContainer.classList.add('hidden');
+        selMonth.classList.remove('hidden');
+        selYear.classList.remove('hidden');
+    } else if (pType === 'year') {
+        customDateContainer.classList.add('hidden');
+        selMonth.classList.add('hidden');
+        selYear.classList.remove('hidden');
+    } else {
+        customDateContainer.classList.add('hidden');
+        selMonth.classList.add('hidden');
+        selYear.classList.add('hidden');
+    }
+    renderCurrentReportView();
+}
 
         function renderCurrentReportView() {
-            const q = (document.getElementById('report-search-input').value || '').toLowerCase();
-            const pType = document.getElementById('report-period-type').value;
-            const selMonth = document.getElementById('report-select-month').value;
-            const selYear = document.getElementById('report-select-year').value;
-            const container = document.getElementById('report-document-container');
-            if(!container) return;
+    const q = (document.getElementById('report-search-input').value || "").toLowerCase();
+    const pType = document.getElementById('report-period-type').value;
+    const selMonth = document.getElementById('report-select-month').value;
+    const selYear = document.getElementById('report-select-year').value;
+    const startDate = document.getElementById('report-start-date')?.value;
+    const endDate = document.getElementById('report-end-date')?.value;
+    const container = document.getElementById('report-document-container');
+    if(!container) return;
 
-            const currentDateFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const currentDateFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-            if (activeReportSubTab === 'kunjungan-akseptor') {
-                let rows = db.kunjungan.filter(k => {
-                    if (pType === 'month') {
-                        if (!k.tanggal.startsWith(`${selYear}-${selMonth}`)) return false;
-                    } else if (pType === 'year') {
-                        if (!k.tanggal.startsWith(selYear)) return false;
-                    }
-                    let ak = db.akseptor.find(a => a.nik === k.akseptorNik) || {};
-                    return (ak.nama || '').toLowerCase().includes(q) || (k.akseptorNik || '').includes(q) || k.petugasNama.toLowerCase().includes(q);
-                });
+    if (activeReportSubTab === 'kunjungan-akseptor') {
+        let rows = db.kunjungan.filter(k => {
+            if (pType === 'custom') {
+                if (startDate && k.tanggal < startDate) return false;
+                if (endDate && k.tanggal > endDate) return false;
+            } else if (pType === 'month') {
+                if (!k.tanggal.startsWith(`${selYear}-${selMonth}`)) return false;
+            } else if (pType === 'year') {
+                if (!k.tanggal.startsWith(selYear)) return false;
+            }
+            let ak = db.akseptor.find(a => a.nik === k.akseptorNik) || {};
+            return (ak.nama || "").toLowerCase().includes(q) || (k.akseptorNik || "").includes(q) || k.petugasNama.toLowerCase().includes(q);
+        });
 
                 let rowsHTML = rows.map(k => {
                     let ak = db.akseptor.find(a => a.nik === k.akseptorNik) || {};
