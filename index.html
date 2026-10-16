@@ -319,10 +319,13 @@
                                 <input type="text" id="search-absensi" oninput="renderAbsensiTable()" placeholder="Cari pegawai..." class="w-full pl-10 pr-4 py-2 border rounded-xl text-sm">
                             </div>
                             <div class="flex items-center space-x-2">
-                                <input type="date" id="absensi-filter-start" onchange="renderAbsensiTable()" class="px-3 py-2 border rounded-xl text-sm">
-                                <span class="text-xs">s/d</span>
-                                <input type="date" id="absensi-filter-end" onchange="renderAbsensiTable()" class="px-3 py-2 border rounded-xl text-sm">
-                            </div>
+    <input type="date" id="absensi-filter-start" onchange="renderAbsensiTable()" class="px-3 py-2 border rounded-xl text-sm">
+    <span class="text-xs text-slate-500">s/d</span>
+    <input type="date" id="absensi-filter-end" onchange="renderAbsensiTable()" class="px-3 py-2 border rounded-xl text-sm">
+    <button onclick="resetAbsensiDateFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-semibold transition" title="Reset Filter Tanggal">
+        <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+    </button>
+</div>
                         </div>
                         <button onclick="fetchAbsensiFromCloud()" class="bg-emerald-600 text-white text-sm px-4 py-2 rounded-xl shadow transition"><i class="fa-solid fa-rotate mr-1"></i> Sinkronkan Data</button>
                     </div>
@@ -1229,22 +1232,61 @@
             saveDB();
         }
 
-        function renderAbsensiTable() {
-            const q = (document.getElementById('search-absensi').value || '').toLowerCase();
-            const fStart = document.getElementById('absensi-filter-start').value;
-            const fEnd = document.getElementById('absensi-filter-end').value;
-            let tb = document.getElementById('table-absensi-body'); tb.innerHTML = '';
-            let list = db.absensi || [];
-            let filtered = list.filter(ab => {
-                if(fStart && ab.tanggal < fStart) return false;
-                if(fEnd && ab.tanggal > fEnd) return false;
-                return ab.pegawai.toLowerCase().includes(q) || ab.pekerjaan.toLowerCase().includes(q);
-            });
-            if(filtered.length === 0) { tb.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada absensi.</td></tr>`; return; }
-            filtered.forEach(ab => {
-                tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-3 px-4">${ab.tanggal}</td><td class="py-3 px-4 font-mono">${ab.jam}</td><td class="py-3 px-4 font-semibold">${ab.pegawai}</td><td class="py-3 px-4">${ab.pekerjaan}</td><td class="py-3 px-4">${ab.status}</td></tr>`;
-            });
-        }
+        // Fungsi untuk mereset filter tanggal absensi
+function resetAbsensiDateFilter() {
+    document.getElementById('absensi-filter-start').value = '';
+    document.getElementById('absensi-filter-end').value = '';
+    renderAbsensiTable();
+}
+
+// Fungsi render tabel absensi dengan pencarian fleksibel & pewarnaan status
+function renderAbsensiTable() {
+    const q = (document.getElementById('search-absensi').value || '').toLowerCase().trim();
+    const fStart = document.getElementById('absensi-filter-start').value;
+    const fEnd = document.getElementById('absensi-filter-end').value;
+    let tb = document.getElementById('table-absensi-body'); 
+    if (!tb) return;
+    tb.innerHTML = '';
+
+    let list = db.absensi || [];
+    let filtered = list.filter(ab => {
+        // Filter Rentang Tanggal
+        if (fStart && ab.tanggal < fStart) return false;
+        if (fEnd && ab.tanggal > fEnd) return false;
+
+        // Pencarian Fleksibel (Nama Pegawai, Pekerjaan, atau Status)
+        const peg = (ab.pegawai || '').toLowerCase();
+        const pek = (ab.pekerjaan || '').toLowerCase();
+        const st = (ab.status || '').toLowerCase();
+
+        return peg.includes(q) || pek.includes(q) || st.includes(q);
+    });
+
+    if (filtered.length === 0) { 
+        tb.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada data absensi ditemukan.</td></tr>`; 
+        return; 
+    }
+
+    filtered.forEach(ab => {
+        const statusText = (ab.status || '-').trim();
+        const isLembur = statusText.toLowerCase().includes('lembur');
+
+        // Pewarnaan teks status (Lembur pakai warna biru)
+        let statusBadgeClass = isLembur 
+            ? 'text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200' 
+            : 'text-slate-700 font-semibold';
+
+        tb.innerHTML += `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                <td class="py-3 px-4 font-medium text-slate-700">${ab.tanggal}</td>
+                <td class="py-3 px-4 font-mono text-slate-600">${ab.jam}</td>
+                <td class="py-3 px-4 font-semibold text-slate-800">${ab.pegawai}</td>
+                <td class="py-3 px-4 text-slate-600">${ab.pekerjaan}</td>
+                <td class="py-3 px-4"><span class="${statusBadgeClass}">${statusText}</span></td>
+            </tr>
+        `;
+    });
+}
 
         function renderObatTable() {
             const q = (document.getElementById('search-obat').value || '').toLowerCase();
