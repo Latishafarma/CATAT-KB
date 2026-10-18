@@ -2,6 +2,8 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
+<!-- Library untuk Ekspor/Impor Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi LATISHA - Pelayanan Kesehatan & KB</title>
     <!-- Tailwind CSS CDN -->
@@ -117,7 +119,22 @@
         <a href="#" onclick="switchTab('backup')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="backup"><i class="fa-solid fa-database w-5 mr-1"></i> Backup & Restore DB</a>
     </div>
 </div>
-            </nav>
+ <!-- MENU SKINCARE (DROPDOWN) -->
+<div class="pt-2 pb-1">
+    <button type="button" onclick="toggleSubmenu('submenu-skincare', 'icon-skincare')" class="w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white transition rounded-xl hover:bg-slate-800/50">
+        <span class="flex items-center"><i class="fa-solid fa-sparkles mr-2 text-pink-400"></i> Skincare</span>
+        <i id="icon-skincare" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+    </button>
+    <div id="submenu-skincare" class="hidden space-y-1 mt-1 pl-3 border-l-2 border-slate-700 ml-4">
+        <a href="#" onclick="switchTab('skincare-produk')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="skincare-produk">
+            <i class="fa-solid fa-pump-soap w-5 mr-1 text-pink-400"></i> Daftar Produk
+        </a>
+        <a href="#" onclick="switchTab('skincare-berita')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="skincare-berita">
+            <i class="fa-solid fa-newspaper w-5 mr-1 text-sky-400"></i> Berita & Edukasi
+        </a>
+    </div>
+</div>
+           </nav>
             <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center"><span id="sidebar-faskes-name">LATISHA</span> v3.0</div>
         </aside>
 
@@ -452,7 +469,65 @@
                         </div>
                     </div>
                 </div>
+<!-- TAB 1: DAFTAR PRODUK SKINCARE -->
+<div id="tab-skincare-produk" class="tab-content hidden space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-sparkles text-pink-500 mr-2"></i> Katalog Produk Skincare</h3>
+            <p class="text-xs text-slate-500">Kelola daftar produk, komposisi, dan kegunaan skincare</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="exportSkincareData()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center">
+                <i class="fa-solid fa-file-export mr-1.5 text-slate-500"></i> Export
+            </button>
+            <label class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center cursor-pointer">
+                <i class="fa-solid fa-file-import mr-1.5 text-slate-500"></i> Import
+                <input type="file" id="import-skincare-file" accept=".xlsx, .xls" onchange="importSkincareData(event)" class="hidden">
+            </label>
+            <button onclick="openModalSkincareProduk()" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center">
+                <i class="fa-solid fa-plus mr-1.5"></i> Tambah Produk
+            </button>
+        </div>
+    </div>
 
+    <!-- TABEL PRODUK -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold">
+                    <tr>
+                        <th class="py-3 px-4 w-12 text-center">No</th>
+                        <th class="py-3 px-4">Nama Produk</th>
+                        <th class="py-3 px-4">Komposisi</th>
+                        <th class="py-3 px-4">Kegunaan</th>
+                        <th class="py-3 px-4 text-center w-28">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-skincare-produk" class="divide-y divide-slate-100">
+                    <!-- Data di-render lewat JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 2: BERITA & EDUKASI SKINCARE -->
+<div id="tab-skincare-berita" class="tab-content hidden space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-newspaper text-sky-500 mr-2"></i> Berita & Informasi Skincare</h3>
+            <p class="text-xs text-slate-500">Bahan bacaan dan edukasi perawatan kulit untuk pengguna</p>
+        </div>
+        <button onclick="openModalSkincareBerita()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center">
+            <i class="fa-solid fa-plus mr-1.5"></i> Tambah Berita / Informasi
+        </button>
+    </div>
+
+    <!-- LIST KARTU BERITA -->
+    <div id="container-skincare-berita" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Card Berita di-render lewat JS -->
+    </div>
+</div>
                 <!-- 5. Kalender Jadwal Dokter -->
                 <div id="tab-kalender-praktik" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -646,7 +721,64 @@
             </div>
         </main>
     </div>
+<!-- MODAL TAMBAH/EDIT PRODUK SKINCARE -->
+<div id="modal-skincare-produk" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h4 id="modal-skincare-title" class="font-bold text-slate-800">Tambah Produk Skincare</h4>
+            <button onclick="closeModalSkincareProduk()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
 
+        <!-- 🟢 TAMBAHKAN id="form-skincare-produk" DI BARIS SEPERTI DI BAWAH INI: -->
+        <form id="form-skincare-produk" onsubmit="saveSkincareProduk(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="skincare-id">
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Nama Produk</label>
+                <input type="text" id="skincare-nama" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none">
+            </div>
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Komposisi</label>
+                <textarea id="skincare-komposisi" rows="2" placeholder="Contoh: Niacinamide 5%, Hyaluronic Acid" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none"></textarea>
+            </div>
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Kegunaan / Manfaat</label>
+                <textarea id="skincare-kegunaan" rows="2" placeholder="Contoh: Mencerahkan kulit dan melembabkan" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2 pt-3 border-t">
+                <button type="button" onclick="closeModalSkincareProduk()" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- MODAL TAMBAH BERITA / EDUKASI -->
+<div id="modal-skincare-berita" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h4 class="font-bold text-slate-800">Tambah Berita / Edukasi Skincare</h4>
+            <button onclick="closeModalSkincareBerita()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <form id="form-skincare-berita" onsubmit="saveSkincareBerita(event)" class="space-y-3 text-xs">
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Judul Berita / Informasi</label>
+                <input type="text" id="berita-judul" required class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none">
+            </div>
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Isi Berita / Catatan</label>
+                <textarea id="berita-isi" rows="4" placeholder="Tulis ringkasan atau teks berita di sini..." class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-sky-500 outline-none"></textarea>
+            </div>
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Upload File (Lampiran PDF / Word / Gambar)</label>
+                <input type="file" id="berita-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+            </div>
+            <div class="flex justify-end space-x-2 pt-3 border-t">
+                <button type="button" onclick="closeModalSkincareBerita()" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl">Simpan Berita</button>
+            </div>
+        </form>
+    </div>
+</div>
+   
     <!-- MODAL PRATINJAU CETAK DOKUMEN -->
     <div id="modal-print-preview" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-2 md:p-6 overflow-y-auto">
         <div class="bg-white max-w-4xl w-full p-6 space-y-4 print-container border border-slate-200 rounded-2xl shadow-2xl">
@@ -3025,7 +3157,236 @@ function togglePasienSort() {
                 try { db = JSON.parse(evt.target.result); saveDB(); initApp(); alert("Restore Database Berhasil!"); } catch(err) { alert("Format File JSON Tidak Sesuai."); }
             }; fr.readAsText(e.target.files[0]);
         }
+// ==========================================
+    // KODE 4: LOGIKA JAVASCRIPT SKINCARE
+    // ==========================================
 
+    let skincareProdukList = JSON.parse(localStorage.getItem('skincare_produk_db')) || [
+        { id: '1', nama: 'Sunscreen Gel SPF 50', komposisi: 'Aqua, Ethylhexyl Methoxycinnamate, Niacinamide', kegunaan: 'Melindungi kulit dari paparan UV-A & UV-B' }
+    ];
+
+    let skincareBeritaList = JSON.parse(localStorage.getItem('skincare_berita_db')) || [
+        { id: '1', tgl: '2026-10-18', judul: 'Edukasi Penggunaan Sunscreen yang Benar', isi: 'Gunakan sunscreen sebanyak 2 ruas jari setiap 2 jam sekali saat berada di luar ruangan.', fileName: '' }
+    ];
+
+    // --- RENDER & CRUD PRODUK SKINCARE ---
+    function renderSkincareProduk() {
+        const tbody = document.getElementById('tbody-skincare-produk');
+        if (!tbody) return;
+        
+        if (skincareProdukList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 text-xs">Belum ada data produk.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = skincareProdukList.map((p, index) => `
+            <tr class="hover:bg-slate-50 text-xs">
+                <td class="py-3 px-4 text-center font-medium">${index + 1}</td>
+                <td class="py-3 px-4 font-bold text-slate-800">${p.nama}</td>
+                <td class="py-3 px-4 text-slate-600">${p.komposisi || '-'}</td>
+                <td class="py-3 px-4 text-slate-600">${p.kegunaan || '-'}</td>
+                <td class="py-3 px-4 text-center space-x-2">
+                    <button onclick="detailSkincareProduk('${p.id}')" title="Detail" class="text-sky-600 hover:text-sky-800"><i class="fa-solid fa-circle-info text-sm"></i></button>
+                    <button onclick="editSkincareProduk('${p.id}')" title="Edit" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-pen-to-square text-sm"></i></button>
+                    <button onclick="deleteSkincareProduk('${p.id}')" title="Hapus" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash text-sm"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openModalSkincareProduk() {
+        document.getElementById('form-skincare-produk').reset();
+        document.getElementById('skincare-id').value = '';
+        document.getElementById('modal-skincare-title').innerText = 'Tambah Produk Skincare';
+        document.getElementById('modal-skincare-produk').classList.remove('hidden');
+        document.getElementById('modal-skincare-produk').classList.add('flex');
+    }
+
+    function closeModalSkincareProduk() {
+        document.getElementById('modal-skincare-produk').classList.add('hidden');
+        document.getElementById('modal-skincare-produk').classList.remove('flex');
+    }
+
+    function saveSkincareProduk(e) {
+        e.preventDefault();
+        const id = document.getElementById('skincare-id').value;
+        const nama = document.getElementById('skincare-nama').value;
+        const komposisi = document.getElementById('skincare-komposisi').value;
+        const kegunaan = document.getElementById('skincare-kegunaan').value;
+
+        if (id) {
+            const index = skincareProdukList.findIndex(p => p.id === id);
+            if (index !== -1) skincareProdukList[index] = { id, nama, komposisi, kegunaan };
+        } else {
+            skincareProdukList.push({ id: Date.now().toString(), nama, komposisi, kegunaan });
+        }
+
+        localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
+        renderSkincareProduk();
+        closeModalSkincareProduk();
+    }
+
+    function detailSkincareProduk(id) {
+        const item = skincareProdukList.find(p => p.id === id);
+        if (item) alert(`[DETAIL PRODUK]\nNama: ${item.nama}\nKomposisi: ${item.komposisi}\nKegunaan: ${item.kegunaan}`);
+    }
+
+    function editSkincareProduk(id) {
+        const item = skincareProdukList.find(p => p.id === id);
+        if (!item) return;
+        document.getElementById('skincare-id').value = item.id;
+        document.getElementById('skincare-nama').value = item.nama;
+        document.getElementById('skincare-komposisi').value = item.komposisi || '';
+        document.getElementById('skincare-kegunaan').value = item.kegunaan || '';
+        document.getElementById('modal-skincare-title').innerText = 'Edit Produk Skincare';
+        document.getElementById('modal-skincare-produk').classList.remove('hidden');
+        document.getElementById('modal-skincare-produk').classList.add('flex');
+    }
+
+    function deleteSkincareProduk(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+            skincareProdukList = skincareProdukList.filter(p => p.id !== id);
+            localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
+            renderSkincareProduk();
+        }
+    }
+
+    // --- EXPORT DATA KE EXCEL (.xlsx) ---
+    function exportSkincareData() {
+        if (skincareProdukList.length === 0) {
+            alert('Belum ada data produk untuk diekspor!');
+            return;
+        }
+
+        // Format data agar header Excel rapi
+        const dataExcel = skincareProdukList.map((item, index) => ({
+            'No': index + 1,
+            'ID Produk': item.id,
+            'Nama Produk': item.nama,
+            'Komposisi': item.komposisi || '',
+            'Kegunaan / Manfaat': item.kegunaan || ''
+        }));
+
+        // Buat worksheet dan workbook
+        const worksheet = XLSX.utils.json_to_sheet(dataExcel);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Produk Skincare");
+
+        // Unduh file Excel
+        const tgl = new Date().toISOString().slice(0, 10);
+        XLSX.writeFile(workbook, `Data_Produk_Skincare_${tgl}.xlsx`);
+    }
+
+    // --- IMPORT DATA DARI EXCEL (.xlsx) ---
+    function importSkincareData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Ambil sheet pertama
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                if (jsonData.length === 0) {
+                    alert('File Excel kosong atau format tidak sesuai!');
+                    return;
+                }
+
+                // Map data Excel ke struktur aplikasi
+                const importedList = jsonData.map(row => ({
+                    id: row['ID Produk'] ? String(row['ID Produk']) : Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                    nama: row['Nama Produk'] || row['Nama'] || 'Tanpa Nama',
+                    komposisi: row['Komposisi'] || '',
+                    kegunaan: row['Kegunaan / Manfaat'] || row['Kegunaan'] || ''
+                }));
+
+                // Gabungkan atau timpa data
+                if (confirm(`Ditemukan ${importedList.length} data produk dari Excel. Apakah Anda ingin memperbarui/menimpa data saat ini?`)) {
+                    skincareProdukList = importedList;
+                    localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
+                    renderSkincareProduk();
+                    alert('Berhasil mengimpor data produk dari file Excel!');
+                }
+            } catch (err) {
+                alert('Gagal membaca file Excel. Pastikan file berformat .xlsx atau .xls!');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // --- RENDER & CRUD BERITA SKINCARE ---
+    function renderSkincareBerita() {
+        const container = document.getElementById('container-skincare-berita');
+        if (!container) return;
+        if (skincareBeritaList.length === 0) {
+            container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-xs">Belum ada berita atau informasi.</p>`;
+            return;
+        }
+        container.innerHTML = skincareBeritaList.map(b => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3 hover:shadow-md transition">
+                <div>
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 mb-2">
+                        <span><i class="fa-regular fa-calendar mr-1"></i> ${b.tgl}</span>
+                        <button onclick="deleteSkincareBerita('${b.id}')" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <h4 class="font-bold text-slate-800 text-sm mb-2 line-clamp-2">${b.judul}</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line">${b.isi}</p>
+                </div>
+                ${b.fileName ? `<div class="pt-3 border-t border-slate-100 flex items-center text-xs text-sky-600 font-medium"><i class="fa-solid fa-paperclip mr-1.5"></i> Lampiran: ${b.fileName}</div>` : ''}
+            </div>
+        `).join('');
+    }
+
+    function openModalSkincareBerita() {
+        document.getElementById('form-skincare-berita').reset();
+        document.getElementById('modal-skincare-berita').classList.remove('hidden');
+        document.getElementById('modal-skincare-berita').classList.add('flex');
+    }
+
+    function closeModalSkincareBerita() {
+        document.getElementById('modal-skincare-berita').classList.add('hidden');
+        document.getElementById('modal-skincare-berita').classList.remove('flex');
+    }
+
+    function saveSkincareBerita(e) {
+        e.preventDefault();
+        const judul = document.getElementById('berita-judul').value;
+        const isi = document.getElementById('berita-isi').value;
+        const fileInput = document.getElementById('berita-file');
+        const fileName = fileInput.files[0] ? fileInput.files[0].name : '';
+
+    skincareBeritaList.unshift({
+            id: Date.now().toString(),
+            tgl: new Date().toISOString().slice(0, 10),
+            judul,
+            isi,
+            fileName
+        });
+
+        localStorage.setItem('skincare_berita_db', JSON.stringify(skincareBeritaList));
+        renderSkincareBerita();
+        closeModalSkincareBerita();
+    }
+
+    function deleteSkincareBerita(id) {
+        if (confirm('Hapus berita/informasi ini?')) {
+            skincareBeritaList = skincareBeritaList.filter(b => b.id !== id);
+            localStorage.setItem('skincare_berita_db', JSON.stringify(skincareBeritaList));
+            renderSkincareBerita();
+        }
+    }
+
+    // Jalankan render saat halaman siap
+    document.addEventListener('DOMContentLoaded', () => {
+        renderSkincareProduk();
+        renderSkincareBerita();
+    });
         window.onload = initApp;
     </script>
 </body>
