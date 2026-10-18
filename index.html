@@ -65,7 +65,7 @@
                     </div>
                     <div>
                         <h1 class="font-bold text-white text-lg tracking-wide">LATISHA</h1>
-                        <p class="text-xs text-slate-400">Apotek & Pelayanan KB</p>
+                        <p class="text-xs text-slate-400">Pencatatan Pelayanan Farmasi dan KB</p>
                     </div>
                 </div>
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -85,43 +85,67 @@
                     <i class="fa-solid fa-calendar-check w-6 text-base mr-2"></i> Transaksi Kunjungan
                 </a>
 
-                <!-- MENU LAYANAN FARMASI -->
-                <div class="pt-2 pb-1"><div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-500">Layanan Farmasi Klinis</div></div>
-                <a href="#" onclick="switchTab('farmasi-konseling')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-konseling"><i class="fa-solid fa-comments w-5 text-sm mr-2 text-emerald-400"></i> Konseling (Form 7)</a>
-                <a href="#" onclick="switchTab('farmasi-pio')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-pio"><i class="fa-solid fa-circle-info w-5 text-sm mr-2 text-blue-400"></i> PIO (Form 8)</a>
-                <a href="#" onclick="switchTab('farmasi-pto')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-pto"><i class="fa-solid fa-file-waveform w-5 text-sm mr-2 text-amber-400"></i> PTO (Form 9)</a>
-                <a href="#" onclick="switchTab('farmasi-swamedikasi')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-swamedikasi"><i class="fa-solid fa-basket-shopping w-5 text-sm mr-2 text-purple-400"></i> Swamedikasi</a>
-                <a href="#" onclick="switchTab('farmasi-meso')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-meso"><i class="fa-solid fa-triangle-exclamation w-5 text-sm mr-2 text-rose-400"></i> MESO (Form 10)</a>
-                <a href="#" onclick="switchTab('farmasi-cpp')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white pl-8" data-target="farmasi-cpp"><i class="fa-solid fa-book-medical w-5 text-sm mr-2 text-teal-400"></i> CPP (Form 5)</a>
+                <!-- MENU LAYANAN FARMASI KLINIS (DROPDOWN) -->
+<div class="pt-2 pb-1">
+    <button type="button" onclick="toggleSubmenu('submenu-farmasi', 'icon-farmasi')" class="w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white transition rounded-xl hover:bg-slate-800/50">
+        <span class="flex items-center"><i class="fa-solid fa-notes-medical mr-2 text-emerald-400"></i> Layanan Farmasi Klinis</span>
+        <i id="icon-farmasi" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+    </button>
+    <div id="submenu-farmasi" class="hidden space-y-1 mt-1 pl-3 border-l-2 border-slate-700 ml-4">
+        <a href="#" onclick="switchTab('farmasi-konseling')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-konseling"><i class="fa-solid fa-comments w-5 mr-1 text-emerald-400"></i> Konseling (Form 7)</a>
+        <a href="#" onclick="switchTab('farmasi-pio')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-pio"><i class="fa-solid fa-circle-info w-5 mr-1 text-blue-400"></i> PIO (Form 8)</a>
+        <a href="#" onclick="switchTab('farmasi-pto')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-pto"><i class="fa-solid fa-file-waveform w-5 mr-1 text-amber-400"></i> PTO (Form 9)</a>
+        <a href="#" onclick="switchTab('farmasi-swamedikasi')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-swamedikasi"><i class="fa-solid fa-basket-shopping w-5 mr-1 text-purple-400"></i> Swamedikasi</a>
+        <a href="#" onclick="switchTab('farmasi-meso')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-meso"><i class="fa-solid fa-triangle-exclamation w-5 mr-1 text-rose-400"></i> MESO (Form 10)</a>
+        <a href="#" onclick="switchTab('farmasi-cpp')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-cpp"><i class="fa-solid fa-book-medical w-5 mr-1 text-teal-400"></i> CPP (Form 5)</a>
+    </div>
+</div>
 
-                <div class="pt-2 pb-1"><div class="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-500">Administrasi</div></div>
-                <a href="#" onclick="switchTab('kalender-praktik')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="kalender-praktik"><i class="fa-solid fa-calendar-days w-6 text-base mr-2 text-emerald-400"></i> Jadwal Dokter</a>
-                <a href="#" onclick="switchTab('absensi')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="absensi"><i class="fa-solid fa-clipboard-user w-6 text-base mr-2"></i> Laporan Absensi</a>
-                <a href="#" onclick="switchTab('obat')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="obat"><i class="fa-solid fa-pills w-6 text-base mr-2"></i> Daftar Obat KB</a>
-                <a href="#" onclick="switchTab('petugas')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="petugas"><i class="fa-solid fa-user-doctor w-6 text-base mr-2"></i> Data Petugas</a>
-                <a href="#" onclick="switchTab('laporan')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="laporan"><i class="fa-solid fa-file-invoice w-6 text-base mr-2"></i> Laporan Resmi</a>
-                <a href="#" onclick="switchTab('faskes')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="faskes"><i class="fa-solid fa-hospital w-6 text-base mr-2"></i> Data Faskes</a>
-                <a href="#" onclick="switchTab('backup')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="backup"><i class="fa-solid fa-database w-6 text-base mr-2"></i> Backup & Restore DB</a>
+               <!-- MENU ADMINISTRASI (DROPDOWN) -->
+<div class="pt-2 pb-1">
+    <button type="button" onclick="toggleSubmenu('submenu-administrasi', 'icon-administrasi')" class="w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white transition rounded-xl hover:bg-slate-800/50">
+        <span class="flex items-center"><i class="fa-solid fa-folder-gear mr-2 text-blue-400"></i> Administrasi</span>
+        <i id="icon-administrasi" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
+    </button>
+    <div id="submenu-administrasi" class="hidden space-y-1 mt-1 pl-3 border-l-2 border-slate-700 ml-4">
+        <a href="#" onclick="switchTab('kalender-praktik')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="kalender-praktik"><i class="fa-solid fa-calendar-days w-5 mr-1 text-emerald-400"></i> Jadwal Dokter</a>
+        <a href="#" onclick="switchTab('absensi')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="absensi"><i class="fa-solid fa-clipboard-user w-5 mr-1"></i> Laporan Absensi</a>
+        <a href="#" onclick="switchTab('obat')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="obat"><i class="fa-solid fa-pills w-5 mr-1"></i> Daftar Obat KB</a>
+        <a href="#" onclick="switchTab('petugas')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="petugas"><i class="fa-solid fa-user-doctor w-5 mr-1"></i> Data Petugas</a>
+        <a href="#" onclick="switchTab('laporan')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="laporan"><i class="fa-solid fa-file-invoice w-5 mr-1"></i> Laporan</a>
+        <a href="#" onclick="switchTab('faskes')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="faskes"><i class="fa-solid fa-hospital w-5 mr-1"></i> Data Faskes</a>
+        <a href="#" onclick="switchTab('backup')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="backup"><i class="fa-solid fa-database w-5 mr-1"></i> Backup & Restore DB</a>
+    </div>
+</div>
             </nav>
-            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center"><span id="sidebar-faskes-name">Apotek Latisha Farma</span> v3.0</div>
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center"><span id="sidebar-faskes-name">LATISHA</span> v3.0</div>
         </aside>
 
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
             <header class="no-print h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10 shadow-sm">
-                <div class="flex items-center space-x-4">
-                    <button onclick="toggleSidebar()" class="text-slate-600 md:hidden"><i class="fa-solid fa-bars text-xl"></i></button>
-                    <div>
-                        <h2 id="page-title" class="text-lg font-bold text-slate-800">Dashboard Utama</h2>
-                        <p id="page-subtitle" class="text-xs text-slate-500">Ringkasan operasional pelayanan kesehatan</p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-semibold">
-                        <i class="fa-solid fa-cloud text-emerald-600 animate-pulse"></i><span id="cloud-sync-text">Cloud Terhubung</span>
-                    </div>
-                </div>
-            </header>
+    <div class="flex items-center space-x-6 flex-1 mr-4 overflow-hidden">
+        <button onclick="toggleSidebar()" class="text-slate-600 md:hidden"><i class="fa-solid fa-bars text-xl"></i></button>
+        <div>
+            <h2 id="page-title" class="text-lg font-bold text-slate-800">Dashboard Utama</h2>
+            <p id="page-subtitle" class="text-xs text-slate-500">Ringkasan operasional pelayanan kesehatan</p>
+        </div>
+        
+        <!-- TEKS BERJALAN DI AREA SAMPING -->
+        <div class="hidden lg:flex items-center flex-1 max-w-md bg-emerald-50/60 border border-emerald-100 rounded-xl px-3 py-1 overflow-hidden">
+            <i class="fa-solid fa-bullhorn text-emerald-600 mr-2 text-xs"></i>
+            <marquee behavior="scroll" direction="left" scrollamount="4" class="text-xs font-medium text-emerald-800">
+                Ucapkan Hamdallah sebelum memulai pekerjaan بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ Selamat datang di Aplikasi Pencatatan Pelayanan Kefarmasian dan Keluarga Berencana "LATISHA V3.0" • Harap cek jadwal kontrol akseptor secara berkala dan pastikan informasi jadwal sampai kepada akseptor• Pastikan data pelayanan Farmasi Klinis tercatat dengan lengkap. Daftar petugas/karyawan : Angga Faryanto-Tri Febriana Sari-Sri Handayani-Disti Dwistika-Anis Prima Dewi
+            </marquee>
+        </div>
+    </div>
+
+    <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-semibold">
+            <i class="fa-solid fa-cloud text-emerald-600 animate-pulse"></i><span id="cloud-sync-text">Cloud Terhubung</span>
+        </div>
+    </div>
+</header>
 
             <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
                 <!-- 1. DASHBOARD -->
@@ -129,7 +153,7 @@
                     <div class="kb-hero-banner rounded-3xl p-6 md:p-8 text-white shadow-lg relative flex flex-col md:flex-row items-center justify-between">
                         <div class="space-y-2 z-10">
                             <div class="inline-flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full text-xs font-semibold uppercase">
-                                <i class="fa-solid fa-heart-pulse text-emerald-300"></i><span>Apotek Latisha Farma</span>
+                                <i class="fa-solid fa-heart-pulse text-emerald-300"></i><span>By Latisha Farma</span>
                             </div>
                             <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">PORTAL PENCATATAN KB DAN FARMASI</h2>
                             <p class="text-emerald-100 text-sm max-w-xl">Kelola pelayanan kesehatan, rekam medis, serta dokumentasi layanan farmasi klinis lengkap.</p>
@@ -410,11 +434,11 @@
                     </div>
                 </div>
 
-                <!-- 6. CPP (Formulir 5) -->
+                <!-- 6. CPP-->
                 <div id="tab-farmasi-cpp" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border shadow-sm flex justify-between items-center">
                         <div>
-                            <h3 class="font-bold text-base">Catatan Pengobatan Pasien / CPP (Formulir 5)</h3>
+                            <h3 class="font-bold text-base">Catatan Pengobatan Pasien</h3>
                             <p class="text-xs text-slate-500">Profil riwayat pengobatan komprehensif pasien</p>
                         </div>
                         <button onclick="openCppModal()" class="bg-brand-600 text-white text-sm px-4 py-2 rounded-xl"><i class="fa-solid fa-plus mr-1"></i> Tambah Catatan CPP</button>
@@ -522,7 +546,7 @@
                     </div>
                 </div>
 
-                <!-- 9. LAPORAN RESMI -->
+                <!-- 9. LAPORAN -->
                 <div id="tab-laporan" class="tab-content hidden space-y-6">
                     <div class="border-b border-slate-200">
                         <nav class="-mb-px flex space-x-8 overflow-x-auto">
@@ -846,7 +870,7 @@
     </div>
 </div>
 
-    <!-- MODAL CPP (FORMULIR 5) -->
+    <!-- MODAL CPP -->
     <div id="modal-cpp" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between border-b pb-3"><h3 class="font-bold text-base">Formulir 5 - Catatan Pengobatan Pasien (CPP)</h3><button onclick="closeCppModal()"><i class="fa-solid fa-xmark text-lg"></i></button></div>
@@ -1114,7 +1138,7 @@
             if (activeNav) activeNav.classList.add('bg-slate-800', 'text-white', 'shadow');
 
             const titles = {
-                dashboard: ["Dashboard Utama", "Ringkasan operasional pelayanan kesehatan"],
+                dashboard: ["Dashboard Utama", "Ringkasan Pelayanan"],
                 pasien: ["Data Pasien", "Kelola data pasien terdaftar"],
                 akseptor: ["Data Akseptor KB", "Kelola data peserta KB aktif"],
                 kunjungan: ["Transaksi Kunjungan", "Catat pelayanan dan obat KB"],
@@ -1123,12 +1147,12 @@
                 'farmasi-pto': ["PTO (Formulir 9)", "Pemantauan Terapi Obat"],
                 'farmasi-swamedikasi': ["Swamedikasi", "Pengobatan mandiri dan KIE"],
                 'farmasi-meso': ["MESO (Formulir 10)", "Monitoring Efek Samping Obat"],
-                'farmasi-cpp': ["Catatan Pengobatan Pasien (Formulir 5)", "Profil riwayat obat komprehensif"],
+                'farmasi-cpp': ["CPP", "Catatan Pengobatan Pasien"],
                 'kalender-praktik': ["Jadwal Dokter", "Jadwal jaga dan layanan tenaga medis"],
                 absensi: ["Laporan Absensi Pegawai", "Presensi harian staf"],
-                obat: ["Daftar Obat KB", "Inventaris obat"],
+                obat: ["Daftar Obat", "Inventaris obat"],
                 petugas: ["Data Petugas", "Tenaga kesehatan terdaftar"],
-                laporan: ["LAPORAN RESMI", "Arsip klinis dan cetak laporan"],
+                laporan: ["Laporan", "Arsip klinis dan cetak laporan"],
                 faskes: ["Data Profil Apotek", "Profil Apotek Latisha Farma"],
                 backup: ["Backup & Restore DB", "Cadangkan data JSON"]
             };
@@ -1262,7 +1286,7 @@
                 const phone = ak.telp || '';
 
                 let faskesName = db.faskes ? db.faskes.nama : 'Apotek Latisha Farma';
-                let msg = `Halo Mom's ${ak.nama || 'Pelanggan'}, ini adalah pengingat dari DPM dr. Anis Prima Dewi. Jadwal kontrol / suntik KB Anda jatuh pada tanggal *${k.tglKembali}*. Mom's bisa datang langsung ke Apotek Latisha Farma di Jl. Poros KTM Tanjung Mas Makmur sesuai jadwal. Terima kasih.`;
+                let msg = `Halo Mom's ${ak.nama || 'Pelanggan'}, ini adalah pengingat dari DPM dr. Anis Prima Dewi. Jadwal suntik KB Anda jatuh pada tanggal *${k.tglKembali}*. Mom's bisa datang langsung ke Apotek Latisha Farma di Jl. Poros KTM Tanjung Mas Makmur (TR 3A) sesuai jadwal. Terima kasih.`;
                 let encodedMsg = encodeURIComponent(msg);
                 
                 let formattedPhone = phone.replace(/[^0-9]/g, '');
@@ -1669,47 +1693,47 @@
         }
         function closeCppModal() { document.getElementById('modal-cpp').classList.add('hidden'); }
         function saveCppData(e) {
-            e.preventDefault();
-            if(!db.farmasi.cpp) db.farmasi.cpp = [];
-            
-            let namaPasien = document.getElementById('cpp-nama').value.trim();
-            let dokterPasien = document.getElementById('cpp-dokter').value.trim();
-            let tglInput = document.getElementById('cpp-tgl').value;
-            let obatInput = document.getElementById('cpp-obat').value;
-            let catatanInput = document.getElementById('cpp-catatan').value;
+    e.preventDefault();
+    if(!db.farmasi.cpp) db.farmasi.cpp = [];
+    
+    let tglInput = document.getElementById('cpp-tgl').value; // Cukup deklarasikan sekali di sini
+    let namaPasien = document.getElementById('cpp-nama').value.trim();
+    let dokterPasien = document.getElementById('cpp-dokter').value.trim();
+    let obatInput = document.getElementById('cpp-obat').value;
+    let catatanInput = document.getElementById('cpp-catatan').value;
 
-            let existingIndex = db.farmasi.cpp.findIndex(item => item.nama.toLowerCase() === namaPasien.toLowerCase());
+    let existingIndex = db.farmasi.cpp.findIndex(item => item.nama.toLowerCase() === namaPasien.toLowerCase());
 
-            if (existingIndex !== -1) {
-                if (!db.farmasi.cpp[existingIndex].riwayatList) {
-                    db.farmasi.cpp[existingIndex].riwayatList = [{
-                        tgl: db.farmasi.cpp[existingIndex].tgl,
-                        obat: db.farmasi.cpp[existingIndex].obat,
-                        catatan: db.farmasi.cpp[existingIndex].catatan
-                    }];
-                }
-                db.farmasi.cpp[existingIndex].riwayatList.push({
-                    tgl: tglInput,
-                    obat: obatInput,
-                    catatan: catatanInput
-                });
-                if(dokterPasien) db.farmasi.cpp[existingIndex].dokter = dokterPasien;
-            } else {
-                db.farmasi.cpp.push({
-                    nama: namaPasien,
-                    dokter: dokterPasien,
-                    riwayatList: [{
-                        tgl: tglInput,
-                        obat: obatInput,
-                        catatan: catatanInput
-                    }]
-                });
-            }
-
-            saveDB(); 
-            closeCppModal();
-            renderFarmasiSubTable('cpp');
+    if (existingIndex !== -1) {
+        if (!db.farmasi.cpp[existingIndex].riwayatList) {
+            db.farmasi.cpp[existingIndex].riwayatList = [{
+                tgl: db.farmasi.cpp[existingIndex].tgl,
+                obat: db.farmasi.cpp[existingIndex].obat,
+                catatan: db.farmasi.cpp[existingIndex].catatan
+            }];
         }
+        db.farmasi.cpp[existingIndex].riwayatList.push({
+            tgl: tglInput,
+            obat: obatInput,
+            catatan: catatanInput
+        });
+        if(dokterPasien) db.farmasi.cpp[existingIndex].dokter = dokterPasien;
+    } else {
+        db.farmasi.cpp.push({
+            nama: namaPasien,
+            dokter: dokterPasien,
+            riwayatList: [{
+                tgl: tglInput,
+                obat: obatInput,
+                catatan: catatanInput
+            }]
+        });
+    }
+
+    saveDB(); 
+    closeCppModal();
+    renderFarmasiSubTable('cpp');
+}
 
         function printFarmasiItem(type, idx) {
             let item = db.farmasi[type][idx];
@@ -2075,39 +2099,65 @@
                 } else if(type === 'pio') {
                     tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-3 px-4">${item.tgl} ${item.waktu||''}</td><td class="py-3 px-4 font-semibold">${item.namaPenanya} (${item.statusPenanya})</td><td class="py-3 px-4">${item.pertanyaan}</td><td class="py-3 px-4">${item.jawaban}</td><td class="py-3 px-4">${item.apoteker}</td><td class="py-3 px-4 text-center whitespace-nowrap">${actionButtons}</td></tr>`;
                 } else if(type === 'pto') {
-                    let riwayatArr = item.riwayatList || [{ tgl: item.tgl, obat: item.obat, masalah: item.masalah, rekomendasi: item.rekomendasi }];
-                    let ringkasanTgl = riwayatArr.map(r => r.tgl).join(', ');
-                    let ringkasanObat = riwayatArr.map(r => `• [${r.tgl}] ${r.obat}`).join('<br>');
-                    let ringkasanMasalah = riwayatArr.map(r => `• [${r.tgl}] ${r.masalah || '-'}`).join('<br>');
-                    let ringkasanRekomendasi = riwayatArr.map(r => `• [${r.tgl}] ${r.rekomendasi || '-'}`).join('<br>');
+    let riwayatArr = item.riwayatList || [{ tgl: item.tgl, obat: item.obat, masalah: item.masalah, rekomendasi: item.rekomendasi }];
+    let ringkasanTgl = riwayatArr.map(r => r.tgl).join(', ');
+    
+    // Tanggal [r.tgl] di dalam isi teks dihapus agar lebih bersih
+    let ringkasanObat = riwayatArr.map(r => `${r.obat || '-'}`).join('<br>');
+    let ringkasanMasalah = riwayatArr.map(r => `${r.masalah || '-'}`).join('<br>');
+    let ringkasanRekomendasi = riwayatArr.map(r => `${r.rekomendasi || '-'}`).join('<br>');
 
-                    tb.innerHTML += `
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-3 px-4 font-semibold text-emerald-800">${item.nama}</td>
-                            <td class="py-3 px-4 font-mono text-xs">${ringkasanTgl} (${riwayatArr.length} Pemantauan)</td>
-                            <td class="py-3 px-4">${ringkasanObat}</td>
-                            <td class="py-3 px-4">${ringkasanMasalah}</td>
-                            <td class="py-3 px-4">${ringkasanRekomendasi}</td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap">${actionButtons}</td>
-                        </tr>`;
-                } else if(type === 'meso') {
+    tb.innerHTML += `
+        <tr class="hover:bg-slate-50">
+            <!-- 1. Kolom Tanggal -->
+            <td class="py-3 px-4 font-mono text-xs">${ringkasanTgl} (${riwayatArr.length} Pemantauan)</td>
+            
+            <!-- 2. Kolom Nama Pasien -->
+            <td class="py-3 px-4 font-semibold text-emerald-800">${item.nama}</td>
+            
+            <!-- 3. Kolom Nama Obat & Dosis -->
+            <td class="py-3 px-4">${ringkasanObat}</td>
+            
+            <!-- 4. Kolom Identifikasi Masalah -->
+            <td class="py-3 px-4">${ringkasanMasalah}</td>
+            
+            <!-- 5. Kolom Rekomendasi / Tindak Lanjut -->
+            <td class="py-3 px-4">${ringkasanRekomendasi}</td>
+            
+            <!-- 6. Kolom Aksi -->
+            <td class="py-3 px-4 text-center whitespace-nowrap">${actionButtons}</td>
+        </tr>`;
+} else if(type === 'meso') {
                     tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-3 px-4 font-semibold">${item.nama}</td><td class="py-3 px-4 text-rose-600 font-medium">${item.obat}</td><td class="py-3 px-4">${item.deskripsi}</td><td class="py-3 px-4">${item.tglMula || '-'} s/d ${item.tglAkhir || '-'}</td><td class="py-3 px-4">${item.pelapor}</td><td class="py-3 px-4 text-center whitespace-nowrap">${actionButtons}</td></tr>`;
                 } else if(type === 'cpp') {
-                    let riwayatArr = item.riwayatList || [{ tgl: item.tgl, obat: item.obat, catatan: item.catatan }];
-                    let ringkasanTgl = riwayatArr.map(r => r.tgl).join(', ');
-                    let ringkasanObat = riwayatArr.map(r => `• [${r.tgl}] ${r.obat}`).join('<br>');
-                    let ringkasanCatatan = riwayatArr.map(r => `• [${r.tgl}] ${r.catatan || '-'}`).join('<br>');
+    let riwayatArr = item.riwayatList || [{ tgl: item.tgl, obat: item.obat, catatan: item.catatan }];
+    let ringkasanTgl = riwayatArr.map(r => r.tgl).join(', ');
+    
+    // UBAH DI SINI: Tanggal [r.tgl] di dalam obat & catatan dihapus agar tidak berulang
+    let ringkasanObat = riwayatArr.map(r => ` ${r.obat || '-'}`).join('<br>');
+    let ringkasanCatatan = riwayatArr.map(r => ` ${r.catatan || '-'}`).join('<br>');
 
-                   tb.innerHTML += `
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-3 px-4 font-semibold text-emerald-800">${item.nama}</td>
-                            <td class="py-3 px-4">${item.dokter || '-'}</td>
-                            <td class="py-3 px-4 font-mono text-xs">${ringkasanTgl} (${riwayatArr.length} Kunjungan)</td>
-                            <td class="py-3 px-4">${ringkasanObat}</td>
-                            <td class="py-3 px-4">${ringkasanCatatan}</td>
-                            <td class="py-3 px-4 text-center whitespace-nowrap">${actionButtons}</td>
-                        </tr>`;
-                }
+    tb.innerHTML += `
+        <tr class="hover:bg-slate-50">
+            <!-- 1. Kolom Tanggal -->
+            <td class="py-3 px-4 font-mono text-xs">${ringkasanTgl} (${riwayatArr.length} Kunjungan)</td>
+            
+            <!-- 2. Kolom Nama Pasien -->
+            <td class="py-3 px-4 font-semibold text-emerald-800">${item.nama}</td>
+            
+            <!-- 3. Kolom Nama Dokter -->
+            <td class="py-3 px-4">${item.dokter || '-'}</td>
+            
+            <!-- 4. Kolom Obat / Dosis / Cara Pakai -->
+            <td class="py-3 px-4">${ringkasanObat}</td>
+            
+            <!-- 5. Kolom Catatan Pelayanan Apoteker -->
+            <td class="py-3 px-4">${ringkasanCatatan}</td>
+            
+            <!-- 6. Kolom Aksi -->
+            <td class="py-3 px-4 text-center whitespace-nowrap">${actionButtons}</td>
+        </tr>`;
+}
             }); // <- Penutup forEach
         } // <- Penutup fungsi renderFarmasiSubTable
 
@@ -2250,46 +2300,48 @@
                 }).join('');
 
                 container.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-                        <h2 style="font-size: 16pt; font-weight: 800; color: #000; margin: 0; text-transform: uppercase;">${fKopNama}</h2>
-                        <p style="font-size: 9pt; color: #333; margin: 4px 0 0 0;">${fKopAlamat}</p>
-                    </div>
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <h3 style="font-size: 11pt; font-weight: 800; color: #047857; margin: 0; text-transform: uppercase;">LAPORAN KUNJUNGAN AKSEPTOR KB</h3>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
-                        <thead>
-                            <tr style="background-color: #f8fafc; font-weight: bold;">
-                                <th style="padding: 8px; border: 1px solid #000; width: 14%; text-align: left;">Tanggal</th>
-                                <th style="padding: 8px; border: 1px solid #000; width: 22%; text-align: left;">Nama Akseptor</th>
-                                <th style="padding: 8px; border: 1px solid #000; width: 22%; text-align: left;">Petugas</th>
-                                <th style="padding: 8px; border: 1px solid #000; width: 20%; text-align: left;">Anamnesa</th>
-                                <th style="padding: 8px; border: 1px solid #000; width: 12%; text-align: left;">Tgl Kembali</th>
-                                <th style="padding: 8px; border: 1px solid #000; width: 10%; text-align: left;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rowsHTML || '<tr><td colspan="6" style="text-align: center; padding: 12px; border: 1px solid #000; color: #94a3b8;">Tidak ada data transaksi kunjungan.</td></tr>'}
-                        </tbody>
-                        <tfoot>
-                            <tr style="background-color: #f8fafc; font-weight: bold;">
-                                <td colspan="5" style="text-align: right; padding: 8px; border: 1px solid #000; text-transform: uppercase;">TOTAL KUNJUNGAN :</td>
-                                <td style="text-align: center; padding: 8px; border: 1px solid #000; color: #047857;">${rows.length} Pasien</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
-                        <div style="text-align: center; width: 220px; font-size: 9.5pt;">
-                           
-                        </div>
-                        <div style="text-align: center; width: 250px; font-size: 9.5pt;">
-                            <p style="margin-bottom: 4px;">Mesuji, ${currentDateFormatted}</p>
-                            <p style="font-weight: 600; color: #333; text-transform: uppercase; margin-bottom: 40px;">Apoteker Penanggung Jawab</p>
-                            <p style="font-weight: bold; text-decoration: underline; margin: 0;">${fApoteker}</p>
-                            <p style="font-size: 8.5pt; color: #475569; margin-top: 2px;">SIPA: ${fSipa}</p>
-                        </div>
-                    </div>
-                `;
+    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
+        <h2 style="font-size: 16pt; font-weight: 800; color: #000; margin: 0; text-transform: uppercase;">${fKopNama}</h2>
+        <!-- TAMBAHAN DPM ANIS PRIMA DEWI -->
+        <h3 style="font-size: 11pt; font-weight: 700; color: #000; margin: 4px 0 0 0; text-transform: uppercase;">DPM ANIS PRIMA DEWI</h3>
+        <p style="font-size: 9pt; color: #333; margin: 4px 0 0 0;">${fKopAlamat}</p>
+    </div>
+    <div style="text-align: center; margin-bottom: 15px;">
+        <h3 style="font-size: 11pt; font-weight: 800; color: #047857; margin: 0; text-transform: uppercase;">LAPORAN KUNJUNGAN AKSEPTOR KB</h3>
+    </div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+        <thead>
+            <tr style="background-color: #f8fafc; font-weight: bold;">
+                <th style="padding: 8px; border: 1px solid #000; width: 14%; text-align: left;">Tanggal</th>
+                <th style="padding: 8px; border: 1px solid #000; width: 22%; text-align: left;">Nama Akseptor</th>
+                <th style="padding: 8px; border: 1px solid #000; width: 22%; text-align: left;">Petugas</th>
+                <th style="padding: 8px; border: 1px solid #000; width: 20%; text-align: left;">Anamnesa</th>
+                <th style="padding: 8px; border: 1px solid #000; width: 12%; text-align: left;">Tgl Kembali</th>
+                <th style="padding: 8px; border: 1px solid #000; width: 10%; text-align: left;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${rowsHTML || '<tr><td colspan="6" style="text-align: center; padding: 12px; border: 1px solid #000; color: #94a3b8;">Tidak ada data transaksi kunjungan.</td></tr>'}
+        </tbody>
+        <tfoot>
+            <tr style="background-color: #f8fafc; font-weight: bold;">
+                <td colspan="5" style="text-align: right; padding: 8px; border: 1px solid #000; text-transform: uppercase;">TOTAL KUNJUNGAN :</td>
+                <td style="text-align: center; padding: 8px; border: 1px solid #000; color: #047857;">${rows.length} Pasien</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="text-align: center; width: 220px; font-size: 9.5pt;">
+        </div>
+        <div style="text-align: center; width: 250px; font-size: 9.5pt;">
+            <p style="margin-bottom: 4px;">Mesuji, ${currentDateFormatted}</p>
+            <!-- PERUBAHAN JABATAN -->
+            <p style="font-weight: 600; color: #333; text-transform: uppercase; margin-bottom: 40px;">Dokter Penanggung Jawab</p>
+            <!-- PERUBAHAN NAMA -->
+            <p style="font-weight: bold; text-decoration: underline; margin: 0;">dr. Anis Prima Dewi</p>
+            </div>
+    </div>
+`;
             } else if (activeReportSubTab === 'farmasi-klinis') {
                 const countKonseling = (db.farmasi && db.farmasi['konseling']) ? db.farmasi['konseling'].length : 0;
                 const countPIO = (db.farmasi && db.farmasi['pio']) ? db.farmasi['pio'].length : 0;
@@ -2320,7 +2372,7 @@
                             <tr><td style="padding: 6px 8px; border: 1px solid #000; text-align: center;">3</td><td style="padding: 6px 8px; border: 1px solid #000; font-weight: 500;">Dokumentasi PTO (Formulir 9)</td><td style="padding: 6px 8px; border: 1px solid #000; text-align: center; font-weight: bold;">${countPTO}</td></tr>
                             <tr><td style="padding: 6px 8px; border: 1px solid #000; text-align: center;">4</td><td style="padding: 6px 8px; border: 1px solid #000; font-weight: 500;">Lembar Swamedikasi</td><td style="padding: 6px 8px; border: 1px solid #000; text-align: center; font-weight: bold;">${countSwamedikasi}</td></tr>
                             <tr><td style="padding: 6px 8px; border: 1px solid #000; text-align: center;">5</td><td style="padding: 6px 8px; border: 1px solid #000; font-weight: 500;">Dokumentasi MESO (Formulir 10)</td><td style="padding: 6px 8px; border: 1px solid #000; text-align: center; font-weight: bold;">${countMESO}</td></tr>
-                            <tr><td style="padding: 6px 8px; border: 1px solid #000; text-align: center;">6</td><td style="padding: 6px 8px; border: 1px solid #000; font-weight: 500;">Catatan Pengobatan Pasien / CPP (Formulir 5)</td><td style="padding: 6px 8px; border: 1px solid #000; text-align: center; font-weight: bold;">${countCPP}</td></tr>
+                            <tr><td style="padding: 6px 8px; border: 1px solid #000; text-align: center;">6</td><td style="padding: 6px 8px; border: 1px solid #000; font-weight: 500;">Catatan Pengobatan Pasien </td><td style="padding: 6px 8px; border: 1px solid #000; text-align: center; font-weight: bold;">${countCPP}</td></tr>
                             <tr style="background-color: #f8fafc; font-weight: bold;">
                                 <td colspan="2" style="padding: 8px; border: 1px solid #000; text-align: right; text-transform: uppercase;">TOTAL PELAYANAN FARMASI KLINIS:</td>
                                 <td style="padding: 8px; border: 1px solid #000; text-align: center; color: #047857;">${countKonseling + countPIO + countPTO + countSwamedikasi + countMESO + countCPP} Kegiatan</td>
@@ -2329,8 +2381,7 @@
                     </table>
                     <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
                         <div style="text-align: center; width: 220px; font-size: 9.5pt;">
-                            <p style="font-weight: 600; color: #333; text-transform: uppercase; margin-bottom: 60px;">Tanda Tangan Pasien</p>
-                            <p style="font-weight: bold; text-decoration: underline; margin: 0;">( .................................... )</p>
+                           
                         </div>
                         <div style="text-align: center; width: 250px; font-size: 9.5pt;">
                             <p style="margin-bottom: 4px;">Mesuji, ${currentDateFormatted}</p>
@@ -2388,8 +2439,7 @@
                     </table>
                     <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
                         <div style="text-align: center; width: 220px; font-size: 9.5pt;">
-                            <p style="font-weight: 600; color: #333; text-transform: uppercase; margin-bottom: 60px;">Tanda Tangan Pasien</p>
-                            <p style="font-weight: bold; text-decoration: underline; margin: 0;">( .................................... )</p>
+                          
                         </div>
                         <div style="text-align: center; width: 250px; font-size: 9.5pt;">
                             <p style="margin-bottom: 4px;">Mesuji, ${currentDateFormatted}</p>
@@ -2403,7 +2453,18 @@
         }
 
         /* LOGIKA PASIEN, AKSEPTOR, KUNJUNGAN & LAINNYA */
-        function togglePasienSort() {
+        function toggleSubmenu(submenuId, iconId) {
+    const submenu = document.getElementById(submenuId);
+    const icon = document.getElementById(iconId);
+    
+    if (submenu) {
+        submenu.classList.toggle('hidden');
+    }
+    if (icon) {
+        icon.classList.toggle('rotate-180');
+    }
+}
+function togglePasienSort() {
             pasienSortOrder = pasienSortOrder === 'asc' ? 'desc' : 'asc';
             document.getElementById('sort-pasien-text').innerText = pasienSortOrder === 'asc' ? 'A - Z' : 'Z - A';
             renderPasienTable();
@@ -2933,7 +2994,7 @@
 
         function triggerReportPrint() {
             const containerHTML = document.getElementById('report-document-container').innerHTML;
-            document.getElementById('print-preview-heading').innerText = "Pratinjau Cetak Laporan Resmi";
+            document.getElementById('print-preview-heading').innerText = "Pratinjau Cetak Laporan";
             document.getElementById('print-preview-content').innerHTML = containerHTML;
             document.getElementById('modal-print-preview').classList.remove('hidden');
         }
