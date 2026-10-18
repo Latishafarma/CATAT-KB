@@ -489,7 +489,16 @@
             </button>
         </div>
     </div>
-
+<!-- KOTAK PENCARIAN PRODUK SKINCARE -->
+<div class="flex justify-between items-center mb-4">
+    <div class="relative w-full max-w-xs">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </span>
+        <input type="text" id="search-skincare-produk" oninput="filterSkincareProduk()" placeholder="Cari nama atau komposisi..." class="w-full pl-9 pr-4 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-pink-500 outline-none bg-white">
+    </div>
+    <!-- (Tombol Tambah Produk / Ekspor / Impor Anda yang sudah ada di sini) -->
+</div>
     <!-- TABEL PRODUK -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
@@ -3387,6 +3396,38 @@ function togglePasienSort() {
         renderSkincareProduk();
         renderSkincareBerita();
     });
+// --- FITUR PENCARIAN OTOMATIS PRODUK SKINCARE ---
+    function filterSkincareProduk() {
+        const keyword = document.getElementById('search-skincare-produk').value.toLowerCase();
+        const tbody = document.getElementById('tbody-skincare-produk');
+        if (!tbody) return;
+
+        // Filter data berdasarkan nama atau komposisi
+        const filteredList = skincareProdukList.filter(p => 
+            p.nama.toLowerCase().includes(keyword) || 
+            (p.komposisi && p.komposisi.toLowerCase().includes(keyword)) ||
+            (p.kegunaan && p.kegunaan.toLowerCase().includes(keyword))
+        );
+
+        if (filteredList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 text-xs">Produk tidak ditemukan.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filteredList.map((p, index) => `
+            <tr class="hover:bg-slate-50 text-xs">
+                <td class="py-3 px-4 text-center font-medium">${index + 1}</td>
+                <td class="py-3 px-4 font-bold text-slate-800">${p.nama}</td>
+                <td class="py-3 px-4 text-slate-600">${p.komposisi || '-'}</td>
+                <td class="py-3 px-4 text-slate-600">${p.kegunaan || '-'}</td>
+                <td class="py-3 px-4 text-center space-x-2">
+                    <button onclick="detailSkincareProduk('${p.id}')" title="Detail" class="text-sky-600 hover:text-sky-800"><i class="fa-solid fa-circle-info text-sm"></i></button>
+                    <button onclick="editSkincareProduk('${p.id}')" title="Edit" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-pen-to-square text-sm"></i></button>
+                    <button onclick="deleteSkincareProduk('${p.id}')" title="Hapus" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash text-sm"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
         window.onload = initApp;
     </script>
 </body>
