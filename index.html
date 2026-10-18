@@ -3156,8 +3156,9 @@ function togglePasienSort() {
             saveDB(); alert("Profil Apotek Berhasil Disimpan!");
         }
        function exportDatabase() {
-            // Pastikan data skincare terbaru dari memori/localStorage dimasukkan ke dalam objek db
-            db.skincare = skincareProdukList || []; 
+            // Masukkan data skincare dan berita/edukasi terbaru ke objek db sebelum di-download
+            db.skincare = skincareProdukList || [];
+            db.beritaEdukasi = beritaEdukasiList || []; // <-- Tambahkan ini
 
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             let dl = document.createElement('a'); 
@@ -3174,7 +3175,7 @@ function togglePasienSort() {
                 try { 
                     db = JSON.parse(evt.target.result); 
                     
-                    // Ambil data skincare dari file JSON yang di-restore ke variabel aplikasi & localStorage
+                    // Ambil data skincare dari file JSON
                     if (db.skincare) {
                         skincareProdukList = db.skincare;
                         localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
@@ -3182,13 +3183,20 @@ function togglePasienSort() {
                         skincareProdukList = [];
                     }
 
+                    // Ambil data berita & edukasi dari file JSON
+                    if (db.beritaEdukasi) {
+                        beritaEdukasiList = db.beritaEdukasi;
+                        localStorage.setItem('berita_edukasi_db', JSON.stringify(beritaEdukasiList));
+                    } else {
+                        beritaEdukasiList = [];
+                    }
+
                     saveDB(); 
                     initApp(); 
                     
-                    // Panggil render skincare agar tabel langsung terisi
-                    if (typeof renderSkincareProduk === 'function') {
-                        renderSkincareProduk();
-                    }
+                    // Refresh tampilan tabel jika fungsinya ada
+                    if (typeof renderSkincareProduk === 'function') renderSkincareProduk();
+                    if (typeof renderBeritaEdukasi === 'function') renderBeritaEdukasi(); // <-- Tambahkan ini jika ada
 
                     alert("Restore Database Berhasil!"); 
                 } catch(err) { 
