@@ -1271,39 +1271,65 @@
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
+    // 1. Sembunyikan SEMUA elemen yang memiliki kelas tab-content
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
 
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-slate-800', 'text-white', 'shadow'));
-            const activeNav = document.querySelector(`.nav-item[data-target="${tabId}"]`);
-            if (activeNav) activeNav.classList.add('bg-slate-800', 'text-white', 'shadow');
+    // 2. Khusus untuk menu dropdown Skincare, jika yang diklik menu utamanya, 
+    // arahkan secara default ke sub-menu 'skincare-produk' atau buka penampungnya.
+    let targetTabId = tabId;
+    if (tabId === 'skincare') {
+        targetTabId = 'skincare-produk';
+    }
 
-            const titles = {
-                dashboard: ["Dashboard Utama", "Ringkasan Pelayanan"],
-                pasien: ["Data Pasien", "Kelola data pasien terdaftar"],
-                akseptor: ["Data Akseptor KB", "Kelola data peserta KB aktif"],
-                kunjungan: ["Transaksi Kunjungan", "Catat pelayanan dan obat KB"],
-                'farmasi-konseling': ["Konseling Obat (Formulir 7)", "Dokumentasi konseling obat pasien"],
-                'farmasi-pio': ["PIO (Formulir 8)", "Pelayanan Informasi Obat"],
-                'farmasi-pto': ["PTO (Formulir 9)", "Pemantauan Terapi Obat"],
-                'farmasi-swamedikasi': ["Swamedikasi", "Pengobatan mandiri dan KIE"],
-                'farmasi-meso': ["MESO (Formulir 10)", "Monitoring Efek Samping Obat"],
-                'farmasi-cpp': ["CPP", "Catatan Pengobatan Pasien"],
-                'kalender-praktik': ["Jadwal Dokter", "Jadwal jaga dan layanan tenaga medis"],
-                absensi: ["Laporan Absensi Pegawai", "Presensi harian staf"],
-                obat: ["Daftar Obat", "Inventaris obat"],
-                petugas: ["Data Petugas", "Tenaga kesehatan terdaftar"],
-                laporan: ["Laporan", "Arsip klinis dan cetak laporan"],
-                faskes: ["Data Profil Apotek", "Profil Apotek Latisha Farma"],
-                backup: ["Backup & Restore DB", "Cadangkan data JSON"]
-            };
-            if (titles[tabId]) {
-                document.getElementById('page-title').innerText = titles[tabId][0];
-                document.getElementById('page-subtitle').innerText = titles[tabId][1];
-            }
-            refreshCurrentActiveTab();
-            if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
-        }
+    // 3. Tampilkan hanya tab target yang dipilih
+    const activeTabElement = document.getElementById('tab-' + targetTabId);
+    if (activeTabElement) {
+        activeTabElement.classList.remove('hidden');
+    }
+
+    // 4. Perbarui status aktif pada tombol navigasi Sidebar
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-slate-800', 'text-white', 'shadow'));
+    const activeNav = document.querySelector(`.nav-item[data-target="${tabId}"]`);
+    if (activeNav) {
+        activeNav.classList.add('bg-slate-800', 'text-white', 'shadow');
+    }
+
+    // 5. Perbarui Judul Halaman di Header atas
+    const titles = {
+        dashboard: ["Dashboard Utama", "Ringkasan Pelayanan"],
+        pasien: ["Data Pasien", "Kelola data pasien terdaftar"],
+        akseptor: ["Data Akseptor KB", "Kelola data peserta KB aktif"],
+        kunjungan: ["Transaksi Kunjungan", "Catat pelayanan dan obat KB"],
+        'farmasi-konseling': ["Konseling Obat (Formulir 7)", "Dokumentasi konseling obat pasien"],
+        'farmasi-pio': ["PIO (Formulir 8)", "Pelayanan Informasi Obat"],
+        'farmasi-pto': ["PTO (Formulir 9)", "Pemantauan Terapi Obat"],
+        'farmasi-swamedikasi': ["Swamedikasi", "Pengobatan mandiri dan KIE"],
+        'farmasi-meso': ["MESO (Formulir 10)", "Monitoring Efek Samping Obat"],
+        'farmasi-cpp': ["CPP", "Catatan Pengobatan Pasien"],
+        'skincare-produk': ["Katalog Produk Skincare", "Kelola daftar produk, komposisi, dan kegunaan skincare"],
+        'skincare-berita': ["Berita & Edukasi Skincare", "Informasi kesehatan dan edukasi perawatan kulit"],
+        'kalender-praktik': ["Jadwal Dokter", "Jadwal jaga dan layanan tenaga medis"],
+        absensi: ["Laporan Absensi Pegawai", "Presensi harian staf"],
+        obat: ["Daftar Obat", "Inventaris obat"],
+        petugas: ["Data Petugas", "Tenaga kesehatan terdaftar"],
+        laporan: ["Laporan", "Arsip klinis dan cetak laporan"],
+        faskes: ["Data Profil Apotek", "Profil Apotek Latisha Farma"],
+        backup: ["Backup & Restore DB", "Cadangkan data JSON"]
+    };
+
+    if (titles[targetTabId]) {
+        document.getElementById('page-title').innerText = titles[targetTabId][0];
+        document.getElementById('page-subtitle').innerText = titles[targetTabId][1];
+    }
+
+    // 6. Refresh data pada tab aktif
+    refreshCurrentActiveTab();
+
+    // 7. Tutup sidebar otomatis di layar kecil (Mobile)
+    if (window.innerWidth < 768) {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+    }
+}
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
 
@@ -1321,6 +1347,10 @@
             if(id === 'petugas') renderPetugasTable();
             if(id === 'laporan') renderCurrentReportView();
             if(id.startsWith('farmasi-')) renderFarmasiSubTable(id.replace('farmasi-', ''));
+            
+            // --- Tambahkan 2 baris ini untuk menyegarkan tabel skincare & berita ---
+            if(id === 'skincare' && typeof renderSkincareProduk === 'function') renderSkincareProduk();
+            if(id === 'berita-edukasi' && typeof renderSkincareBerita === 'function') renderSkincareBerita();
         }
 
         function calculateAge(bd) {
@@ -3155,10 +3185,10 @@ function togglePasienSort() {
             db.faskes = { nama: document.getElementById('f-nama').value, kode: document.getElementById('f-kode').value, telp: document.getElementById('f-telp').value, alamat: document.getElementById('f-alamat').value, kepala: document.getElementById('f-kepala').value, nip: document.getElementById('f-nip').value };
             saveDB(); alert("Profil Apotek Berhasil Disimpan!");
         }
-       function exportDatabase() {
-            // Masukkan data skincare dan berita/edukasi terbaru ke objek db sebelum di-download
+      function exportDatabase() {
+            // Masukkan data skincare dan berita edukasi ke objek db
             db.skincare = skincareProdukList || [];
-            db.beritaEdukasi = beritaEdukasiList || []; // <-- Tambahkan ini
+            db.skincareBerita = skincareBeritaList || []; // <-- Sesuaikan dengan nama variabel baru
 
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             let dl = document.createElement('a'); 
@@ -3175,7 +3205,7 @@ function togglePasienSort() {
                 try { 
                     db = JSON.parse(evt.target.result); 
                     
-                    // Ambil data skincare dari file JSON
+                    // Ambil data produk skincare dari file JSON
                     if (db.skincare) {
                         skincareProdukList = db.skincare;
                         localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
@@ -3183,12 +3213,12 @@ function togglePasienSort() {
                         skincareProdukList = [];
                     }
 
-                    // Ambil data berita & edukasi dari file JSON
-                    if (db.beritaEdukasi) {
-                        beritaEdukasiList = db.beritaEdukasi;
-                        localStorage.setItem('berita_edukasi_db', JSON.stringify(beritaEdukasiList));
+                    // Ambil data berita edukasi skincare dari file JSON
+                    if (db.skincareBerita) {
+                        skincareBeritaList = db.skincareBerita;
+                        localStorage.setItem('skincare_berita_db', JSON.stringify(skincareBeritaList));
                     } else {
-                        beritaEdukasiList = [];
+                        skincareBeritaList = [];
                     }
 
                     saveDB(); 
@@ -3196,7 +3226,7 @@ function togglePasienSort() {
                     
                     // Refresh tampilan tabel jika fungsinya ada
                     if (typeof renderSkincareProduk === 'function') renderSkincareProduk();
-                    if (typeof renderBeritaEdukasi === 'function') renderBeritaEdukasi(); // <-- Tambahkan ini jika ada
+                    if (typeof renderSkincareBerita === 'function') renderSkincareBerita(); // <-- Sesuaikan nama fungsi render beritanya
 
                     alert("Restore Database Berhasil!"); 
                 } catch(err) { 
