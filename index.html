@@ -3155,16 +3155,47 @@ function togglePasienSort() {
             db.faskes = { nama: document.getElementById('f-nama').value, kode: document.getElementById('f-kode').value, telp: document.getElementById('f-telp').value, alamat: document.getElementById('f-alamat').value, kepala: document.getElementById('f-kepala').value, nip: document.getElementById('f-nip').value };
             saveDB(); alert("Profil Apotek Berhasil Disimpan!");
         }
-        function exportDatabase() {
+       function exportDatabase() {
+            // Pastikan data skincare terbaru dari memori/localStorage dimasukkan ke dalam objek db
+            db.skincare = skincareProdukList || []; 
+
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-            let dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "backup_db_latisha.json");
-            document.body.appendChild(dl); dl.click(); dl.remove();
+            let dl = document.createElement('a'); 
+            dl.setAttribute("href", dataStr); 
+            dl.setAttribute("download", "backup_db_latisha.json");
+            document.body.appendChild(dl); 
+            dl.click(); 
+            dl.remove();
         }
+
         function importDatabase(e) {
             let fr = new FileReader();
             fr.onload = function(evt) {
-                try { db = JSON.parse(evt.target.result); saveDB(); initApp(); alert("Restore Database Berhasil!"); } catch(err) { alert("Format File JSON Tidak Sesuai."); }
-            }; fr.readAsText(e.target.files[0]);
+                try { 
+                    db = JSON.parse(evt.target.result); 
+                    
+                    // Ambil data skincare dari file JSON yang di-restore ke variabel aplikasi & localStorage
+                    if (db.skincare) {
+                        skincareProdukList = db.skincare;
+                        localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
+                    } else {
+                        skincareProdukList = [];
+                    }
+
+                    saveDB(); 
+                    initApp(); 
+                    
+                    // Panggil render skincare agar tabel langsung terisi
+                    if (typeof renderSkincareProduk === 'function') {
+                        renderSkincareProduk();
+                    }
+
+                    alert("Restore Database Berhasil!"); 
+                } catch(err) { 
+                    alert("Format File JSON Tidak Sesuai."); 
+                }
+            }; 
+            fr.readAsText(e.target.files[0]);
         }
 // ==========================================
     // KODE 4: LOGIKA JAVASCRIPT SKINCARE
