@@ -1463,6 +1463,15 @@
                 }
             } catch (err) { console.warn("Fallback lokal"); }
         }
+async function initApp() {
+    await loadFromSupabase();
+    await loadMasterObatFromSupabase(); // Memuat Master Obat dari Supabase
+    await loadSkincareFromSupabase();     // Memuat Katalog Skincare & Berita dari Supabase
+    await fetchAbsensiFromCloud();
+    updateFaskesDisplay();
+    switchTab('dashboard');
+    setupRealtimeSync();
+}
 // ==========================================
 // FUNGSI EXPORT DATA MASTER OBAT (FLEKSIBEL)
 // ==========================================
