@@ -1463,7 +1463,85 @@
                 }
             } catch (err) { console.warn("Fallback lokal"); }
         }
+// ==========================================
+// FUNGSI EXPORT DATA MASTER OBAT (FLEKSIBEL)
+// ==========================================
+async function exportDataObat() {
+    try {
+        // 1. Cari objek client Supabase dari berbagai nama variabel yang umum digunakan
+        let client = null;
 
+        if (typeof supabaseClient !== 'undefined' && typeof supabaseClient.from === 'function') {
+            client = supabaseClient;
+        } else if (typeof _supabase !== 'undefined' && typeof _supabase.from === 'function') {
+            client = _supabase;
+        } else if (typeof db !== 'undefined' && typeof db.from === 'function') {
+            client = db;
+        } else if (typeof supabase !== 'undefined' && typeof supabase.from === 'function') {
+            client = supabase;
+        } else if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+            client = window.supabaseClient;
+        } else if (window.supabase && typeof window.supabase.from === 'function') {
+            client = window.supabase;
+        }
+
+        // 2. Fallback: Jika variabel global tidak ditemukan, buat client baru otomatis menggunakan SUPABASE_URL & SUPABASE_KEY
+        if (!client && typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+            if (typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_KEY !== 'undefined') {
+                client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        }
+
+        if (!client) {
+            alert('Client Supabase tidak dapat ditemukan. Mohon pastikan inisialisasi Supabase (SUPABASE_URL & SUPABASE_KEY) diletakkan di atas skrip ini.');
+            return;
+        }
+
+        // 3. Ambil data dari tabel master_obat
+        const { data, error } = await client
+            .from('master_obat')
+            .select('nama_obat, kekuatan, indikasi, efek_samping, dosis_kgbb, fda, literatur');
+
+        if (error) {
+            alert('Gagal mengambil data dari Supabase: ' + error.message);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            alert('Belum ada data di dalam tabel master_obat untuk diekspor.');
+            return;
+        }
+
+        // 4. Format nama header kolom sesuai tampilan antarmuka ( Master Data Obat )
+        const formattedData = data.map((item, index) => ({
+            'No': index + 1,
+            'Nama Obat': item.nama_obat || '',
+            'Kekuatan': item.kekuatan || '',
+            'Indikasi': item.indikasi || '',
+            'Efek Samping': item.efek_samping || '',
+            'Dosis/kgBB': item.dosis_kgbb || '',
+            'FDA': item.fda || '',
+            'Literatur': item.literatur || ''
+        }));
+
+        if (typeof XLSX === 'undefined') {
+            alert('Library XLSX belum dimuat. Pastikan CDN SheetJS terpasang di <head>.');
+            return;
+        }
+
+        // 5. Buat dan unduh file CSV/Excel
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Master Data Obat");
+
+        const timestamp = new Date().toISOString().slice(0, 10);
+        XLSX.writeFile(workbook, `Master_Data_Obat_Latisha_${timestamp}.csv`, { bookType: 'csv' });
+
+    } catch (err) {
+        console.error('Error saat export data:', err);
+        alert('Terjadi kesalahan saat mengekspor data: ' + err.message);
+    }
+}
         async function saveDB() {
             try {
                 await _supabase.from('app_settings').upsert({ key: 'apd_kb_main_db', value: db });
