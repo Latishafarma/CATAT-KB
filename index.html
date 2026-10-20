@@ -1445,13 +1445,14 @@
         let currentCalMonth = new Date().getMonth();
 
         async function initApp() {
-            await loadFromSupabase();
-            await fetchAbsensiFromCloud();
-            updateFaskesDisplay();
-            switchTab('dashboard');
-            setupRealtimeSync();
-        }
-
+    await loadFromSupabase();
+    await loadMasterObatFromSupabase(); // Memuat Master Obat dari Supabase
+    await loadSkincareFromSupabase();     // Memuat Katalog Skincare & Berita dari Supabase
+    await fetchAbsensiFromCloud();
+    updateFaskesDisplay();
+    switchTab('dashboard');
+    setupRealtimeSync();
+}
         async function loadFromSupabase() {
             try {
                 const { data } = await _supabase.from('app_settings').select('*').eq('key', 'apd_kb_main_db').single();
@@ -1463,15 +1464,6 @@
                 }
             } catch (err) { console.warn("Fallback lokal"); }
         }
-async function initApp() {
-    await loadFromSupabase();
-    await loadMasterObatFromSupabase(); // Memuat Master Obat dari Supabase
-    await loadSkincareFromSupabase();     // Memuat Katalog Skincare & Berita dari Supabase
-    await fetchAbsensiFromCloud();
-    updateFaskesDisplay();
-    switchTab('dashboard');
-    setupRealtimeSync();
-}
 // ==========================================
 // FUNGSI EXPORT DATA MASTER OBAT (FLEKSIBEL)
 // ==========================================
@@ -3793,29 +3785,80 @@ function togglePasienSort() {
             }; 
             fr.readAsText(e.target.files[0]);
         }
-		// Variabel global penampung data Master Obat
-let masterObatData = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
-    { 
-        id: 1, 
-        nama: "Paracetamol", 
-        kekuatan: "500 mg", 
-        indikasi: "Demam dan nyeri ringan", 
-        efekSamping: "Mual, reaksi alergi ringan", 
-        dosisKgBB: "10-15 mg/kgBB", 
-        kategoriFda: "B",
-        literatur: "Medscape Reference / ISO Indonesia" // Kolom baru
-    },
-    { 
-        id: 2, 
-        nama: "Amoxicillin", 
-        kekuatan: "500 mg", 
-        indikasi: "Infeksi bakteri", 
-        efekSamping: "Diare, mual, ruam kulit", 
-        dosisKgBB: "20-40 mg/kgBB", 
-        kategoriFda: "B",
-        literatur: "Medscape Reference / BNF" // Kolom baru
+		// Variabel global penampung data Master Obat dari Supabase
+let masterObatData = [];
+// Deklarasi global penampung data skincare
+let skincareProdukList = [];
+let skincareBeritaList = [];
+async function loadMasterObatFromSupabase() {
+    try {
+        const { data, error } = await _supabase
+            .from('master_obat')
+            .select('*')
+            .order('id', { ascending: true });
+
+        if (error) throw error;
+
+        if (data) {
+            masterObatData = data.map(item => ({
+                id: item.id,
+                nama: item.nama_obat,
+                kekuatan: item.kekuatan,
+                indikasi: item.indikasi,
+                efekSamping: item.efek_samping,
+                dosisKgBB: item.dosis_kgbb,
+                kategoriFda: item.fda,
+                literatur: item.literatur
+            }));
+            renderTabelMasterObat();
+        }
+    } catch (err) {
+        console.error("Gagal memuat master obat:", err.message);
     }
-];
+}
+// --- MUAT DATA SKINCARE & BERITA DARI SUPABASE ---
+async function loadSkincareFromSupabase() {
+    try {
+        // 1. Muat Produk Skincare
+        const { data: produkData, error: produkError } = await _supabase
+            .from('skincare_produk')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (produkError) throw produkError;
+
+        if (produkData) {
+            skincareProdukList = produkData.map(item => ({
+                id: item.id,
+                nama: item.nama,
+                komposisi: item.komposisi,
+                kegunaan: item.kegunaan
+            }));
+            renderSkincareProduk();
+        }
+
+        // 2. Muat Berita & Edukasi Skincare
+        const { data: beritaData, error: beritaError } = await _supabase
+            .from('skincare_berita')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (beritaError) throw beritaError;
+
+        if (beritaData) {
+            skincareBeritaList = beritaData.map(item => ({
+                id: item.id,
+                tgl: item.tgl,
+                judul: item.judul,
+                isi: item.isi,
+                fileName: item.file_name || ''
+            }));
+            renderSkincareBerita();
+        }
+    } catch (err) {
+        console.error("Gagal memuat data skincare:", err.message);
+    }
+}
 // ==========================================
 // KODE TAHAP 3: LOGIKA PENCARIAN & SUGESTI OBAT
 // ==========================================
@@ -3893,13 +3936,7 @@ document.addEventListener('click', function(e) {
     // KODE 4: LOGIKA JAVASCRIPT SKINCARE
     // ==========================================
 
-    let skincareProdukList = JSON.parse(localStorage.getItem('skincare_produk_db')) || [
-        { id: '1', nama: 'Sunscreen Gel SPF 50', komposisi: 'Aqua, Ethylhexyl Methoxycinnamate, Niacinamide', kegunaan: 'Melindungi kulit dari paparan UV-A & UV-B' }
-    ];
-
-    let skincareBeritaList = JSON.parse(localStorage.getItem('skincare_berita_db')) || [
-        { id: '1', tgl: '2026-10-18', judul: 'Edukasi Penggunaan Sunscreen yang Benar', isi: 'Gunakan sunscreen sebanyak 2 ruas jari setiap 2 jam sekali saat berada di luar ruangan.', fileName: '' }
-    ];
+   
 
     // --- RENDER & CRUD PRODUK SKINCARE ---
     function renderSkincareProduk() {
@@ -3939,49 +3976,77 @@ document.addEventListener('click', function(e) {
         document.getElementById('modal-skincare-produk').classList.remove('flex');
     }
 
-    function saveSkincareProduk(e) {
-        e.preventDefault();
-        const id = document.getElementById('skincare-id').value;
-        const nama = document.getElementById('skincare-nama').value;
-        const komposisi = document.getElementById('skincare-komposisi').value;
-        const kegunaan = document.getElementById('skincare-kegunaan').value;
+    // --- SIMPAN / TAMBAH & EDIT PRODUK SKINCARE KE SUPABASE ---
+async function saveSkincareProduk(e) {
+    e.preventDefault();
+    const id = document.getElementById('skincare-id').value;
+    const payload = {
+        nama: document.getElementById('skincare-nama').value.trim(),
+        komposisi: document.getElementById('skincare-komposisi').value.trim(),
+        kegunaan: document.getElementById('skincare-kegunaan').value.trim()
+    };
 
+    try {
         if (id) {
-            const index = skincareProdukList.findIndex(p => p.id === id);
-            if (index !== -1) skincareProdukList[index] = { id, nama, komposisi, kegunaan };
+            // Mode Edit di Supabase
+            const { error } = await _supabase
+                .from('skincare_produk')
+                .update(payload)
+                .eq('id', id);
+
+            if (error) throw error;
         } else {
-            skincareProdukList.push({ id: Date.now().toString(), nama, komposisi, kegunaan });
+            // Mode Tambah ke Supabase
+            const { error } = await _supabase
+                .from('skincare_produk')
+                .insert([payload]);
+
+            if (error) throw error;
         }
 
-        localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
-        renderSkincareProduk();
         closeModalSkincareProduk();
+        await loadSkincareFromSupabase(); // Muat ulang data terbaru dari cloud Supabase
+        alert("Produk skincare berhasil disimpan ke Cloud Supabase!");
+    } catch (err) {
+        alert("Gagal menyimpan produk ke database: " + err.message);
     }
+}
 
-    function detailSkincareProduk(id) {
-        const item = skincareProdukList.find(p => p.id === id);
-        if (item) alert(`[DETAIL PRODUK]\nNama: ${item.nama}\nKomposisi: ${item.komposisi}\nKegunaan: ${item.kegunaan}`);
-    }
+function detailSkincareProduk(id) {
+    const item = skincareProdukList.find(p => String(p.id) === String(id));
+    if (item) alert(`[DETAIL PRODUK]\nNama: ${item.nama}\nKomposisi: ${item.komposisi}\nKegunaan: ${item.kegunaan}`);
+}
 
-    function editSkincareProduk(id) {
-        const item = skincareProdukList.find(p => p.id === id);
-        if (!item) return;
-        document.getElementById('skincare-id').value = item.id;
-        document.getElementById('skincare-nama').value = item.nama;
-        document.getElementById('skincare-komposisi').value = item.komposisi || '';
-        document.getElementById('skincare-kegunaan').value = item.kegunaan || '';
-        document.getElementById('modal-skincare-title').innerText = 'Edit Produk Skincare';
-        document.getElementById('modal-skincare-produk').classList.remove('hidden');
-        document.getElementById('modal-skincare-produk').classList.add('flex');
-    }
+function editSkincareProduk(id) {
+    const item = skincareProdukList.find(p => String(p.id) === String(id));
+    if (!item) return;
+    document.getElementById('skincare-id').value = item.id;
+    document.getElementById('skincare-nama').value = item.nama;
+    document.getElementById('skincare-komposisi').value = item.komposisi || '';
+    document.getElementById('skincare-kegunaan').value = item.kegunaan || '';
+    document.getElementById('modal-skincare-title').innerText = 'Edit Produk Skincare';
+    document.getElementById('modal-skincare-produk').classList.remove('hidden');
+    document.getElementById('modal-skincare-produk').classList.add('flex');
+}
 
-    function deleteSkincareProduk(id) {
-        if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
-            skincareProdukList = skincareProdukList.filter(p => p.id !== id);
-            localStorage.setItem('skincare_produk_db', JSON.stringify(skincareProdukList));
-            renderSkincareProduk();
+// --- HAPUS PRODUK SKINCARE DARI SUPABASE ---
+async function deleteSkincareProduk(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus produk ini dari Cloud?')) {
+        try {
+            const { error } = await _supabase
+                .from('skincare_produk')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            await loadSkincareFromSupabase(); // Muat ulang data terbaru
+            alert("Produk berhasil dihapus dari cloud.");
+        } catch (err) {
+            alert("Gagal menghapus produk: " + err.message);
         }
     }
+}
 
     // --- EXPORT DATA KE EXCEL (.xlsx) ---
     function exportSkincareData() {
@@ -4086,33 +4151,54 @@ document.addEventListener('click', function(e) {
         document.getElementById('modal-skincare-berita').classList.remove('flex');
     }
 
-    function saveSkincareBerita(e) {
-        e.preventDefault();
-        const judul = document.getElementById('berita-judul').value;
-        const isi = document.getElementById('berita-isi').value;
-        const fileInput = document.getElementById('berita-file');
-        const fileName = fileInput.files[0] ? fileInput.files[0].name : '';
+    // --- SIMPAN BERITA & EDUKASI SKINCARE KE SUPABASE ---
+async function saveSkincareBerita(e) {
+    e.preventDefault();
+    const judul = document.getElementById('berita-judul').value.trim();
+    const isi = document.getElementById('berita-isi').value.trim();
+    const fileInput = document.getElementById('berita-file');
+    const fileName = fileInput.files[0] ? fileInput.files[0].name : '';
 
-    skincareBeritaList.unshift({
-            id: Date.now().toString(),
-            tgl: new Date().toISOString().slice(0, 10),
-            judul,
-            isi,
-            fileName
-        });
+    const payload = {
+        tgl: new Date().toISOString().slice(0, 10),
+        judul: judul,
+        isi: isi,
+        file_name: fileName
+    };
 
-        localStorage.setItem('skincare_berita_db', JSON.stringify(skincareBeritaList));
-        renderSkincareBerita();
+    try {
+        const { error } = await _supabase
+            .from('skincare_berita')
+            .insert([payload]);
+
+        if (error) throw error;
+
         closeModalSkincareBerita();
+        await loadSkincareFromSupabase(); // Muat ulang data terbaru dari cloud
+        alert("Berita & Edukasi skincare berhasil disimpan ke Cloud Supabase!");
+    } catch (err) {
+        alert("Gagal menyimpan berita ke database: " + err.message);
     }
+}
 
-    function deleteSkincareBerita(id) {
-        if (confirm('Hapus berita/informasi ini?')) {
-            skincareBeritaList = skincareBeritaList.filter(b => b.id !== id);
-            localStorage.setItem('skincare_berita_db', JSON.stringify(skincareBeritaList));
-            renderSkincareBerita();
+// --- HAPUS BERITA & EDUKASI SKINCARE DARI SUPABASE ---
+async function deleteSkincareBerita(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus berita/informasi ini dari Cloud?')) {
+        try {
+            const { error } = await _supabase
+                .from('skincare_berita')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            await loadSkincareFromSupabase(); // Muat ulang data terbaru
+            alert("Berita berhasil dihapus dari cloud.");
+        } catch (err) {
+            alert("Gagal menghapus berita: " + err.message);
         }
     }
+}
 
     // Jalankan render saat halaman siap
     document.addEventListener('DOMContentLoaded', () => {
@@ -4246,28 +4332,24 @@ function renderTabelMasterObat() {
 
     tbody.innerHTML = html;
 }
-// =========================================================
-// LOGIKA MASTER OBAT: RENDER, FILTER, EDIT, SIMPAN, HAPUS
-// =========================================================
+// ==========================================
+// MODUL MASTER DATA OBAT (SUPABASE CLOUD)
+// ==========================================
 
-// 1. Render & Filter Tabel Master Obat
 function filterMasterObat(keyword) {
     const tbody = document.getElementById('tabel-master-obat-body');
     if (!tbody) return;
 
     if (!masterObatData || masterObatData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 text-xs italic">Belum ada data obat di Master Obat.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
         return;
     }
 
     const query = (keyword || '').toLowerCase().trim();
-
-    // Filter data berdasarkan ketikan pencarian
     const filtered = masterObatData.filter(obat => 
         (obat.nama && obat.nama.toLowerCase().includes(query)) || 
         (obat.indikasi && obat.indikasi.toLowerCase().includes(query)) ||
-        (obat.literatur && obat.literatur.toLowerCase().includes(query)) ||
-        (obat.kategoriFda && obat.kategoriFda.toLowerCase().includes(query))
+        (obat.literatur && obat.literatur.toLowerCase().includes(query))
     );
 
     if (filtered.length === 0) {
@@ -4277,10 +4359,7 @@ function filterMasterObat(keyword) {
 
     let html = '';
     filtered.forEach((obat, displayIndex) => {
-        // Lacak indeks asli di dalam array masterObatData
-        const originalIndex = masterObatData.findIndex(item => item.id === obat.id || item.nama === obat.nama);
-        const targetIndex = originalIndex !== -1 ? originalIndex : displayIndex;
-
+        const originalIndex = masterObatData.findIndex(item => item.id === obat.id);
         html += `
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
                 <td class="px-4 py-2.5 text-center font-medium text-slate-500">${displayIndex + 1}</td>
@@ -4295,117 +4374,20 @@ function filterMasterObat(keyword) {
                 <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
                 <td class="px-4 py-2.5 text-center">
                     <div class="flex items-center justify-center space-x-1">
-                        <!-- Tombol Edit terhubung dengan index asli -->
-                        <button type="button" onclick="editObat(${targetIndex})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <!-- Tombol Hapus -->
-                        <button type="button" onclick="hapusObat(${targetIndex})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
+                        <button type="button" onclick="editObat(${originalIndex})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button type="button" onclick="hapusObat(${originalIndex})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </td>
             </tr>
         `;
     });
-
     tbody.innerHTML = html;
 }
 
-// Fungsi pembungkus untuk memanggil render standar
 function renderTabelMasterObat() {
     const inputCari = document.getElementById('cari-master-obat');
-    const keyword = inputCari ? inputCari.value : '';
-    filterMasterObat(keyword);
+    filterMasterObat(inputCari ? inputCari.value : '');
 }
-
-// 2. Fungsi Mengaktifkan Fitur EDIT (Mengisi data ke modal form)
-function editObat(index) {
-    const obat = masterObatData[index];
-    if (!obat) {
-        alert("Data obat tidak ditemukan!");
-        return;
-    }
-
-    // Isi nilai input form berdasarkan data obat yang dipilih
-    document.getElementById('input-edit-index').value = index;
-    document.getElementById('input-nama-master').value = obat.nama || '';
-    document.getElementById('input-kekuatan-master').value = obat.kekuatan || '';
-    document.getElementById('input-indikasi-master').value = obat.indikasi || '';
-    document.getElementById('input-efek-master').value = obat.efekSamping || '';
-    document.getElementById('input-dosis-master').value = obat.dosisKgBB || '';
-    document.getElementById('input-fda-master').value = obat.kategoriFda || 'B';
-    document.getElementById('input-literatur-master').value = obat.literatur || '';
-
-    // Ubah Judul Modal
-    document.getElementById('modal-obat-title').innerText = 'Edit Data Obat';
-
-    // Tampilkan Modal
-    const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.remove('hidden');
-}
-
-// 3. Fungsi Buka Modal Tambah Obat Baru
-function bukaModalObatBaru() {
-    document.getElementById('form-master-obat').reset();
-    document.getElementById('input-edit-index').value = "-1";
-    document.getElementById('modal-obat-title').innerText = 'Tambah Obat Baru';
-    
-    const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.remove('hidden');
-}
-
-// 4. Fungsi Tutup Modal
-function tutupModalObat() {
-    const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.add('hidden');
-}
-
-// 5. Fungsi Menyimpan Data (Menangani Tambah & Edit)
-function simpanMasterObat(event) {
-    event.preventDefault();
-
-    const editIndex = parseInt(document.getElementById('input-edit-index').value);
-    
-    const dataObat = {
-        id: editIndex >= 0 ? masterObatData[editIndex].id : Date.now(),
-        nama: document.getElementById('input-nama-master').value.trim(),
-        kekuatan: document.getElementById('input-kekuatan-master').value.trim(),
-        indikasi: document.getElementById('input-indikasi-master').value.trim(),
-        efekSamping: document.getElementById('input-efek-master').value.trim(),
-        dosisKgBB: document.getElementById('input-dosis-master').value.trim(),
-        kategoriFda: document.getElementById('input-fda-master').value,
-        literatur: document.getElementById('input-literatur-master').value.trim()
-    };
-
-    if (editIndex >= 0) {
-        // Mode Edit: Perbarui data lama
-        masterObatData[editIndex] = dataObat;
-    } else {
-        // Mode Tambah: Masukkan data baru ke array
-        masterObatData.push(dataObat);
-    }
-
-    // Simpan ke LocalStorage
-    localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
-
-    // Refresh Tabel & Tutup Modal
-    renderTabelMasterObat();
-    tutupModalObat();
-}
-
-// 6. Fungsi Menghapus Data Obat
-function hapusObat(index) {
-    const obat = masterObatData[index];
-    if (!obat) return;
-
-    if (confirm(`Apakah Anda yakin ingin menghapus "${obat.nama}" dari Master Obat?`)) {
-        masterObatData.splice(index, 1);
-        localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
-        renderTabelMasterObat();
-    }
-}
-
 // ==========================================
 // KODE LENGKAP FITUR INTERAKSI OBAT (MEDSCAPE)
 // ==========================================
