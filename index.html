@@ -86,6 +86,27 @@
                 <a href="#" onclick="switchTab('kunjungan')" class="nav-item flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="kunjungan">
                     <i class="fa-solid fa-calendar-check w-6 text-base mr-2"></i> Transaksi Kunjungan
                 </a>
+		<!-- MENU APOTEK & SUB MENU MASTER OBAT -->
+<!-- MENU APOTEK DENGAN DROPDOWN -->
+<div class="space-y-1 pt-1">
+    <!-- Tombol Utama Menu Apotek (Bisa Diklik untuk Buka/Tutup Sub-menu) -->
+    <button onclick="toggleApotekMenu()" class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-200 transition-colors">
+        <span class="flex items-center gap-2">
+            <i class="fa-solid fa-prescription-bottle-medical"></i> Apotek
+        </span>
+        <i id="apotek-arrow" class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"></i>
+    </button>
+
+    <!-- Daftar Sub-Menu Apotek (Secara default tersembunyi / hidden, akan terbuka saat diklik) -->
+    <div id="apotek-submenu" class="hidden space-y-1 pl-3">
+        <!-- Sub-Menu: Master Obat -->
+        <button onclick="switchTab('master-obat')" id="btn-tab-master-obat" data-target="master-obat" class="nav-item w-full flex items-center px-3 py-2 text-xs rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+            <i class="fa-solid fa-boxes-stacked w-5 text-sm mr-2"></i> Master Obat
+        </button>
+        <!-- (Nanti jika ada sub-menu apotek lain, bisa ditambahkan di sini) -->
+    </div>
+</div>
+
 
                 <!-- MENU LAYANAN FARMASI KLINIS (DROPDOWN) -->
 <div class="pt-2 pb-1">
@@ -100,6 +121,8 @@
         <a href="#" onclick="switchTab('farmasi-swamedikasi')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-swamedikasi"><i class="fa-solid fa-basket-shopping w-5 mr-1 text-purple-400"></i> Swamedikasi</a>
         <a href="#" onclick="switchTab('farmasi-meso')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-meso"><i class="fa-solid fa-triangle-exclamation w-5 mr-1 text-rose-400"></i> MESO (Form 10)</a>
         <a href="#" onclick="switchTab('farmasi-cpp')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-cpp"><i class="fa-solid fa-book-medical w-5 mr-1 text-teal-400"></i> CPP (Form 5)</a>
+        <!-- Sub Menu Baru: Interaksi Obat -->
+        <a href="#" onclick="switchTab('farmasi-interaksi')" class="nav-item flex items-center px-4 py-2 text-xs font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800 hover:text-white" data-target="farmasi-interaksi"><i class="fa-solid fa-pills w-5 mr-1 text-red-400"></i> Interaksi Obat</a>
     </div>
 </div>
 
@@ -355,12 +378,76 @@
                     </div>
                 </div>
 
+                <div id="tab-master-obat" class="tab-apotek-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                        
+                        <!-- Header Utama: Judul & Tombol Export/Import -->
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-100 pb-4">
+                            <div>
+                                <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-boxes-stacked text-indigo-600"></i> Master Data Obat
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Kelola informasi obat, indikasi klinis, dosis per KgBB, dan kategori kehamilan FDA.</p>
+                            </div>
+                            
+                            <!-- Tombol Export & Import CSV -->
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportDataObat()" class="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-file-excel"></i> Export CSV
+                                </button>
+                                <label class="px-3 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                    <i class="fa-solid fa-file-import"></i> Import CSV
+                                    <input type="file" id="input-import-csv" accept=".csv" onchange="importDataObat(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Baris Pencarian Utama & Tombol Tambah Obat -->
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 pt-1">
+                            <div class="relative w-full md:w-80">
+                                <input type="text" 
+                                       id="cari-master-obat" 
+                                       onkeyup="filterMasterObat(this.value)" 
+                                       placeholder="Cari obat, indikasi, literatur..." 
+                                       class="w-full pl-9 pr-3 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            </div>
+                            
+                            <button type="button" onclick="bukaModalObatBaru()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-4 py-2 rounded-xl transition flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-plus mr-1.5"></i> Tambah Obat
+                            </button>
+                        </div>
+
+                        <!-- Tabel Tunggal Master Obat (9 Kolom Lengkap) -->
+                        <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200 shadow-sm mt-3">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-3 text-center w-12">No</th>
+                                        <th class="px-4 py-3">Nama Obat</th>
+                                        <th class="px-4 py-3">Kekuatan</th>
+                                        <th class="px-4 py-3">Indikasi</th>
+                                        <th class="px-4 py-3">Efek Samping</th>
+                                        <th class="px-4 py-3">Dosis/kgBB</th>
+                                        <th class="px-4 py-3 text-center">FDA</th>
+                                        <th class="px-4 py-3">Literatur</th>
+                                        <th class="px-4 py-3 text-center w-24">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel-master-obat-body" class="divide-y divide-slate-100">
+                                    <!-- Data obat dirender otomatis oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
                 <!-- SUB-MENU LAYANAN FARMASI KLINIS (DISESUAIKAN DENGAN FORMULIR SPESIFIK) -->
                 <!-- 1. KONSELING (Formulir 7) -->
                 <div id="tab-farmasi-konseling" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border shadow-sm flex justify-between items-center">
                         <div>
-                            <h3 class="font-bold text-base">Dokumentasi Konseling (Formulir 7)</h3>
+                            <h3 class="font-bold text-base">Form KONSELING</h3>
                             <p class="text-xs text-slate-500">Pencatatan konseling obat pasien secara lengkap</p>
                         </div>
                         <button onclick="openKonselingModal()" class="bg-brand-600 text-white text-sm px-4 py-2 rounded-xl"><i class="fa-solid fa-plus mr-1"></i> Tambah Konseling</button>
@@ -375,7 +462,7 @@
                     </div>
                 </div>
 
-                <!-- 2. PIO (Formulir 8) -->
+                <!-- 2. PIO -->
                 <div id="tab-farmasi-pio" class="tab-content hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl border shadow-sm flex justify-between items-center">
                         <div>
@@ -469,6 +556,91 @@
                         </div>
                     </div>
                 </div>
+				
+<!-- TAB 7: DRUG INTERACTIONS CHECKER (INTERAKSI OBAT) -->
+<div id="tab-farmasi-interaksi" class="tab-content hidden space-y-6">
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+        <div class="flex items-center space-x-3 border-b pb-4">
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-pills"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg text-slate-800">Drug Interactions Checker</h3>
+                <p class="text-xs text-slate-500">Pengecekan interaksi obat berdasarkan referensi klinis</p>
+            </div>
+        </div>
+<div class="flex items-center space-x-2">
+    <!-- Tombol Impor Data Interaksi (CSV) -->
+    <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-2 rounded-xl shadow-sm transition cursor-pointer flex items-center">
+        <i class="fa-solid fa-file-import mr-1.5"></i> Impor CSV
+        <input type="file" id="import-interaksi-file" accept=".csv" onchange="importDataInteraksiExcel(event)" class="hidden">
+    </label>
+    
+    <!-- Tombol Export Data Interaksi (CSV) -->
+    <button type="button" onclick="exportDataInteraksiExcel()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-medium text-xs px-3 py-2 rounded-xl shadow-sm transition flex items-center">
+        <i class="fa-solid fa-file-export mr-1.5 text-emerald-600"></i> Export CSV
+    </button>
+</div>
+        <!-- Form Input & Tombol Aksi -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-xs font-semibold mb-1">Pilih / Masukkan Nama Obat</label>
+                <div class="flex space-x-2">
+                    <!-- PEMBUNGKUS INPUT DENGAN KOTAK SUGESTI (DIPERBARUI) -->
+                    <div class="relative w-full">
+                        <input type="text" 
+                               id="input-nama-obat-checker" 
+                               onkeyup="cariSugestiObat(this.value)" 
+                               placeholder="Contoh: Simvastatin, Warfarin, Amlodipine..." 
+                               class="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" 
+                               autocomplete="off">
+                        
+                        <!-- Kotak Dropdown Daftar Sugesti dari Master Obat -->
+                        <div id="sugesti-obat-list" class="absolute z-50 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg hidden max-h-48 overflow-y-auto">
+                            <!-- Hasil pencarian obat akan muncul di sini secara dinamis -->
+                        </div>
+                    </div>
+                    <!-- AKHIR PEMBUNGKUS -->
+
+                    <button type="button" onclick="tambahObatKeChecker()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm px-4 py-2 rounded-xl transition shrink-0 flex items-center">
+                        <i class="fa-solid fa-plus mr-1"></i> Tambah
+                    </button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Tindakan</label>
+                <button type="button" onclick="cekInteraksiObat()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-2 px-4 rounded-xl shadow transition flex items-center justify-center">
+                    <i class="fa-solid fa-magnifying-glass-plus mr-1.5"></i> Cek Interaksi Obat
+                </button>
+            </div>
+        </div>
+
+        <!-- Daftar Obat Terpilih -->
+        <div>
+            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Daftar Obat Terpilih:</div>
+            <div id="container-obat-terpilih" class="flex flex-wrap gap-2 min-h-[46px] p-3 bg-slate-50 border border-slate-200 rounded-xl items-center">
+                <span class="text-slate-400 text-xs italic">Belum ada obat yang ditambahkan.</span>
+            </div>
+            <div class="flex justify-between items-center mt-2 text-xs text-slate-500">
+                <span>Minimal masukkan 2 obat untuk mendeteksi potensi interaksi.</span>
+                <button type="button" onclick="kosongkanChecker()" class="text-rose-600 hover:underline font-medium">Reset Daftar</button>
+            </div>
+        </div>
+
+        <!-- Hasil Analisis Interaksi -->
+        <div id="hasil-interaksi-container" class="hidden border-t border-slate-200 pt-6">
+            <h4 class="text-base font-bold text-slate-800 mb-4 flex items-center">
+                <i class="fa-solid fa-clipboard-check text-indigo-600 mr-2"></i> Hasil Analisis Interaksi Obat
+            </h4>
+            <div id="list-hasil-interaksi" class="space-y-4"></div>
+        </div>
+    </div>
+</div>
+<!-- Submenu Farmasi Klinis -->
+<a href="#" onclick="switchTab('farmasi-interaksi')" class="nav-item flex items-center px-4 py-2.5 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-200" data-target="farmasi-interaksi">
+    <i class="fas fa-pills mr-3 text-red-400"></i>
+    Interaksi Obat (Medscape Ref)
+</a>
 <!-- TAB 1: DAFTAR PRODUK SKINCARE -->
 <div id="tab-skincare-produk" class="tab-content hidden space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -612,6 +784,7 @@
                         </table>
                     </div>
                 </div>
+				
 
                 <!-- 8. PETUGAS MEDIS -->
                 <div id="tab-petugas" class="tab-content hidden space-y-6">
@@ -730,6 +903,72 @@
             </div>
         </main>
     </div>
+	
+<!-- ========================================================= -->
+<!-- MODAL FORM TAMBAH / EDIT MASTER OBAT -->
+<!-- ========================================================= -->
+<div id="modal-master-obat" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 id="modal-obat-title" class="font-bold text-slate-800 text-base">Tambah / Edit Data Obat</h3>
+            <button onclick="tutupModalObat()" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Form Input Field -->
+        <form id="form-master-obat" onsubmit="simpanMasterObat(event)" class="space-y-3 text-xs">
+            <!-- Hidden Input ID untuk Penanda Mode Edit -->
+            <input type="hidden" id="input-edit-index" value="-1">
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700">Nama Obat *</label>
+                <input type="text" id="input-nama-master" required placeholder="Contoh: Paracetamol" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-semibold mb-1 text-slate-700">Kekuatan</label>
+                    <input type="text" id="input-kekuatan-master" placeholder="Contoh: 500 mg" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-1 text-slate-700">Kategori FDA</label>
+                    <select id="input-fda-master" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="A">A</option>
+                        <option value="B" selected>B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="X">X</option>
+                        <option value="N/A">N/A</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700">Indikasi</label>
+                <input type="text" id="input-indikasi-master" placeholder="Contoh: Demam, nyeri ringan" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700">Efek Samping</label>
+                <input type="text" id="input-efek-master" placeholder="Contoh: Mual, ruam kulit" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700">Dosis / kgBB</label>
+                <input type="text" id="input-dosis-master" placeholder="Contoh: 10-15 mg/kgBB" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700">Literatur / Referensi Klinis</label>
+                <input type="text" id="input-literatur-master" placeholder="Contoh: Medscape / ISO / BPOM" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-3 border-t">
+                <button type="button" onclick="tutupModalObat()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium transition">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition shadow-sm">Simpan Obat</button>
+            </div>
+        </form>
+    </div>
+</div>
 <!-- MODAL TAMBAH/EDIT PRODUK SKINCARE -->
 <div id="modal-skincare-produk" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
@@ -1271,18 +1510,22 @@
         }
 
         function switchTab(tabId) {
-    // 1. Sembunyikan SEMUA elemen yang memiliki kelas tab-content
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    // 1. Sembunyikan SEMUA elemen tab utama DAN tab apotek (termasuk Master Obat)
+    document.querySelectorAll('.tab-content, .tab-apotek-content').forEach(el => el.classList.add('hidden'));
 
-    // 2. Khusus untuk menu dropdown Skincare, jika yang diklik menu utamanya, 
-    // arahkan secara default ke sub-menu 'skincare-produk' atau buka penampungnya.
+    // 2. Khusus untuk menu dropdown Skincare atau Apotek, arahkan default sub-menu jika diperlukan
     let targetTabId = tabId;
     if (tabId === 'skincare') {
         targetTabId = 'skincare-produk';
     }
 
     // 3. Tampilkan hanya tab target yang dipilih
-    const activeTabElement = document.getElementById('tab-' + targetTabId);
+    // Cek apakah tab target menggunakan format ID standar 'tab-' atau prefiks khusus apotek 'tab-apotek-'
+    let activeTabElement = document.getElementById('tab-' + targetTabId);
+    if (!activeTabElement) {
+        activeTabElement = document.getElementById('tab-apotek-' + targetTabId);
+    }
+    
     if (activeTabElement) {
         activeTabElement.classList.remove('hidden');
     }
@@ -1294,13 +1537,14 @@
         activeNav.classList.add('bg-slate-800', 'text-white', 'shadow');
     }
 
-    // 5. Perbarui Judul Halaman di Header atas
+    // 5. Perbarui Judul Halaman di Header atas (Tambahkan judul untuk Master Obat di sini)
     const titles = {
         dashboard: ["Dashboard Utama", "Ringkasan Pelayanan"],
         pasien: ["Data Pasien", "Kelola data pasien terdaftar"],
         akseptor: ["Data Akseptor KB", "Kelola data peserta KB aktif"],
         kunjungan: ["Transaksi Kunjungan", "Catat pelayanan dan obat KB"],
-        'farmasi-konseling': ["Konseling Obat (Formulir 7)", "Dokumentasi konseling obat pasien"],
+        'master-obat': ["Master Data Obat", "Kelola informasi obat, indikasi klinis, dosis per KgBB, dan kategori kehamilan FDA."], // <--- TAMBAHKAN INI
+        'farmasi-konseling': ["Konseling Obat", "Dokumentasi konseling obat pasien"],
         'farmasi-pio': ["PIO (Formulir 8)", "Pelayanan Informasi Obat"],
         'farmasi-pto': ["PTO (Formulir 9)", "Pemantauan Terapi Obat"],
         'farmasi-swamedikasi': ["Swamedikasi", "Pengobatan mandiri dan KIE"],
@@ -1323,7 +1567,9 @@
     }
 
     // 6. Refresh data pada tab aktif
-    refreshCurrentActiveTab();
+    if (typeof refreshCurrentActiveTab === 'function') {
+        refreshCurrentActiveTab();
+    }
 
     // 7. Tutup sidebar otomatis di layar kecil (Mobile)
     if (window.innerWidth < 768) {
@@ -1332,7 +1578,19 @@
 }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
-
+// Fungsi untuk membuka/menutup dropdown menu Apotek di sidebar
+function toggleApotekMenu() {
+    const submenu = document.getElementById('apotek-submenu');
+    const arrow = document.getElementById('apotek-arrow');
+    
+    if (submenu.classList.contains('hidden')) {
+        submenu.classList.remove('hidden');
+        arrow.classList.add('rotate-180'); // Memutar panah ke atas
+    } else {
+        submenu.classList.add('hidden');
+        arrow.classList.remove('rotate-180'); // Mengembalikan panah ke bawah
+    }
+}
         function refreshCurrentActiveTab() {
             const active = document.querySelector('.tab-content:not(.hidden)');
             if(!active) return;
@@ -2425,7 +2683,220 @@
                 saveDB();
             }
         }
+		// Fungsi untuk menghapus data obat berdasarkan index
+function hapusObat(index) {
+    if (confirm("Apakah Anda yakin ingin menghapus obat ini dari Master Obat?")) {
+        masterObatData.splice(index, 1);
+        // Simpan perubahan ke LocalStorage
+        localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
+        // Refresh tampilan tabel
+        if (typeof renderTabelMasterObat === 'function') {
+            renderTabelMasterObat();
+        } else {
+            location.reload(); // Muat ulang halaman jika fungsi render belum didefinisikan
+        }
+    }
+}
 
+// Fungsi untuk mengedit data obat (memasukkan kembali data ke form input)
+function editObat(index) {
+    const obat = masterObatData[index];
+    if (!obat) return;
+
+    // Sesuaikan ID elemen form input tambah/edit obat Anda di bawah ini jika berbeda:
+    document.getElementById('input-edit-id').value = obat.id; // Jika ada hidden input ID
+    document.getElementById('input-nama-master').value = obat.nama || '';
+    document.getElementById('input-kekuatan-master').value = obat.kekuatan || '';
+    document.getElementById('input-indikasi-master').value = obat.indikasi || '';
+    document.getElementById('input-efek-master').value = obat.efekSamping || '';
+    document.getElementById('input-dosis-master').value = obat.dosisKgBB || '';
+    document.getElementById('input-fda-master').value = obat.kategoriFda || '';
+
+    // Jika form Anda sudah memiliki input untuk literatur, set nilainya juga:
+    const inputLiteratur = document.getElementById('input-literatur-master');
+    if (inputLiteratur) {
+        inputLiteratur.value = obat.literatur || '';
+    }
+
+    // Biasanya membuka modal form edit jika menggunakan modal
+    // const modal = document.getElementById('modal-master-obat');
+    // if (modal) modal.classList.remove('hidden');
+}
+// ==========================================
+    // LOGIKA DRUG INTERACTIONS CHECKER
+    // ==========================================
+    let daftarObatChecker = [];
+
+    function tambahObatKeChecker() {
+        const input = document.getElementById('input-nama-obat-checker');
+        const namaObat = input.value.trim();
+        
+        if (!namaObat) {
+            alert('Silakan masukkan nama obat terlebih dahulu.');
+            return;
+        }
+
+        // Cek duplikasi
+        if (daftarObatChecker.map(o => o.toLowerCase()).includes(namaObat.toLowerCase())) {
+            alert('Obat tersebut sudah ada di dalam daftar.');
+            input.value = '';
+            return;
+        }
+
+        daftarObatChecker.push(namaObat);
+        input.value = '';
+        renderObatTerpilihChecker();
+    }
+
+    function renderObatTerpilihChecker() {
+        const container = document.getElementById('container-obat-terpilih');
+        if (!container) return;
+
+        if (daftarObatChecker.length === 0) {
+            container.innerHTML = `<span class="text-slate-400 text-xs italic">Belum ada obat yang ditambahkan.</span>`;
+            return;
+        }
+
+        container.innerHTML = daftarObatChecker.map((obat, index) => `
+            <span class="inline-flex items-center bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm">
+                ${obat}
+                <button type="button" onclick="hapusObatChecker(${index})" class="ml-2 text-indigo-400 hover:text-rose-600 focus:outline-none">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </span>
+        `).join('');
+    }
+
+    function hapusObatChecker(index) {
+        daftarObatChecker.splice(index, 1);
+        renderObatTerpilihChecker();
+        // Sembunyikan hasil jika daftar kosong atau diubah
+        document.getElementById('hasil-interaksi-container').classList.add('hidden');
+    }
+
+    function kosongkanChecker() {
+        daftarObatChecker = [];
+        renderObatTerpilihChecker();
+        document.getElementById('hasil-interaksi-container').classList.add('hidden');
+    }
+async function cekInteraksiObat() {
+    if (daftarObatChecker.length < 2) {
+        alert('Harap masukkan minimal 2 obat untuk melakukan pengecekan interaksi.');
+        return;
+    }
+
+    const hasilContainer = document.getElementById('hasil-interaksi-container');
+    const listHasil = document.getElementById('list-hasil-interaksi');
+    hasilContainer.classList.remove('hidden');
+    
+    listHasil.innerHTML = `
+        <div class="p-4 bg-purple-50 text-purple-700 rounded-xl flex items-center space-x-3 border border-purple-200">
+            <i class="fa-solid fa-spinner fa-spin text-xl text-purple-600"></i>
+            <div>
+                <p class="font-bold text-xs">Memeriksa Database Interaksi Supabase...</p>
+                <p class="text-[11px] text-purple-600">Menganalisis kombinasi obat: <strong>${daftarObatChecker.join(', ')}</strong></p>
+            </div>
+        </div>
+    `;
+
+    try {
+        const { data: dbInteraksi, error } = await _supabase
+            .from('interaksi_obat')
+            .select('*');
+
+        if (error) throw error;
+
+        let htmlContent = '';
+        let totalDitemukan = 0;
+
+        const cleanInputs = daftarObatChecker.map(o => o.trim().toLowerCase());
+
+        if (dbInteraksi && dbInteraksi.length > 0) {
+            dbInteraksi.forEach(item => {
+                const dbA = item.obat_a.trim().toLowerCase();
+                const dbB = item.obat_b.trim().toLowerCase();
+
+                const match1 = cleanInputs.some(inp => inp.includes(dbA)) && cleanInputs.some(inp => inp.includes(dbB));
+                const match2 = cleanInputs.some(inp => inp.includes(dbB)) && cleanInputs.some(inp => inp.includes(dbA));
+
+                if (match1 || match2) {
+                    totalDitemukan++;
+                    
+                    let badgeClass = item.level.includes('Serious') || item.level.includes('Major') 
+                        ? 'bg-rose-100 text-rose-800 border-rose-300' 
+                        : 'bg-amber-100 text-amber-800 border-amber-300';
+
+                    let medscapeButton = '';
+                    if (item.url_referensi) {
+                        medscapeButton = `
+                            <a href="${item.url_referensi}" target="_blank" class="inline-flex items-center space-x-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-semibold transition shadow-sm">
+                                <i class="fa-solid fa-external-link-alt"></i>
+                                <span>Buka Medscape</span>
+                            </a>
+                        `;
+                    }
+
+                    // Tampilan penjelasan mekanisme jika tersedia
+                    let mekanismeHtml = '';
+                    if (item.mekanisme) {
+                        mekanismeHtml = `
+                            <div class="p-2.5 bg-purple-100/60 rounded-lg border border-purple-200/80 text-xs text-purple-950">
+                                <strong><i class="fa-solid fa-microscope mr-1 text-purple-700"></i> Mekanisme Valid:</strong> ${item.mekanisme}
+                            </div>
+                        `;
+                    }
+
+                    htmlContent += `
+                        <div class="p-4 rounded-xl border border-purple-200 bg-purple-50/50 text-purple-950 space-y-3 shadow-sm mb-3">
+                            <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider">
+                                <span class="text-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Interaksi Terdeteksi</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${badgeClass}">${item.level}</span>
+                            </div>
+                            <p class="text-xs font-bold text-purple-900">
+                                Pasangan: <span class="uppercase">${item.obat_a}</span> $\\leftrightarrow$ <span class="uppercase">${item.obat_b}</span>
+                            </p>
+                            <p class="text-xs leading-relaxed"><strong>Efek Klinis:</strong> ${item.efek}</p>
+                            
+                            ${mekanismeHtml}
+
+                            <p class="text-xs leading-relaxed text-purple-800"><strong>Rekomendasi:</strong> ${item.rekomendasi}</p>
+                            
+                            <div class="pt-2 border-t border-purple-200 flex items-center justify-between text-[11px] text-purple-700 flex-wrap gap-2">
+                                <span><i class="fa-solid fa-database mr-1"></i> Sumber: Database Apotek Latisha Farma</span>
+                                ${medscapeButton}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        if (totalDitemukan === 0) {
+            listHasil.innerHTML = `
+                <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 flex items-center space-x-3">
+                    <i class="fa-solid fa-circle-check text-emerald-600 text-xl"></i>
+                    <div>
+                        <p class="font-bold text-xs">Pengecekan Selesai (Supabase DB)</p>
+                        <p class="text-xs text-emerald-700">Tidak ada catatan interaksi berbahaya pada database internal untuk kombinasi: <strong>${daftarObatChecker.join(', ')}</strong>.</p>
+                    </div>
+                </div>`;
+        } else {
+            listHasil.innerHTML = htmlContent;
+        }
+
+    } catch (err) {
+        console.error("Supabase Interaksi Error:", err);
+        listHasil.innerHTML = `
+            <div class="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center space-x-2">
+                <i class="fa-solid fa-circle-xmark text-red-600 text-lg"></i>
+                <div>
+                    <p class="font-bold text-xs">Gagal Mengambil Data Supabase</p>
+                    <p class="text-[11px]">Terjadi kendala saat membaca data interaksi dari Supabase.</p>
+                </div>
+            </div>`;
+    }
+}
+    
         function renderCurrentReportView() {
             const q = (document.getElementById('report-search-input').value || "").toLowerCase();
             const pType = document.getElementById('report-period-type').value;
@@ -3235,6 +3706,102 @@ function togglePasienSort() {
             }; 
             fr.readAsText(e.target.files[0]);
         }
+		// Variabel global penampung data Master Obat
+let masterObatData = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
+    { 
+        id: 1, 
+        nama: "Paracetamol", 
+        kekuatan: "500 mg", 
+        indikasi: "Demam dan nyeri ringan", 
+        efekSamping: "Mual, reaksi alergi ringan", 
+        dosisKgBB: "10-15 mg/kgBB", 
+        kategoriFda: "B",
+        literatur: "Medscape Reference / ISO Indonesia" // Kolom baru
+    },
+    { 
+        id: 2, 
+        nama: "Amoxicillin", 
+        kekuatan: "500 mg", 
+        indikasi: "Infeksi bakteri", 
+        efekSamping: "Diare, mual, ruam kulit", 
+        dosisKgBB: "20-40 mg/kgBB", 
+        kategoriFda: "B",
+        literatur: "Medscape Reference / BNF" // Kolom baru
+    }
+];
+// ==========================================
+// KODE TAHAP 3: LOGIKA PENCARIAN & SUGESTI OBAT
+// ==========================================
+
+// 1. Fungsi untuk memfilter data Master Obat berdasarkan ketikan pengguna
+function cariSugestiObat(keyword) {
+    const container = document.getElementById('sugesti-obat-list');
+    
+    // Jika input kosong, sembunyikan kotak sugesti
+    if (!keyword || keyword.trim() === "") {
+        container.classList.add('hidden');
+        container.innerHTML = "";
+        return;
+    }
+
+    const query = keyword.toLowerCase();
+    
+    // Ambil data dari array global masterObatData yang sudah dibuat di Tahap 1
+    const hasilFilter = typeof masterObatData !== 'undefined' ? masterObatData.filter(obat => 
+        (obat.nama && obat.nama.toLowerCase().includes(query)) || 
+        (obat.indikasi && obat.indikasi.toLowerCase().includes(query))
+    ) : [];
+
+    // Jika tidak ada data yang cocok, sembunyikan kotak sugesti
+    if (hasilFilter.length === 0) {
+        container.classList.add('hidden');
+        container.innerHTML = "";
+        return;
+    }
+
+    // Render hasil pencarian ke dalam list dropdown sugesti
+    let html = '';
+    hasilFilter.forEach(obat => {
+        const infoKekuatan = obat.kekuatan ? `(${obat.kekuatan})` : '';
+        const infoFda = obat.kategoriFda ? obat.kategoriFda : 'FDA';
+        
+        // Panggil fungsi pilihSugestiObat saat salah satu list diklik
+        html += `
+            <div onclick="pilihSugestiObat('${obat.nama}', '${obat.kekuatan || ''}')" 
+                 class="px-3 py-2 text-xs hover:bg-indigo-50 cursor-pointer border-b border-slate-100 flex justify-between items-center transition">
+                <span class="font-medium text-slate-800">${obat.nama} <span class="text-slate-500">${infoKekuatan}</span></span>
+                <span class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-semibold">${infoFda}</span>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    container.classList.remove('hidden');
+}
+
+// 2. Fungsi ketika salah satu obat dari daftar sugesti diklik oleh pengguna
+function pilihSugestiObat(namaObat, kekuatan) {
+    const inputField = document.getElementById('input-nama-obat-checker');
+    
+    // Masukkan nama dan kekuatan obat ke dalam input teks
+    inputField.value = kekuatan ? `${namaObat} ${kekuatan}` : namaObat;
+    
+    // Sembunyikan kembali kotak sugesti
+    document.getElementById('sugesti-obat-list').classList.add('hidden');
+    
+    // Fokuskan kembali kursor ke input
+    inputField.focus();
+}
+
+// 3. Menutup kotak sugesti jika pengguna mengklik di luar area input/dropdown
+document.addEventListener('click', function(e) {
+    const inputField = document.getElementById('input-nama-obat-checker');
+    const container = document.getElementById('sugesti-obat-list');
+    
+    if (inputField && container && !inputField.contains(e.target) && !container.contains(e.target)) {
+        container.classList.add('hidden');
+    }
+});
 // ==========================================
     // KODE 4: LOGIKA JAVASCRIPT SKINCARE
     // ==========================================
@@ -3497,6 +4064,349 @@ function togglePasienSort() {
             </tr>
         `).join('');
     }
+	// ==========================================
+// MASTER DATA OBAT & NAVIGASI TAB APOTEK
+// ==========================================
+
+let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
+    {
+        id: 1,
+        nama: 'Amlodipine',
+        kekuatan: '5 mg',
+        indikasi: 'Hipertensi, Angina Pektoris',
+        efekSamping: 'Edema perifer, sakit kepala, pusing',
+        dosisKgbb: '0.05 - 0.2 mg/kgBB/hari',
+        kategoriFda: 'C',
+        literatur: 'Medscape Reference' // Kolom Literatur ditambahkan
+    },
+    {
+        id: 2,
+        nama: 'Simvastatin',
+        kekuatan: '20 mg',
+        indikasi: 'Hiperkolesterolemia',
+        efekSamping: 'Miopati, peningkatan enzim hati',
+        dosisKgbb: 'Dewasa: 10 - 40 mg/hari',
+        kategoriFda: 'X',
+        literatur: 'ISO Indonesia / MIMS' // Kolom Literatur ditambahkan
+    },
+    {
+        id: 3,
+        nama: 'Parasetamol',
+        kekuatan: '500 mg',
+        indikasi: 'Analgetik, Antipiretik',
+        efekSamping: 'Reaksi alergi, hepatotoksisitas dosis tinggi',
+        dosisKgbb: '10 - 15 mg/kgBB/kali (3-4 kali/hari)',
+        kategoriFda: 'B',
+        literatur: 'FORNAS / BPOM' // Kolom Literatur ditambahkan
+    }
+];
+
+let sortDirectionNama = 'asc';
+
+
+// Switch Tab Menu Apotek
+function gantiTabApotek(targetTab) {
+    // Sembunyikan semua konten tab utama aplikasi DAN tab apotek
+    document.querySelectorAll('.tab-content, .tab-apotek-content').forEach(el => el.classList.add('hidden'));
+    
+    // Hapus aktif kelas dari semua tombol menu
+    document.querySelectorAll('[id^="btn-tab-"], .sidebar-menu-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-50', 'text-indigo-600', 'font-semibold');
+    });
+
+    // Tampilkan target tab Master Obat
+    const targetContent = document.getElementById('tab-apotek-' + targetTab);
+    const targetBtn = document.getElementById('btn-tab-' + targetTab);
+
+    if (targetContent) targetContent.classList.remove('hidden');
+    if (targetBtn) targetBtn.classList.add('bg-indigo-50', 'text-indigo-600', 'font-semibold');
+
+    if (targetTab === 'master-obat') {
+        renderTabelMasterObat();
+    }
+}
+
+/// Contoh penyesuaian di dalam fungsi render tabel Master Obat:
+function renderTabelMasterObat() {
+    const tbody = document.getElementById('tabel-master-obat-body'); // Sesuaikan ID tbody Anda
+    if (!tbody) return;
+
+    if (masterObatData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    masterObatData.forEach((obat, index) => {
+        html += `
+            <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs text-slate-700">
+                <td class="px-4 py-2.5 font-medium">${index + 1}</td>
+                <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama || '-'}</td>
+                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
+                <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
+                <td class="px-4 py-2.5">${obat.efekSamping || '-'}</td>
+                <td class="px-4 py-2.5">${obat.dosisKgBB || '-'}</td>
+                <td class="px-4 py-2.5"><span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-semibold text-[10px]">${obat.kategoriFda || '-'}</span></td>
+                <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
+                <td class="px-4 py-2.5 text-center">
+                    <!-- Sesuaikan dengan tombol aksi edit/hapus Anda -->
+                    <button onclick="editObat(${index})" class="text-indigo-600 hover:text-indigo-800 mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button onclick="hapusObat(${index})" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+// =========================================================
+// LOGIKA MASTER OBAT: RENDER, FILTER, EDIT, SIMPAN, HAPUS
+// =========================================================
+
+// 1. Render & Filter Tabel Master Obat
+function filterMasterObat(keyword) {
+    const tbody = document.getElementById('tabel-master-obat-body');
+    if (!tbody) return;
+
+    if (!masterObatData || masterObatData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 text-xs italic">Belum ada data obat di Master Obat.</td></tr>`;
+        return;
+    }
+
+    const query = (keyword || '').toLowerCase().trim();
+
+    // Filter data berdasarkan ketikan pencarian
+    const filtered = masterObatData.filter(obat => 
+        (obat.nama && obat.nama.toLowerCase().includes(query)) || 
+        (obat.indikasi && obat.indikasi.toLowerCase().includes(query)) ||
+        (obat.literatur && obat.literatur.toLowerCase().includes(query)) ||
+        (obat.kategoriFda && obat.kategoriFda.toLowerCase().includes(query))
+    );
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 text-xs italic">Data obat tidak ditemukan.</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    filtered.forEach((obat, displayIndex) => {
+        // Lacak indeks asli di dalam array masterObatData
+        const originalIndex = masterObatData.findIndex(item => item.id === obat.id || item.nama === obat.nama);
+        const targetIndex = originalIndex !== -1 ? originalIndex : displayIndex;
+
+        html += `
+            <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
+                <td class="px-4 py-2.5 text-center font-medium text-slate-500">${displayIndex + 1}</td>
+                <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama || '-'}</td>
+                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
+                <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
+                <td class="px-4 py-2.5">${obat.efekSamping || '-'}</td>
+                <td class="px-4 py-2.5">${obat.dosisKgBB || '-'}</td>
+                <td class="px-4 py-2.5 text-center">
+                    <span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold text-[10px] border border-indigo-100">${obat.kategoriFda || '-'}</span>
+                </td>
+                <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
+                <td class="px-4 py-2.5 text-center">
+                    <div class="flex items-center justify-center space-x-1">
+                        <!-- Tombol Edit terhubung dengan index asli -->
+                        <button type="button" onclick="editObat(${targetIndex})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <!-- Tombol Hapus -->
+                        <button type="button" onclick="hapusObat(${targetIndex})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// Fungsi pembungkus untuk memanggil render standar
+function renderTabelMasterObat() {
+    const inputCari = document.getElementById('cari-master-obat');
+    const keyword = inputCari ? inputCari.value : '';
+    filterMasterObat(keyword);
+}
+
+// 2. Fungsi Mengaktifkan Fitur EDIT (Mengisi data ke modal form)
+function editObat(index) {
+    const obat = masterObatData[index];
+    if (!obat) {
+        alert("Data obat tidak ditemukan!");
+        return;
+    }
+
+    // Isi nilai input form berdasarkan data obat yang dipilih
+    document.getElementById('input-edit-index').value = index;
+    document.getElementById('input-nama-master').value = obat.nama || '';
+    document.getElementById('input-kekuatan-master').value = obat.kekuatan || '';
+    document.getElementById('input-indikasi-master').value = obat.indikasi || '';
+    document.getElementById('input-efek-master').value = obat.efekSamping || '';
+    document.getElementById('input-dosis-master').value = obat.dosisKgBB || '';
+    document.getElementById('input-fda-master').value = obat.kategoriFda || 'B';
+    document.getElementById('input-literatur-master').value = obat.literatur || '';
+
+    // Ubah Judul Modal
+    document.getElementById('modal-obat-title').innerText = 'Edit Data Obat';
+
+    // Tampilkan Modal
+    const modal = document.getElementById('modal-master-obat');
+    if (modal) modal.classList.remove('hidden');
+}
+
+// 3. Fungsi Buka Modal Tambah Obat Baru
+function bukaModalObatBaru() {
+    document.getElementById('form-master-obat').reset();
+    document.getElementById('input-edit-index').value = "-1";
+    document.getElementById('modal-obat-title').innerText = 'Tambah Obat Baru';
+    
+    const modal = document.getElementById('modal-master-obat');
+    if (modal) modal.classList.remove('hidden');
+}
+
+// 4. Fungsi Tutup Modal
+function tutupModalObat() {
+    const modal = document.getElementById('modal-master-obat');
+    if (modal) modal.classList.add('hidden');
+}
+
+// 5. Fungsi Menyimpan Data (Menangani Tambah & Edit)
+function simpanMasterObat(event) {
+    event.preventDefault();
+
+    const editIndex = parseInt(document.getElementById('input-edit-index').value);
+    
+    const dataObat = {
+        id: editIndex >= 0 ? masterObatData[editIndex].id : Date.now(),
+        nama: document.getElementById('input-nama-master').value.trim(),
+        kekuatan: document.getElementById('input-kekuatan-master').value.trim(),
+        indikasi: document.getElementById('input-indikasi-master').value.trim(),
+        efekSamping: document.getElementById('input-efek-master').value.trim(),
+        dosisKgBB: document.getElementById('input-dosis-master').value.trim(),
+        kategoriFda: document.getElementById('input-fda-master').value,
+        literatur: document.getElementById('input-literatur-master').value.trim()
+    };
+
+    if (editIndex >= 0) {
+        // Mode Edit: Perbarui data lama
+        masterObatData[editIndex] = dataObat;
+    } else {
+        // Mode Tambah: Masukkan data baru ke array
+        masterObatData.push(dataObat);
+    }
+
+    // Simpan ke LocalStorage
+    localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
+
+    // Refresh Tabel & Tutup Modal
+    renderTabelMasterObat();
+    tutupModalObat();
+}
+
+// 6. Fungsi Menghapus Data Obat
+function hapusObat(index) {
+    const obat = masterObatData[index];
+    if (!obat) return;
+
+    if (confirm(`Apakah Anda yakin ingin menghapus "${obat.nama}" dari Master Obat?`)) {
+        masterObatData.splice(index, 1);
+        localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
+        renderTabelMasterObat();
+    }
+}
+
+// ==========================================
+// KODE LENGKAP FITUR INTERAKSI OBAT (MEDSCAPE)
+// ==========================================
+
+// 1. Variabel penampung data database interaksi
+let databaseInteraksiMedscape = JSON.parse(localStorage.getItem('apotek_interaksi_medscape')) || [
+    {
+        obatA: "ketoconazole",
+        obatB: "miconazole",
+        tingkat: "Serious (Major)",
+        deskripsi: "Penggunaan bersamaan antijamur golongan azol sistemik dapat meningkatkan risiko toksisitas berat dan pemanjangan interval QT.",
+        penanganan: "Hindari penggunaan bersamaan kecuali sangat diperlukan dengan pemantauan ketat.",
+        sumberUrl: "https://reference.medscape.com/drug-interactionchecker"
+    }
+];
+
+// 2. Fungsi Impor CSV Data Interaksi
+function importDataInteraksiExcel(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const lines = e.target.result.split('\n');
+        let count = 0;
+        let dataBaru = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+            if (cols.length >= 5) {
+                dataBaru.push({
+                    obatA: cols[0].toLowerCase(),
+                    obatB: cols[1].toLowerCase(),
+                    tingkat: cols[2] || 'Moderate',
+                    deskripsi: cols[3] || '-',
+                    penanganan: cols[4] || '-',
+                    sumberUrl: cols[5] || 'https://reference.medscape.com/drug-interactionchecker'
+                });
+                count++;
+            }
+        }
+
+        if (count > 0) {
+            databaseInteraksiMedscape = dataBaru;
+            localStorage.setItem('apotek_interaksi_medscape', JSON.stringify(databaseInteraksiMedscape));
+            alert(`Berhasil mengimpor ${count} data interaksi obat!`);
+        } else {
+            alert('Format file CSV tidak sesuai atau tidak ada data yang terbaca.');
+        }
+
+        event.target.value = '';
+    };
+    reader.readAsText(file);
+}
+
+// 3. Fungsi Export CSV Data Interaksi (Tombol Export)
+function exportDataInteraksiExcel() {
+    if (!databaseInteraksiMedscape || databaseInteraksiMedscape.length === 0) {
+        alert('Belum ada data interaksi obat yang dimuat untuk diexport.');
+        return;
+    }
+
+    let csvContent = 'Obat A,Obat B,Tingkat Keparahan,Deskripsi,Penanganan,Sumber URL\n';
+    databaseInteraksiMedscape.forEach(item => {
+        let obatA = (item.obatA || '').replace(/"/g, '""');
+        let obatB = (item.obatB || '').replace(/"/g, '""');
+        let tingkat = (item.tingkat || '').replace(/"/g, '""');
+        let deskripsi = (item.deskripsi || '').replace(/"/g, '""');
+        let penanganan = (item.penanganan || '').replace(/"/g, '""');
+        let sumberUrl = (item.sumberUrl || 'https://reference.medscape.com/drug-interactionchecker').replace(/"/g, '""');
+
+        csvContent += `"${obatA}","${obatB}","${tingkat}","${deskripsi}","${penanganan}","${sumberUrl}"\n`;
+    });
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Database_Interaksi_Medscape.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Inisialisasi awal
+document.addEventListener('DOMContentLoaded', () => {
+    renderTabelMasterObat();
+});
         window.onload = initApp;
     </script>
 </body>
