@@ -1671,16 +1671,50 @@
         }
 
         async function loadFromSupabase() {
-            try {
-                const { data } = await _supabase.from('app_settings').select('*').eq('key', 'apd_kb_main_db').single();
-                if (data && data.value) {
-                    db = data.value;
-                    if(!db.pasien) db.pasien = [];
-                    if(!db.farmasi) db.farmasi = { konseling: [], pio: [], pto: [], swamedikasi: [], meso: [], cpp: [] };
-                    if(!db.jadwalPraktik) db.jadwalPraktik = [];
-                }
-            } catch (err) { console.warn("Fallback lokal"); }
+    try {
+        console.log("Memulai pengambilan data master obat dari Supabase...");
+        
+        // 1. Ambil data utama pengaturan aplikasi
+        const { data: settingData } = await _supabase
+            .from('app_settings')
+            .select('*')
+            .eq('key', 'catat_kb_main_db')
+            .single();
+        
+        if (settingData && settingData.value) {
+            db = settingData.value;
+            if(!db.pasien) db.pasien = [];
+            if(!db.farmasi) db.farmasi = { konseling: [], pio: [], pto: [], swamedikasi: [], meso: [], cpp: [] };
+            if(!db.jadwalPraktik) db.jadwalPraktik = [];
         }
+
+        // 2. Ambil data LANGSUNG dari tabel 'master_obat'
+        const { data: obatData, error: obatError } = await _supabase
+            .from('master_obat')
+            .select('*');
+
+        if (obatError) {
+            console.error("Gagal memuat tabel master obat:", obatError.message);
+        } else if (obatData) {
+            // Masukkan data mentah ke variabel global masterObatData
+            masterObatData = obatData;
+            console.log("Data master obat berhasil dimuat ke memori:", masterObatData);
+        }
+
+        // 3. PAKSA render tabel dijalankan agar data langsung muncul di layar
+        if (typeof renderTabelMasterObat === 'function') {
+            renderTabelMasterObat();
+            console.log("Fungsi renderTabelMasterObat() berhasil dipanggil!");
+        } else {
+            console.error("Fungsi renderTabelMasterObat tidak ditemukan!");
+        }
+
+    } catch (err) { 
+        console.error("Terjadi kesalahan saat memuat data:", err); 
+    }
+}  
+
+
 // ==========================================
 // FUNGSI EXPORT DATA MASTER OBAT (FLEKSIBEL)
 // ==========================================
@@ -3009,30 +3043,7 @@ function hapusObat(index) {
     }
 }
 
-// Fungsi untuk mengedit data obat (memasukkan kembali data ke form input)
-function editObat(index) {
-    const obat = masterObatData[index];
-    if (!obat) return;
 
-    // Sesuaikan ID elemen form input tambah/edit obat Anda di bawah ini jika berbeda:
-    document.getElementById('input-edit-id').value = obat.id; // Jika ada hidden input ID
-    document.getElementById('input-nama-master').value = obat.nama || '';
-    document.getElementById('input-kekuatan-master').value = obat.kekuatan || '';
-    document.getElementById('input-indikasi-master').value = obat.indikasi || '';
-    document.getElementById('input-efek-master').value = obat.efekSamping || '';
-    document.getElementById('input-dosis-master').value = obat.dosisKgBB || '';
-    document.getElementById('input-fda-master').value = obat.kategoriFda || '';
-
-    // Jika form Anda sudah memiliki input untuk literatur, set nilainya juga:
-    const inputLiteratur = document.getElementById('input-literatur-master');
-    if (inputLiteratur) {
-        inputLiteratur.value = obat.literatur || '';
-    }
-
-    // Biasanya membuka modal form edit jika menggunakan modal
-    // const modal = document.getElementById('modal-master-obat');
-    // if (modal) modal.classList.remove('hidden');
-}
 // ==========================================
     // LOGIKA DRUG INTERACTIONS CHECKER
     // ==========================================
@@ -4439,10 +4450,10 @@ function gantiTabApotek(targetTab) {
 
 /// Contoh penyesuaian di dalam fungsi render tabel Master Obat:
 function renderTabelMasterObat() {
-    const tbody = document.getElementById('tabel-master-obat-body'); // Sesuaikan ID tbody Anda
+    const tbody = document.getElementById('tabel-master-obat-body'); 
     if (!tbody) return;
 
-    if (masterObatData.length === 0) {
+    if (!masterObatData || masterObatData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
         return;
     }
@@ -4450,81 +4461,24 @@ function renderTabelMasterObat() {
     let html = '';
     masterObatData.forEach((obat, index) => {
         html += `
-            <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs text-slate-700">
-                <td class="px-4 py-2.5 font-medium">${index + 1}</td>
-                <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama || '-'}</td>
-                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
-                <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
-                <td class="px-4 py-2.5">${obat.efekSamping || '-'}</td>
-                <td class="px-4 py-2.5">${obat.dosisKgBB || '-'}</td>
-                <td class="px-4 py-2.5"><span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-semibold text-[10px]">${obat.kategoriFda || '-'}</span></td>
-                <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
-                <td class="px-4 py-2.5 text-center">
-                    <!-- Sesuaikan dengan tombol aksi edit/hapus Anda -->
-                    <button onclick="editObat(${index})" class="text-indigo-600 hover:text-indigo-800 mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button onclick="hapusObat(${index})" class="text-rose-600 hover:text-rose-800"><i class="fa-solid fa-trash"></i></button>
-                </td>
-            </tr>
-        `;
-    });
-
-    tbody.innerHTML = html;
-}
-// =========================================================
-// LOGIKA MASTER OBAT: RENDER, FILTER, EDIT, SIMPAN, HAPUS
-// =========================================================
-
-// 1. Render & Filter Tabel Master Obat
-function filterMasterObat(keyword) {
-    const tbody = document.getElementById('tabel-master-obat-body');
-    if (!tbody) return;
-
-    if (!masterObatData || masterObatData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 text-xs italic">Belum ada data obat di Master Obat.</td></tr>`;
-        return;
-    }
-
-    const query = (keyword || '').toLowerCase().trim();
-
-    // Filter data berdasarkan ketikan pencarian
-    const filtered = masterObatData.filter(obat => 
-        (obat.nama && obat.nama.toLowerCase().includes(query)) || 
-        (obat.indikasi && obat.indikasi.toLowerCase().includes(query)) ||
-        (obat.literatur && obat.literatur.toLowerCase().includes(query)) ||
-        (obat.kategoriFda && obat.kategoriFda.toLowerCase().includes(query))
-    );
-
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 text-xs italic">Data obat tidak ditemukan.</td></tr>`;
-        return;
-    }
-
-    let html = '';
-    filtered.forEach((obat, displayIndex) => {
-        // Lacak indeks asli di dalam array masterObatData
-        const originalIndex = masterObatData.findIndex(item => item.id === obat.id || item.nama === obat.nama);
-        const targetIndex = originalIndex !== -1 ? originalIndex : displayIndex;
-
-        html += `
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
-                <td class="px-4 py-2.5 text-center font-medium text-slate-500">${displayIndex + 1}</td>
-                <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama || '-'}</td>
+                <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
+                <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama_obat || obat.nama || '-'}</td>
                 <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
                 <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
-                <td class="px-4 py-2.5">${obat.efekSamping || '-'}</td>
-                <td class="px-4 py-2.5">${obat.dosisKgBB || '-'}</td>
+                <td class="px-4 py-2.5">${obat.efek_samping || obat.efekSamping || '-'}</td>
+                <td class="px-4 py-2.5">${obat.dosis_kgbb || obat.dosisKgBB || '-'}</td>
                 <td class="px-4 py-2.5 text-center">
-                    <span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold text-[10px] border border-indigo-100">${obat.kategoriFda || '-'}</span>
+                    <span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold text-[10px] border border-indigo-100">${obat.fda || obat.kategoriFda || '-'}</span>
                 </td>
                 <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
                 <td class="px-4 py-2.5 text-center">
                     <div class="flex items-center justify-center space-x-1">
-                        <!-- Tombol Edit terhubung dengan index asli -->
-                        <button type="button" onclick="editObat(${targetIndex})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
+                        <!-- Menggunakan index dinamis '${index}' agar tombol edit/hapus sesuai barisnya -->
+                        <button type="button" onclick="editObat(${index})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <!-- Tombol Hapus -->
-                        <button type="button" onclick="hapusObat(${targetIndex})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
+                        <button type="button" onclick="hapusObat(${index})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -4534,16 +4488,55 @@ function filterMasterObat(keyword) {
     });
 
     tbody.innerHTML = html;
-}
+}   
+// =========================================================
+// LOGIKA MASTER OBAT: RENDER, FILTER, EDIT, SIMPAN, HAPUS
+// =========================================================
 
-// Fungsi pembungkus untuk memanggil render standar
-function renderTabelMasterObat() {
-    const inputCari = document.getElementById('cari-master-obat');
-    const keyword = inputCari ? inputCari.value : '';
-    filterMasterObat(keyword);
-}
+function renderTabelMasterObat(dataArray = null) {
+    const tbody = document.getElementById('tabel-master-obat-body'); 
+    if (!tbody) return;
 
-// 2. Fungsi Mengaktifkan Fitur EDIT (Mengisi data ke modal form)
+    // Gunakan data parameter jika ada (misal dari hasil pencarian), jika tidak gunakan data global masterObatData
+    const dataToRender = dataArray || masterObatData;
+
+    if (!dataToRender || dataToRender.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
+        return;
+    }
+
+    let html = '';
+    dataToRender.forEach((obat, index) => {
+        html += `
+            <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
+                <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
+                <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama_obat || obat.nama || '-'}</td>
+                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
+                <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
+                <td class="px-4 py-2.5">${obat.efek_samping || obat.efekSamping || '-'}</td>
+                <td class="px-4 py-2.5">${obat.dosis_kgbb || obat.dosisKgBB || '-'}</td>
+                <td class="px-4 py-2.5 text-center">
+                    <span class="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded font-bold text-[10px] border border-indigo-100">${obat.fda || obat.kategoriFda || '-'}</span>
+                </td>
+                <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
+                <td class="px-4 py-2.5 text-center">
+                    <div class="flex items-center justify-center space-x-1">
+                        <button type="button" onclick="editObat(${index})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button type="button" onclick="hapusObat(${index})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+} 
+
+// Fungsi Mengaktifkan Fitur EDIT (Mengisi data ke modal form)
 function editObat(index) {
     const obat = masterObatData[index];
     if (!obat) {
@@ -4551,23 +4544,28 @@ function editObat(index) {
         return;
     }
 
-    // Isi nilai input form berdasarkan data obat yang dipilih
-    document.getElementById('input-edit-index').value = index;
-    document.getElementById('input-nama-master').value = obat.nama || '';
+    // Isi nilai input form berdasarkan data obat yang dipilih (disesuaikan dengan kolom Supabase)
+    const inputEditIndex = document.getElementById('input-edit-index');
+    if (inputEditIndex) inputEditIndex.value = index;
+
+    document.getElementById('input-nama-master').value = obat.nama_obat || obat.nama || '';
     document.getElementById('input-kekuatan-master').value = obat.kekuatan || '';
     document.getElementById('input-indikasi-master').value = obat.indikasi || '';
-    document.getElementById('input-efek-master').value = obat.efekSamping || '';
-    document.getElementById('input-dosis-master').value = obat.dosisKgBB || '';
-    document.getElementById('input-fda-master').value = obat.kategoriFda || 'B';
-    document.getElementById('input-literatur-master').value = obat.literatur || '';
+    document.getElementById('input-efek-master').value = obat.efek_samping || obat.efekSamping || '';
+    document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || '';
+    document.getElementById('input-fda-master').value = obat.fda || obat.kategoriFda || 'B';
+    
+    const inputLiteratur = document.getElementById('input-literatur-master');
+    if (inputLiteratur) inputLiteratur.value = obat.literatur || '';
 
-    // Ubah Judul Modal
-    document.getElementById('modal-obat-title').innerText = 'Edit Data Obat';
+    // Ubah Judul Modal jika elemennya ada
+    const modalTitle = document.getElementById('modal-obat-title');
+    if (modalTitle) modalTitle.innerText = 'Edit Data Obat';
 
     // Tampilkan Modal
     const modal = document.getElementById('modal-master-obat');
     if (modal) modal.classList.remove('hidden');
-}
+} 
 
 // 3. Fungsi Buka Modal Tambah Obat Baru
 function bukaModalObatBaru() {
@@ -4592,68 +4590,38 @@ async function simpanMasterObat(event) {
     const editIndex = parseInt(document.getElementById('input-edit-index').value);
     
     const dataObat = {
-        id: editIndex >= 0 ? masterObatData[editIndex].id : Date.now(),
-        nama: document.getElementById('input-nama-master').value.trim(),
+        nama_obat: document.getElementById('input-nama-master').value.trim(),
         kekuatan: document.getElementById('input-kekuatan-master').value.trim(),
         indikasi: document.getElementById('input-indikasi-master').value.trim(),
-        efekSamping: document.getElementById('input-efek-master').value.trim(),
-        dosisKgBB: document.getElementById('input-dosis-master').value.trim(),
-        kategoriFda: document.getElementById('input-fda-master').value,
+        efek_samping: document.getElementById('input-efek-master').value.trim(),
+        dosis_kgbb: document.getElementById('input-dosis-master').value.trim(),
+        fda: document.getElementById('input-fda-master').value,
         literatur: document.getElementById('input-literatur-master').value.trim()
     };
 
-    if (editIndex >= 0) {
-        // Mode Edit: Perbarui data lama
-        masterObatData[editIndex] = dataObat;
-    } else {
-        // Mode Tambah: Masukkan data baru ke array
-        masterObatData.push(dataObat);
+    if (editIndex >= 0 && masterObatData[editIndex] && masterObatData[editIndex].id) {
+        dataObat.id = masterObatData[editIndex].id;
     }
 
-    // 1. Simpan ke LocalStorage khusus master obat (jika masih diperlukan)
-    localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
+    try {
+        const { error } = await _supabase
+            .from('master_obat')
+            .upsert(dataObat);
 
-    // 2. Sinkronkan juga ke objek global db (asumsi struktur db Anda menyimpan obat di db.obat)
-    if (typeof db !== 'undefined') {
-        db.obat = masterObatData; 
-
-        // 3. Simpan pembaruan objek db ke tabel app_settings di Supabase
-        try {
-            const { error } = await _supabase
-                .from('app_settings')
-                .upsert({
-                    key: 'apd_kb_main_db', // Sesuaikan key database JSON Anda di Supabase
-                    value: db
-                }, { onConflict: 'key' });
-
-            if (error) {
-                console.error("Gagal sinkronisasi master obat ke Supabase:", error.message);
-                alert("Gagal menyimpan ke database cloud: " + error.message);
-            } else {
-                console.log("Master obat berhasil disinkronkan ke Supabase!");
-            }
-        } catch (err) {
-            console.error("Kesalahan koneksi saat menyimpan ke Supabase:", err);
+        if (error) {
+            console.error("Gagal menyimpan master obat ke Supabase:", error.message);
+            alert("Gagal menyimpan: " + error.message);
+            return;
         }
+
+        await loadFromSupabase();
+    } catch (err) {
+        console.error("Kesalahan koneksi:", err);
     }
 
-    // Refresh Tabel & Tutup Modal
-    renderTabelMasterObat();
     tutupModalObat();
-}
+}  
 
-
-// 6. Fungsi Menghapus Data Obat
-function hapusObat(index) {
-    const obat = masterObatData[index];
-    if (!obat) return;
-
-    if (confirm(`Apakah Anda yakin ingin menghapus "${obat.nama}" dari Master Obat?`)) {
-        masterObatData.splice(index, 1);
-        localStorage.setItem('apotek_master_obat', JSON.stringify(masterObatData));
-        renderTabelMasterObat();
-    }
-}
 
 // --- LOGIKA SURAT PESANAN ---
 let suratPesananData = JSON.parse(localStorage.getItem('apotek_surat_pesanan_db')) || [];
