@@ -1700,7 +1700,7 @@ async function loadFromSupabase() {
             console.log("Data master obat berhasil dimuat ke memori:", masterObatData);
         }
 
-        // 3. AMBIL DATA LANGSUNG DARI TABEL 'supplier' (TAMBAHAN BARU)
+        // 3. AMBIL DATA LANGSUNG DARI TABEL 'supplier'
         const { data: supData, error: supError } = await _supabase
             .from('supplier')
             .select('*');
@@ -1713,13 +1713,54 @@ async function loadFromSupabase() {
             console.log("Data supplier berhasil dimuat ke memori:", supplierData);
         }
 
-        // 4. PAKSA render tabel dijalankan agar data langsung muncul di layar
+        // 4. AMBIL DAN KELOMPOKKAN DATA DARI TABEL 'item_surat_pesanan' (TAMBAHAN BARU)
+        const { data: spSupabaseData, error: spError } = await _supabase
+            .from('item_surat_pesanan')
+            .select('*');
+
+        if (spError) {
+            console.error("Gagal memuat item surat pesanan:", spError.message);
+        } else if (spSupabaseData && spSupabaseData.length > 0) {
+            let groupedMap = {};
+            spSupabaseData.forEach(row => {
+                if (!groupedMap[row.nomor_sp]) {
+                    groupedMap[row.nomor_sp] = {
+                        id: row.id || Date.now(),
+                        jenis: row.jenis_sp || 'OOT',
+                        nomor: row.nomor_sp,
+                        tanggal: row.tanggal || new Date().toISOString().split('T')[0],
+                        supplierNama: row.supplier_nama || '-',
+                        supplierAlamat: '-',
+                        supplierTelp: '-',
+                        items: []
+                    };
+                }
+                groupedMap[row.nomor_sp].items.push({
+                    namaObat: row.nama_obat,
+                    zatAktif: row.zat_aktif || '',
+                    bentukSediaan: row.bentuk_sediaan || '',
+                    jumlah: row.jumlah,
+                    satuan: row.satuan,
+                    ket: row.ket || '-'
+                });
+            });
+
+            suratPesananData = Object.values(groupedMap);
+            localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
+            console.log("Data surat pesanan berhasil dimuat dari Supabase:", suratPesananData);
+        }
+
+        // 5. PAKSA render semua tabel agar data langsung muncul di layar
         if (typeof renderTabelMasterObat === 'function') {
             renderTabelMasterObat();
         }
         
         if (typeof renderTabelSupplier === 'function') {
             renderTabelSupplier();
+        }
+
+        if (typeof renderTabelSuratPesanan === 'function') {
+            renderTabelSuratPesanan();
         }
 
     } catch (err) { 
