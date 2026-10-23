@@ -4535,7 +4535,28 @@ function renderTabelMasterObat(dataArray = null) {
 
     tbody.innerHTML = html;
 } 
+// Fungsi untuk memfilter tabel Master Obat berdasarkan input pencarian
+function filterMasterObat(keyword) {
+    const query = (keyword || '').toLowerCase().trim();
+    
+    if (typeof masterObatData === 'undefined' || !masterObatData) return;
 
+    // Filter data berdasarkan nama obat, indikasi, efek samping, atau literatur
+    const filteredData = masterObatData.filter(obat => {
+        const nama = (obat.nama_obat || obat.nama || '').toLowerCase();
+        const indikasi = (obat.indikasi || '').toLowerCase();
+        const literatur = (obat.literatur || '').toLowerCase();
+        const efekSamping = (obat.efek_samping || obat.efekSamping || '').toLowerCase();
+
+        return nama.includes(query) || 
+               indikasi.includes(query) || 
+               literatur.includes(query) || 
+               efekSamping.includes(query);
+    });
+
+    // Render ulang tabel dengan data hasil filter
+    renderTabelMasterObat(filteredData);
+} 
 // Fungsi Mengaktifkan Fitur EDIT (Mengisi data ke modal form)
 function editObat(index) {
     const obat = masterObatData[index];
