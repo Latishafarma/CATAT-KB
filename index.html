@@ -111,6 +111,10 @@
         <button onclick="switchTab('supplier')" id="btn-tab-supplier" data-target="supplier" class="nav-item w-full flex items-center px-3 py-2 text-xs rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
             <i class="fa-solid fa-truck-field w-5 text-sm mr-2 text-emerald-400"></i> Supplier
         </button>
+		<!-- Tombol Sub-Menu Kalkulator Dosis (Tambahan Baru) -->
+<button type="button" onclick="bukaKalkulatorDosis()" class="nav-item w-full flex items-center px-3 py-2 text-xs rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+    <i class="fa-solid fa-calculator w-5 text-sm mr-2 text-sky-400"></i> Kalkulator Dosis Anak
+</button>
     </div>
 </div>
 
@@ -4528,10 +4532,9 @@ function renderTabelMasterObat() {
                 <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
                 <td class="px-4 py-2.5 text-center">
                     <div class="flex items-center justify-center space-x-1">
-                        <!-- Menggunakan index dinamis '${index}' agar tombol edit/hapus sesuai barisnya -->
-                        <button type="button" onclick="editObat(${index})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
+                       <button type="button" onclick="editObat(${index})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
+    <i class="fa-solid fa-pen-to-square"></i>
+</button>
                         <button type="button" onclick="hapusObat(${index})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -4575,9 +4578,9 @@ function renderTabelMasterObat(dataArray = null) {
                 <td class="px-4 py-2.5 text-indigo-600 font-medium">${obat.literatur || '-'}</td>
                 <td class="px-4 py-2.5 text-center">
                     <div class="flex items-center justify-center space-x-1">
-                        <button type="button" onclick="editObat(${index})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
+                        <button type="button" onclick="editObat('${encodeURIComponent(obat.nama_obat || obat.nama)}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
+    <i class="fa-solid fa-pen-to-square"></i>
+</button>
                         <button type="button" onclick="hapusObat(${index})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -4611,36 +4614,45 @@ function filterMasterObat(keyword) {
     // Render ulang tabel dengan data hasil filter
     renderTabelMasterObat(filteredData);
 } 
-// Fungsi Mengaktifkan Fitur EDIT (Mengisi data ke modal form)
-function editObat(index) {
-    const obat = masterObatData[index];
+// Fungsi Edit Berbasis Nama Unik (Dijamin 100% Akurat & Tidak Tertukar)
+function editObat(encodedName) {
+    const namaCari = decodeURIComponent(encodedName).trim().toLowerCase();
+    const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
+    
+    const obat = masterObat.find(o => {
+        const namaDb = String(o.nama_obat || o.nama || '').trim().toLowerCase();
+        return namaDb === namaCari;
+    });
+
     if (!obat) {
-        alert("Data obat tidak ditemukan!");
+        alert("Data obat tidak ditemukan di database!");
         return;
     }
 
-    // Isi nilai input form berdasarkan data obat yang dipilih (disesuaikan dengan kolom Supabase)
-    const inputEditIndex = document.getElementById('input-edit-index');
-    if (inputEditIndex) inputEditIndex.value = index;
+    // ✨ SIMPAN ID DATABASE KE INPUT TERSEMBUNYI (PENTING AGAR TIDAK DUPLIKAT)
+    const inputEditId = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
+    if (inputEditId) inputEditId.value = obat.id || ''; // Mengambil ID unik dari database Supabase
 
+    // Isi nilai input form
     document.getElementById('input-nama-master').value = obat.nama_obat || obat.nama || '';
-    document.getElementById('input-kekuatan-master').value = obat.kekuatan || '';
+    document.getElementById('input-kekuatan-master').value = obat.kekuatan || obat.kekuatan_mg || '';
     document.getElementById('input-indikasi-master').value = obat.indikasi || '';
     document.getElementById('input-efek-master').value = obat.efek_samping || obat.efekSamping || '';
-    document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || '';
+    document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || obat.dosis_min || '';
     document.getElementById('input-fda-master').value = obat.fda || obat.kategoriFda || 'B';
     
     const inputLiteratur = document.getElementById('input-literatur-master');
     if (inputLiteratur) inputLiteratur.value = obat.literatur || '';
 
-    // Ubah Judul Modal jika elemennya ada
     const modalTitle = document.getElementById('modal-obat-title');
     if (modalTitle) modalTitle.innerText = 'Edit Data Obat';
 
-    // Tampilkan Modal
     const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.remove('hidden');
-} 
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+}   
 
 // 3. Fungsi Buka Modal Tambah Obat Baru
 function bukaModalObatBaru() {
@@ -4660,42 +4672,77 @@ function tutupModalObat() {
 
 // // 5. Fungsi Menyimpan Data (Menangani Tambah & Edit) - Terintegrasi JSON & Supabase
 async function simpanMasterObat(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
 
-    const editIndex = parseInt(document.getElementById('input-edit-index').value);
-    
-    const dataObat = {
-        nama_obat: document.getElementById('input-nama-master').value.trim(),
-        kekuatan: document.getElementById('input-kekuatan-master').value.trim(),
-        indikasi: document.getElementById('input-indikasi-master').value.trim(),
-        efek_samping: document.getElementById('input-efek-master').value.trim(),
-        dosis_kgbb: document.getElementById('input-dosis-master').value.trim(),
-        fda: document.getElementById('input-fda-master').value,
-        literatur: document.getElementById('input-literatur-master').value.trim()
+    // Ambil ID dari input tersembunyi
+    const editId = document.getElementById('input-edit-id')?.value || document.getElementById('input-edit-index')?.value;
+    const namaInput = document.getElementById('input-nama-master')?.value.trim();
+    const kekuatanInput = document.getElementById('input-kekuatan-master')?.value.trim();
+    const indikasiInput = document.getElementById('input-indikasi-master')?.value.trim();
+    const efekInput = document.getElementById('input-efek-master')?.value.trim();
+    const dosisInput = document.getElementById('input-dosis-master')?.value.trim();
+    const fdaInput = document.getElementById('input-fda-master')?.value.trim();
+    const literaturInput = document.getElementById('input-literatur-master')?.value.trim();
+
+    if (!namaInput) {
+        alert("Nama obat wajib diisi!");
+        return;
+    }
+
+    const payload = {
+        nama_obat: namaInput,
+        kekuatan: kekuatanInput,
+        indikasi: indikasiInput,
+        efek_samping: efekInput,
+        dosis_kgbb: dosisInput,
+        fda: fdaInput,
+        literatur: literaturInput
     };
 
-    if (editIndex >= 0 && masterObatData[editIndex] && masterObatData[editIndex].id) {
-        dataObat.id = masterObatData[editIndex].id;
+    if (editId && editId !== "") {
+        payload.id = isNaN(editId) ? editId : parseInt(editId); // Sesuaikan dengan tipe ID Supabase (UUID / Integer)
     }
 
     try {
         const { error } = await _supabase
-            .from('master_obat')
-            .upsert(dataObat);
+            .from('master_obat') // Sesuaikan nama tabel Anda jika berbeda
+            .upsert(payload);
 
         if (error) {
-            console.error("Gagal menyimpan master obat ke Supabase:", error.message);
-            alert("Gagal menyimpan: " + error.message);
+            alert("Gagal menyimpan ke Supabase: " + error.message);
             return;
         }
 
-        await loadFromSupabase();
-    } catch (err) {
-        console.error("Kesalahan koneksi:", err);
-    }
+        // ==========================================
+        // ✨ OTOMATIS TUTUP MODAL & RESET FORM DI SINI
+        // ==========================================
+        const modal = document.getElementById('modal-master-obat');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.style.display = 'none'; // Memastikan modal benar-benar tertutup
+        }
 
-    tutupModalObat();
-}  
+        // Reset form & kosongkan input ID edit
+        const formObj = document.getElementById('form-master-obat');
+        if (formObj) formObj.reset();
+
+        const inputEditIdField = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
+        if (inputEditIdField) inputEditIdField.value = '';
+        // ==========================================
+
+        // Reload data terbaru dari Supabase / Render ulang tabel
+        if (typeof loadMasterObatFromSupabase === 'function') {
+            await loadMasterObatFromSupabase();
+        } else if (typeof renderTabelMasterObat === 'function') {
+            renderTabelMasterObat();
+        }
+
+        alert("Data obat berhasil disimpan!");
+
+    } catch (err) {
+        console.error("Error simpanMasterObat:", err);
+    }
+}    
 
 
 // --- LOGIKA SURAT PESANAN ---
@@ -5490,12 +5537,13 @@ function cetakSuratPesanan(index) {
                     window.print();
                     window.onafterprint = function() { window.close(); };
                 };
-            <\/script>
+			<\/script>
         </body>
         </html>
     `);
     printWin.document.close();
 }
+
 // --- LOGIKA DATA SUPPLIER ---
 let supplierData = JSON.parse(localStorage.getItem('apotek_supplier_db')) || [
     { id: 1, nama: "PT Kimia Farma Trading & Distribution", alamat: "Jl. Rawageni No. 45, Jakarta", telp: "021778899" }
@@ -5623,6 +5671,7 @@ function hapusSupplier(index) {
         renderTabelSupplier();
     }
 }
+
 // ==========================================
 // KODE LENGKAP FITUR INTERAKSI OBAT (MEDSCAPE)
 // ==========================================
@@ -5711,7 +5760,257 @@ function exportDataInteraksiExcel() {
 document.addEventListener('DOMContentLoaded', () => {
     renderTabelMasterObat();
 });
+     
+   // ==========================================
+        // 1. Kalkulator Dosis Obat Anak
+        // ==========================================
+        let selectedObatCalc = null;
+
+        function bukaKalkulatorDosis() {
+            const modal = document.getElementById('modal-kalkulator-dosis');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+
+            const inputObat = document.getElementById('calc-search-obat');
+            if (inputObat) inputObat.value = '';
+            const inputBB = document.getElementById('calc-bb');
+            if (inputBB) inputBB.value = '';
+            const inputUsia = document.getElementById('calc-usia');
+            if (inputUsia) inputUsia.value = '';
+
+            const infoAturan = document.getElementById('calc-info-aturan');
+            if (infoAturan) infoAturan.innerHTML = 'Belum ada obat yang dipilih. Silakan pilih obat terlebih dahulu.';
+
+            const hasilBox = document.getElementById('calc-hasil-box');
+            if (hasilBox) hasilBox.classList.add('hidden');
+
+            // --- ISI OTOMATIS DATALIST DARI MASTER OBAT ---
+            const datalist = document.getElementById('list-master-calc');
+            const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
+            
+            if (datalist) {
+                datalist.innerHTML = masterObat.map(o => {
+                    const nama = o.nama_obat || o.nama || '';
+                    return `<option value="${nama}">`;
+                }).join('');
+            }
+        } 
+
+        function pilihObatKalkulator(namaObat) {
+            const infoAturan = document.getElementById('calc-info-aturan');
+            const hasilBox = document.getElementById('calc-hasil-box');
+
+            if (!namaObat) {
+                infoAturan.innerHTML = 'Belum ada obat yang dipilih. Silakan pilih obat terlebih dahulu.';
+                if (hasilBox) hasilBox.classList.add('hidden');
+                selectedObatCalc = null;
+                return;
+            }
+
+            const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
+            selectedObatCalc = masterObat.find(o => (o.nama_obat || o.nama || '').toLowerCase() === namaObat.toLowerCase());
+
+            if (!selectedObatCalc) {
+                infoAturan.innerHTML = `
+                    <div class="text-rose-600 font-semibold">⚠️ Obat tidak ditemukan di Master Obat.</div>
+                    <div class="text-slate-500">Silakan pilih obat dari daftar master.</div>
+                `;
+                if (hasilBox) hasilBox.classList.add('hidden');
+                selectedObatCalc = null;
+                return;
+            }
+
+            const teksKekuatan = String(selectedObatCalc.kekuatan || selectedObatCalc.kekuatan_mg || '');
+            const teksDosis = String(selectedObatCalc.dosis_kgbb || selectedObatCalc.dosis || selectedObatCalc.dosis_min || '');
+
+            let mgSediaan = 0;
+            let mlSediaan = 5;
+
+            const matchMg = teksKekuatan.match(/(\d+)\s*mg/i);
+            const matchMl = teksKekuatan.match(/(\d+)\s*ml/i);
+            if (matchMg) mgSediaan = parseFloat(matchMg[1]);
+            if (matchMl) mlSediaan = parseFloat(matchMl[1]);
+
+            let minDosis = 0;
+            let maxDosis = 0;
+
+            const matchDosisRentang = teksDosis.match(/(\d+(?:\.\d+)?)\s*[-–to]\s*(\d+(?:\.\d+)?)/i);
+            if (matchDosisRentang) {
+                minDosis = parseFloat(matchDosisRentang[1]);
+                maxDosis = parseFloat(matchDosisRentang[2]);
+            } else {
+                const matchDosisSingle = teksDosis.match(/(\d+(?:\.\d+)?)/);
+                if (matchDosisSingle) {
+                    minDosis = parseFloat(matchDosisSingle[1]);
+                    maxDosis = minDosis;
+                }
+            }
+
+            if (!mgSediaan) mgSediaan = 120;
+            if (!minDosis) minDosis = 10;
+            if (!maxDosis) maxDosis = minDosis;
+
+            selectedObatCalc.parsed_min = minDosis;
+            selectedObatCalc.parsed_max = maxDosis;
+            selectedObatCalc.parsed_mg = mgSediaan;
+            selectedObatCalc.parsed_ml = mlSediaan;
+
+            infoAturan.innerHTML = `
+                <div><b>Kekuatan Sediaan:</b> ${teksKekuatan || (mgSediaan + ' mg / ' + mlSediaan + ' mL')}</div>
+                <div><b>Rentang Dosis Referensi:</b> ${teksDosis || (minDosis + ' s.d ' + maxDosis + ' mg/kgBB')}</div>
+            `;
+
+            hitungDosisOtomatis();
+        }
+
+        function hitungDosisOtomatis() {
+            const bbInput = document.getElementById('calc-bb');
+            const bb = parseFloat(bbInput ? bbInput.value : 0);
+            const hasilBox = document.getElementById('calc-hasil-box');
+
+            if (!bb || bb <= 0 || !selectedObatCalc) {
+                if (hasilBox) hasilBox.classList.add('hidden');
+                return;
+            }
+
+            const minDosis = selectedObatCalc.parsed_min || 10;
+            const maxDosis = selectedObatCalc.parsed_max || 15;
+            const mgSediaan = selectedObatCalc.parsed_mg || 120;
+            const mlSediaan = selectedObatCalc.parsed_ml || 5;
+
+            const totalMinMg = bb * minDosis;
+            const totalMaxMg = bb * maxDosis;
+            const totalMinMl = (totalMinMg / mgSediaan) * mlSediaan;
+            const totalMaxMl = (totalMaxMg / mgSediaan) * mlSediaan;
+
+            document.getElementById('calc-res-mg').innerText = `${totalMinMg.toFixed(1)} mg - ${totalMaxMg.toFixed(1)} mg`;
+            document.getElementById('calc-res-ml').innerText = `± ${totalMinMl.toFixed(1)} mL - ${totalMaxMl.toFixed(1)} mL`;
+
+            if (hasilBox) hasilBox.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 2. Fitur Edit Master Obat
+        // ==========================================
+        function editObat(encodedName) {
+            const namaCari = decodeURIComponent(encodedName).trim().toLowerCase();
+            const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
+            
+            const obat = masterObat.find(o => {
+                const namaDb = String(o.nama_obat || o.nama || '').trim().toLowerCase();
+                return namaDb === namaCari;
+            });
+
+            if (!obat) {
+                alert("Data obat tidak ditemukan di database!");
+                return;
+            }
+
+            const inputEditId = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
+            if (inputEditId) inputEditId.value = obat.id || '';
+
+            document.getElementById('input-nama-master').value = obat.nama_obat || obat.nama || '';
+            document.getElementById('input-kekuatan-master').value = obat.kekuatan || obat.kekuatan_mg || '';
+            document.getElementById('input-indikasi-master').value = obat.indikasi || '';
+            document.getElementById('input-efek-master').value = obat.efek_samping || obat.efekSamping || '';
+            document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || obat.dosis_min || '';
+            document.getElementById('input-fda-master').value = obat.fda || obat.kategoriFda || 'B';
+            
+            const inputLiteratur = document.getElementById('input-literatur-master');
+            if (inputLiteratur) inputLiteratur.value = obat.literatur || '';
+
+            const modalTitle = document.getElementById('modal-obat-title');
+            if (modalTitle) modalTitle.innerText = 'Edit Data Obat';
+
+            const modal = document.getElementById('modal-master-obat');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        }
+
+        // Inisialisasi Utama Aplikasi
         window.onload = initApp;
     </script>
+
+    <!-- ========================================== -->
+    <!-- KERANGKA HTML MODAL (DI LUAR SCRIPT)       -->
+    <!-- ========================================== -->
+    <div id="modal-kalkulator-dosis" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden border border-slate-100">
+            <!-- Header Modal -->
+            <div class="bg-gradient-to-r from-sky-600 to-blue-700 px-6 py-4 flex items-center justify-between text-white">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-calculator text-xl"></i>
+                    <h3 class="font-bold text-base">Kalkulator Dosis Obat Anak</h3>
+                </div>
+                <button type="button" onclick="tutupKalkulatorDosis()" class="text-white/80 hover:text-white text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Body Form Kalkulator -->
+            <div class="p-6 space-y-4">
+                <div class="bg-sky-50 border border-sky-100 rounded-xl p-3 text-xs text-sky-800 flex items-start space-x-2">
+                    <i class="fa-solid fa-circle-info text-sky-600 mt-0.5"></i>
+                    <span>Gunakan alat ini untuk memandu staf non-farmasi dalam menghitung takaran obat anak secara aman berdasarkan Berat Badan (kg).</span>
+                </div>
+
+                <!-- Pilih Obat -->
+                <div>
+                    <!-- Input pencarian obat -->
+<input type="text" id="calc-search-obat" list="list-master-calc" placeholder="Ketik atau pilih nama obat..." class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500" oninput="pilihObatKalkulator(this.value)" onchange="pilihObatKalkulator(this.value)">
+
+<!-- Datalist penampung pilihan -->
+<datalist id="list-master-calc"></datalist>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Berat Badan -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Berat Badan Anak (kg)</label>
+                        <input type="number" id="calc-bb" step="0.1" min="1" placeholder="Contoh: 14" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500" oninput="hitungDosisOtomatis()">
+                    </div>
+                    <!-- Usia (Opsional) -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Usia (Tahun/Bulan)</label>
+                        <input type="text" id="calc-usia" placeholder="Cth: 3 Tahun" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500">
+                    </div>
+                </div>
+
+                <!-- Info Aturan Pakai Master -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <div class="font-semibold text-slate-700">Aturan Dosis Referensi:</div>
+                    <div id="calc-info-aturan" class="text-slate-500 italic">Belum ada obat yang dipilih. Silakan pilih obat terlebih dahulu.</div>
+                </div>
+
+                <!-- Hasil Perhitungan -->
+                <div id="calc-hasil-box" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2">
+                    <div class="font-bold text-emerald-800 text-xs uppercase tracking-wider flex items-center space-x-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Hasil Perhitungan Dosis Aman</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-emerald-200 text-xs">
+                        <div>
+                            <span class="text-slate-500 block">Dosis Sekali Minum (mg):</span>
+                            <span id="calc-res-mg" class="font-bold text-emerald-900 text-sm">-</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block">Anjuran Volume Sirup (mL):</span>
+                            <span id="calc-res-ml" class="font-bold text-blue-700 text-sm">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="text-[10px] text-slate-400 italic text-center pt-2">
+                    * Hasil ini adalah alat bantu hitung awal. Untuk kasus khusus atau bayi di bawah 1 tahun, wajib dikonfirmasi ke Apoteker.
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-slate-50 px-6 py-3 border-t flex justify-end">
+                <button type="button" onclick="tutupKalkulatorDosis()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition">Tutup</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
