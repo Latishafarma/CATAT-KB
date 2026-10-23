@@ -1670,11 +1670,11 @@
             setupRealtimeSync();
         }
 
-        async function loadFromSupabase() {
+async function loadFromSupabase() {
     try {
-        console.log("Memulai pengambilan data master obat dari Supabase...");
+        console.log("Memulai pengambilan data dari Supabase...");
         
-        // 1. Ambil data utama pengaturan aplikasi
+        // 1. Ambil data utama pengaturan aplikasi (catat_kb_main_db)
         const { data: settingData } = await _supabase
             .from('app_settings')
             .select('*')
@@ -1696,23 +1696,36 @@
         if (obatError) {
             console.error("Gagal memuat tabel master obat:", obatError.message);
         } else if (obatData) {
-            // Masukkan data mentah ke variabel global masterObatData
             masterObatData = obatData;
             console.log("Data master obat berhasil dimuat ke memori:", masterObatData);
         }
 
-        // 3. PAKSA render tabel dijalankan agar data langsung muncul di layar
+        // 3. AMBIL DATA LANGSUNG DARI TABEL 'supplier' (TAMBAHAN BARU)
+        const { data: supData, error: supError } = await _supabase
+            .from('supplier')
+            .select('*');
+
+        if (supError) {
+            console.error("Gagal memuat tabel supplier:", supError.message);
+        } else if (supData) {
+            supplierData = supData;
+            localStorage.setItem('apotek_supplier_db', JSON.stringify(supplierData));
+            console.log("Data supplier berhasil dimuat ke memori:", supplierData);
+        }
+
+        // 4. PAKSA render tabel dijalankan agar data langsung muncul di layar
         if (typeof renderTabelMasterObat === 'function') {
             renderTabelMasterObat();
-            console.log("Fungsi renderTabelMasterObat() berhasil dipanggil!");
-        } else {
-            console.error("Fungsi renderTabelMasterObat tidak ditemukan!");
+        }
+        
+        if (typeof renderTabelSupplier === 'function') {
+            renderTabelSupplier();
         }
 
     } catch (err) { 
         console.error("Terjadi kesalahan saat memuat data:", err); 
     }
-}  
+} 
 
 
 // ==========================================
@@ -4682,44 +4695,69 @@ function renderTabelSuratPesanan() {
     const keyword = (document.getElementById('search-surat-pesanan')?.value || '').toLowerCase().trim();
     if (!tbody) return;
 
+    // Ambil data terbaru dari localStorage
+    suratPesananData = JSON.parse(localStorage.getItem('apotek_surat_pesanan_db')) || [];
+
+    if (suratPesananData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 italic">Belum ada riwayat surat pesanan.</td></tr>`;
+        return;
+    }
+
     let filtered = suratPesananData.filter(sp => {
-        const jenisMatch = (sp.jenis || '').toLowerCase().includes(keyword);
-        const nomorMatch = (sp.nomor || '').toLowerCase().includes(keyword);
-        const supplierMatch = (sp.supplierNama || '').toLowerCase().includes(keyword);
-        const obatMatch = (sp.items || []).some(item => (item.namaObat || '').toLowerCase().includes(keyword));
-        return jenisMatch || nomorMatch || supplierMatch || obatMatch;
+        const jenis = sp.jenis || sp.jenis_sp || '';
+        const nomor = sp.nomor || sp.nomor_sp || '';
+        const supplier = sp.supplierNama || sp.supplier_nama || '';
+        const items = sp.items || sp.item_obat || [];
+
+        const jenisMatch = jenis.toLowerCase().includes(keyword);
+        const nomorMatch = nomor.toLowerCase().includes(keyword);
+        const supplierMatch = supplier.toLowerCase().includes(keyword);
+        const obatMatch = items.some(item => (item.namaObat || item.nama_obat || '').toLowerCase().includes(keyword));
+        
+        return keyword === '' || jenisMatch || nomorMatch || supplierMatch || obatMatch;
     });
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 italic">Belum ada riwayat surat pesanan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 italic">Pencarian tidak ditemukan.</td></tr>`;
         return;
     }
 
     let html = '';
     filtered.forEach((sp, index) => {
-        const originalIndex = suratPesananData.findIndex(item => item.id === sp.id);
-        const daftarObatStr = (sp.items || []).map(i => `• ${i.namaObat} (${i.jumlah} ${i.satuan})`).join('<br>');
+        const originalIndex = suratPesananData.findIndex(item => (item.id && item.id === sp.id) || item.nomor === sp.nomor);
+        const jenisVal = sp.jenis || sp.jenis_sp || '-';
+        const nomorVal = sp.nomor || sp.nomor_sp || '-';
+        const tanggalVal = sp.tanggal || '-';
+        const supplierVal = sp.supplierNama || sp.supplier_nama || '-';
+        const itemsArr = sp.items || sp.item_obat || [];
+
+        const daftarObatStr = itemsArr.map(i => {
+            const nama = i.namaObat || i.nama_obat || '-';
+            const jumlah = i.jumlah || 0;
+            const satuan = i.satuan || '';
+            return `• ${nama} (${jumlah} ${satuan})`;
+        }).join('<br>');
 
         html += `
             <tr class="hover:bg-slate-50 transition border-b">
                 <td class="py-3 px-4 text-center font-medium">${index + 1}</td>
                 <td class="py-3 px-4">
-                    <span class="font-bold text-slate-800">${sp.nomor || '-'}</span><br>
-                    <span class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>${sp.tanggal || '-'}</span>
+                    <span class="font-bold text-slate-800">${nomorVal}</span><br>
+                    <span class="text-xs text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>${tanggalVal}</span>
                 </td>
-                <td class="py-3 px-4"><span class="bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full text-xs font-semibold">${sp.jenis}</span></td>
-                <td class="py-3 px-4 font-medium text-slate-700">${sp.supplierNama || '-'}</td>
+                <td class="py-3 px-4"><span class="bg-sky-50 text-sky-700 px-2.5 py-1 rounded-full text-xs font-semibold">${jenisVal}</span></td>
+                <td class="py-3 px-4 font-medium text-slate-700">${supplierVal}</td>
                 <td class="py-3 px-4 text-xs text-slate-600 leading-relaxed">${daftarObatStr || '-'}</td>
                 <td class="py-3 px-4 text-center whitespace-nowrap">
-                    <button type="button" onclick="cetakSuratPesanan(${originalIndex})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Cetak Surat Pesanan"><i class="fa-solid fa-print"></i></button>
-                    <button type="button" onclick="editSuratPesanan(${originalIndex})" class="p-1.5 text-sky-600 hover:bg-sky-50 rounded-lg transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button type="button" onclick="hapusSuratPesanan(${originalIndex})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                    <button type="button" onclick="cetakSuratPesanan(${originalIndex >= 0 ? originalIndex : index})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Cetak Surat Pesanan"><i class="fa-solid fa-print"></i></button>
+                    <button type="button" onclick="editSuratPesanan(${originalIndex >= 0 ? originalIndex : index})" class="p-1.5 text-sky-600 hover:bg-sky-50 rounded-lg transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button type="button" onclick="hapusSuratPesanan(${originalIndex >= 0 ? originalIndex : index})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                 </td>
             </tr>
         `;
     });
     tbody.innerHTML = html;
-}
+} 
 
 // 2. Buka Modal Surat Pesanan Baru
 function bukaModalSuratPesananBaru() {
@@ -4774,9 +4812,9 @@ function tambahBarisItemPesanan(itemData = {}) {
     const rowId = 'row-item-' + Date.now() + Math.random().toString(36).substr(2, 4);
     const rowNum = tbody.rows.length + 1;
 
-    // Ambil data dari master obat untuk datalist pencarian otomatis
+    // Ambil data dari master obat untuk datalist pencarian otomatis (menggunakan fallback nama_obat / nama)
     const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : [];
-    let datalistOptions = masterObat.map(o => `<option value="${o.nama}">`).join('');
+    let datalistOptions = masterObat.map(o => `<option value="${o.nama_obat || o.nama || ''}">`).join('');
 
     const tr = document.createElement('tr');
     tr.id = rowId;
@@ -4797,7 +4835,7 @@ function tambahBarisItemPesanan(itemData = {}) {
         </td>
     `;
     tbody.appendChild(tr);
-}
+} 
 
 function hapusBarisItemPesanan(rowId) {
     const row = document.getElementById(rowId);
@@ -4816,15 +4854,19 @@ function reorderRowNumbers() {
 function pilihOtomatisMasterObat(inputElem) {
     const val = inputElem.value.trim().toLowerCase();
     const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : [];
-    const matched = masterObat.find(o => o.nama.toLowerCase() === val);
+    
+    // Cari berdasarkan nama_obat atau nama dengan aman
+    const matched = masterObat.find(o => {
+        const nama = (o.nama_obat || o.nama || '').toLowerCase();
+        return nama === val;
+    });
     
     const tr = inputElem.closest('tr');
     if (matched && tr) {
-        // Hanya mengambil kekuatan obat (misal: 500 mg)
         tr.querySelector('.input-zat').value = matched.kekuatan || '';
-        tr.querySelector('.input-bentuk').value = 'Tablet'; // Default bentuk sediaan
+        tr.querySelector('.input-bentuk').value = 'Tablet'; 
     }
-}
+} 
 
 /// Fungsi pembantu untuk mengirim data item obat ke Supabase
 async function simpanSuratPesananKeSupabase(dataSP) {
