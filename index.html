@@ -5889,7 +5889,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (hasilBox) hasilBox.classList.remove('hidden');
         }
-
+// ==========================================
+        // FUNGSI PENUTUP MODAL KALKULATOR DOSIS
+        // ==========================================
+        function tutupKalkulatorDosis() {
+            const modal = document.getElementById('modal-kalkulator-dosis');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none'; // Memastikan modal benar-benar tersembunyi
+            }
+        } 
         // ==========================================
         // 2. Fitur Edit Master Obat
         // ==========================================
