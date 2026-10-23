@@ -4831,13 +4831,33 @@ function tutupModalSuratPesanan() {
 
 function muatDropdownSupplier(selectedName = '') {
     const select = document.getElementById('sp-supplier');
-    const supList = JSON.parse(localStorage.getItem('apotek_supplier_db')) || [];
+    if (!select) return;
+
+    // Gunakan supplierData global atau fallback ke localStorage
+    const supList = (typeof supplierData !== 'undefined' && supplierData.length > 0) 
+        ? supplierData 
+        : (JSON.parse(localStorage.getItem('apotek_supplier_db')) || []);
+
     select.innerHTML = '<option value="">-- Pilih Supplier --</option>';
+    
     supList.forEach(sup => {
-        let isSelected = sup.nama === selectedName ? 'selected' : '';
-        select.innerHTML += `<option value="${sup.nama}" data-alamat="${sup.alamat || '-'}" data-telp="${sup.telp || '-'}" ${isSelected}>${sup.nama}</option>`;
+        // Sesuaikan dengan nama kolom Supabase: nama_supplier dan no_tlp
+        const namaSup = sup.nama_supplier || sup.nama || '';
+        const alamatSup = sup.alamat || '-';
+        const telpSup = sup.no_tlp || sup.telp || '-';
+
+        let isSelected = namaSup === selectedName ? 'selected' : '';
+        
+        select.innerHTML += `
+            <option value="${namaSup}" data-alamat="${alamatSup}" data-telp="${telpSup}" ${isSelected}>
+                ${namaSup}
+            </option>
+        `;
     });
-    autofillSupplierData();
+    
+    if (typeof autofillSupplierData === 'function') {
+        autofillSupplierData();
+    }
 }
 
 function autofillSupplierData() {
@@ -5478,19 +5498,24 @@ function renderTabelSupplier() {
     const tbody = document.getElementById('tabel-supplier-body');
     if (!tbody) return;
 
-    if (supplierData.length === 0) {
+    if (!supplierData || supplierData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 text-xs italic">Belum ada data supplier.</td></tr>`;
         return;
     }
 
     let html = '';
     supplierData.forEach((sup, index) => {
+        // Ambil data sesuai nama kolom tabel di Supabase
+        const namaSup = sup.nama_supplier || sup.nama || '-';
+        const alamatSup = sup.alamat || '-';
+        const telpSup = sup.no_tlp || sup.telp || '-';
+
         html += `
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
                 <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
-                <td class="px-4 py-2.5 font-semibold text-slate-800">${sup.nama || '-'}</td>
-                <td class="px-4 py-2.5">${sup.alamat || '-'}</td>
-                <td class="px-4 py-2.5">${sup.telp || '-'}</td>
+                <td class="px-4 py-2.5 font-semibold text-slate-800">${namaSup}</td>
+                <td class="px-4 py-2.5">${alamatSup}</td>
+                <td class="px-4 py-2.5">${telpSup}</td>
                 <td class="px-4 py-2.5 text-center">
                     <div class="flex items-center justify-center space-x-1">
                         <button type="button" onclick="editSupplier(${index})" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Edit Data">
@@ -5505,7 +5530,7 @@ function renderTabelSupplier() {
         `;
     });
     tbody.innerHTML = html;
-}
+} 
 
 // 2. Buka Modal Tambah Supplier
 function bukaModalSupplierBaru() {
@@ -5521,26 +5546,47 @@ function tutupModalSupplier() {
 }
 
 // 4. Simpan Data Supplier (Tambah / Edit)
-function simpanSupplier(event) {
-    event.preventDefault();
+async function simpanSupplier(event) {
+    if (event) event.preventDefault();
 
-    const editIndex = parseInt(document.getElementById('input-edit-supplier-index').value);
-    const dataSupplier = {
-        id: editIndex >= 0 ? supplierData[editIndex].id : Date.now(),
-        nama: document.getElementById('input-supplier-nama').value.trim(),
-        alamat: document.getElementById('input-supplier-alamat').value.trim(),
-        telp: document.getElementById('input-supplier-telp').value.trim()
-    };
+    const editIndex = parseInt(document.getElementById('input-edit-supplier-index')?.value || '-1');
+    const namaInput = document.getElementById('input-supplier-nama')?.value.trim();
+    const alamatInput = document.getElementById('input-supplier-alamat')?.value.trim();
+    const telpInput = document.getElementById('input-supplier-telp')?.value.trim();
 
-    if (editIndex >= 0) {
-        supplierData[editIndex] = dataSupplier;
-    } else {
-        supplierData.push(dataSupplier);
+    if (!namaInput) {
+        alert("Nama supplier wajib diisi!");
+        return;
     }
 
-    localStorage.setItem('apotek_supplier_db', JSON.stringify(supplierData));
-    renderTabelSupplier();
-    tutupModalSupplier();
+    // Payload yang dikirim ke Supabase
+    const payload = {
+        nama_supplier: namaInput,
+        alamat: alamatInput,
+        no_tlp: telpInput
+    };
+
+    // Jika mode edit, sertakan ID
+    if (editIndex >= 0 && supplierData[editIndex] && supplierData[editIndex].id) {
+        payload.id = supplierData[editIndex].id;
+    }
+
+    try {
+        const { error } = await _supabase
+            .from('supplier')
+            .upsert(payload);
+
+        if (error) {
+            alert("Gagal menyimpan ke Supabase: " + error.message);
+            return;
+        }
+
+        await loadFromSupabase(); // Reload data dari Supabase
+        tutupModalSupplier();
+        alert("Data supplier berhasil disimpan!");
+    } catch (err) {
+        console.error("Error simpanSupplier:", err);
+    }
 }
 
 // 5. Edit Supplier
@@ -5549,12 +5595,14 @@ function editSupplier(index) {
     if (!sup) return;
 
     document.getElementById('input-edit-supplier-index').value = index;
-    document.getElementById('input-supplier-nama').value = sup.nama || '';
+    document.getElementById('input-supplier-nama').value = sup.nama_supplier || sup.nama || '';
     document.getElementById('input-supplier-alamat').value = sup.alamat || '';
-    document.getElementById('input-supplier-telp').value = sup.telp || '';
-    document.getElementById('modal-supplier-title').innerText = 'Edit Data Supplier';
-    document.getElementById('modal-supplier').classList.remove('hidden');
-}
+    document.getElementById('input-supplier-telp').value = sup.no_tlp || sup.telp || '';
+
+    // Tampilkan modal
+    const modal = document.getElementById('modal-supplier');
+    if (modal) modal.classList.remove('hidden');
+} 
 
 // 6. Hapus Supplier
 function hapusSupplier(index) {
