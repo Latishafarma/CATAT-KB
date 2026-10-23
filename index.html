@@ -4861,9 +4861,17 @@ function tambahBarisItemPesanan(itemData = {}) {
     const rowId = 'row-item-' + Date.now() + Math.random().toString(36).substr(2, 4);
     const rowNum = tbody.rows.length + 1;
 
-    // Ambil data dari master obat untuk datalist pencarian otomatis (menggunakan fallback nama_obat / nama)
+    // Ambil data dari master obat untuk datalist pencarian otomatis
     const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : [];
-    let datalistOptions = masterObat.map(o => `<option value="${o.nama_obat || o.nama || ''}">`).join('');
+    let datalistObatOptions = masterObat.map(o => `<option value="${o.nama_obat || o.nama || ''}">`).join('');
+
+    // Opsi pilihan untuk Bentuk Sediaan
+    const listBentukSediaan = ['SIRUP CAIR', 'SIRUP KERING', 'CAIRAN INJEKSI', 'TABLET', 'KAPSUL'];
+    let datalistBentukOptions = listBentukSediaan.map(b => `<option value="${b}">`).join('');
+
+    // Opsi pilihan untuk Satuan
+    const listSatuan = ['BOX', 'STRIP', 'TUBE', 'SUPPO', 'AMPUL', 'BTL', 'KARTON', 'PCS', 'RENTENG', 'FLS'];
+    let datalistSatuanOptions = listSatuan.map(s => `<option value="${s}">`).join('');
 
     const tr = document.createElement('tr');
     tr.id = rowId;
@@ -4871,20 +4879,32 @@ function tambahBarisItemPesanan(itemData = {}) {
     tr.innerHTML = `
         <td class="p-2 text-center row-number font-medium">${rowNum}</td>
         <td class="p-2 relative">
-            <input type="text" list="list-master-obat-sp" value="${itemData.namaObat || ''}" placeholder="Ketik nama obat..." class="input-nama-obat w-full px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-sky-500 outline-none" required oninput="pilihOtomatisMasterObat(this)">
-            <datalist id="list-master-obat-sp">${datalistOptions}</datalist>
+            <input type="text" list="list-master-obat-sp-${rowId}" value="${itemData.namaObat || ''}" placeholder="Ketik nama obat..." class="input-nama-obat w-full px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-sky-500 outline-none" required oninput="pilihOtomatisMasterObat(this)">
+            <datalist id="list-master-obat-sp-${rowId}">${datalistObatOptions}</datalist>
         </td>
         <td class="p-2"><input type="text" value="${itemData.zatAktif || ''}" placeholder="Zat Aktif & Kekuatan" class="input-zat w-full px-2 py-1.5 border rounded-lg outline-none"></td>
-        <td class="p-2"><input type="text" value="${itemData.bentukSediaan || ''}" placeholder="Tablet / Syr" class="input-bentuk w-full px-2 py-1.5 border rounded-lg outline-none"></td>
+        
+        <!-- Kolom Bentuk Sediaan dengan Dropdown & Pencarian Otomatis -->
+        <td class="p-2 relative">
+            <input type="text" list="list-bentuk-${rowId}" value="${itemData.bentukSediaan || ''}" placeholder="Pilih/Cari bentuk..." class="input-bentuk w-full px-2 py-1.5 border rounded-lg outline-none">
+            <datalist id="list-bentuk-${rowId}">${datalistBentukOptions}</datalist>
+        </td>
+
         <td class="p-2"><input type="number" min="1" value="${itemData.jumlah || 1}" class="input-jumlah w-full px-2 py-1.5 border rounded-lg text-center outline-none" required></td>
-        <td class="p-2"><input type="text" value="${itemData.satuan || 'Box'}" placeholder="Box / Botol" class="input-satuan w-full px-2 py-1.5 border rounded-lg outline-none"></td>
+        
+        <!-- Kolom Satuan dengan Dropdown & Pencarian Otomatis -->
+        <td class="p-2 relative">
+            <input type="text" list="list-satuan-${rowId}" value="${itemData.satuan || 'BOX'}" placeholder="Pilih/Cari satuan..." class="input-satuan w-full px-2 py-1.5 border rounded-lg outline-none">
+            <datalist id="list-satuan-${rowId}">${datalistSatuanOptions}</datalist>
+        </td>
+
         <td class="p-2"><input type="text" value="${itemData.ket || '-'}" placeholder="Ket" class="input-ket w-full px-2 py-1.5 border rounded-lg outline-none"></td>
         <td class="p-2 text-center">
             <button type="button" onclick="hapusBarisItemPesanan('${rowId}')" class="text-rose-600 hover:text-rose-800 p-1"><i class="fa-solid fa-trash"></i></button>
         </td>
     `;
     tbody.appendChild(tr);
-} 
+}  
 
 function hapusBarisItemPesanan(rowId) {
     const row = document.getElementById(rowId);
