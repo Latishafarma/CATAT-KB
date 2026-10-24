@@ -98,7 +98,7 @@
     </button>
 
     <!-- Daftar Sub-Menu Apotek -->
-    <div id="apotek-submenu" class="hidden space-y-1 pl-3">
+    <div id="apotek-menu-dropdown" class="hidden pl-4 space-y-1 mt-1">
         <!-- Sub-Menu: Master Obat -->
         <button onclick="switchTab('master-obat')" id="btn-tab-master-obat" data-target="master-obat" class="nav-item w-full flex items-center px-3 py-2 text-xs rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
             <i class="fa-solid fa-boxes-stacked w-5 text-sm mr-2"></i> Master Obat
@@ -1979,18 +1979,27 @@ async function exportDataObat() {
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
 // Fungsi untuk membuka/menutup dropdown menu Apotek di sidebar
+// Fungsi untuk membuka/menutup menu apotek dan memutar ikon panah
 function toggleApotekMenu() {
-    const submenu = document.getElementById('apotek-submenu');
-    const arrow = document.getElementById('apotek-arrow');
-    
-    if (submenu.classList.contains('hidden')) {
-        submenu.classList.remove('hidden');
-        arrow.classList.add('rotate-180'); // Memutar panah ke atas
+    // Sesuaikan ID wadah/menu dropdown apotek Anda di bawah ini
+    const menuDropdown = document.getElementById('apotek-menu-dropdown'); 
+    const arrowIcon = document.getElementById('apotek-arrow');
+
+    if (menuDropdown) {
+        menuDropdown.classList.toggle('hidden');
+        
+        // Memutar ikon panah saat menu dibuka/ditutup
+        if (arrowIcon) {
+            if (menuDropdown.classList.contains('hidden')) {
+                arrowIcon.classList.remove('rotate-180');
+            } else {
+                arrowIcon.classList.add('rotate-180');
+            }
+        }
     } else {
-        submenu.classList.add('hidden');
-        arrow.classList.remove('rotate-180'); // Mengembalikan panah ke bawah
+        console.warn("Wadah menu dropdown apotek tidak ditemukan. Periksa ID elemen penampungnya.");
     }
-}
+} 
         function refreshCurrentActiveTab() {
     const active = document.querySelector('.tab-content:not(.hidden)');
     if(!active) return;
@@ -5785,160 +5794,145 @@ document.addEventListener('DOMContentLoaded', () => {
             const hasilBox = document.getElementById('calc-hasil-box');
             if (hasilBox) hasilBox.classList.add('hidden');
 
-            // --- ISI OTOMATIS DATALIST DARI MASTER OBAT ---
             const datalist = document.getElementById('list-master-calc');
             const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
-            
             if (datalist) {
-                datalist.innerHTML = masterObat.map(o => {
-                    const nama = o.nama_obat || o.nama || '';
-                    return `<option value="${nama}">`;
-                }).join('');
+                datalist.innerHTML = masterObat.map(o => `<option value="${o.nama_obat || o.nama || ''}">`).join('');
             }
-        } 
-
-        function pilihObatKalkulator(namaObat) {
-            const infoAturan = document.getElementById('calc-info-aturan');
-            const hasilBox = document.getElementById('calc-hasil-box');
-
-            if (!namaObat) {
-                infoAturan.innerHTML = 'Belum ada obat yang dipilih. Silakan pilih obat terlebih dahulu.';
-                if (hasilBox) hasilBox.classList.add('hidden');
-                selectedObatCalc = null;
-                return;
-            }
-
-            const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
-            selectedObatCalc = masterObat.find(o => (o.nama_obat || o.nama || '').toLowerCase() === namaObat.toLowerCase());
-
-            if (!selectedObatCalc) {
-                infoAturan.innerHTML = `
-                    <div class="text-rose-600 font-semibold">⚠️ Obat tidak ditemukan di Master Obat.</div>
-                    <div class="text-slate-500">Silakan pilih obat dari daftar master.</div>
-                `;
-                if (hasilBox) hasilBox.classList.add('hidden');
-                selectedObatCalc = null;
-                return;
-            }
-
-            const teksKekuatan = String(selectedObatCalc.kekuatan || selectedObatCalc.kekuatan_mg || '');
-            const teksDosis = String(selectedObatCalc.dosis_kgbb || selectedObatCalc.dosis || selectedObatCalc.dosis_min || '');
-
-            let mgSediaan = 0;
-            let mlSediaan = 5;
-
-            const matchMg = teksKekuatan.match(/(\d+)\s*mg/i);
-            const matchMl = teksKekuatan.match(/(\d+)\s*ml/i);
-            if (matchMg) mgSediaan = parseFloat(matchMg[1]);
-            if (matchMl) mlSediaan = parseFloat(matchMl[1]);
-
-            let minDosis = 0;
-            let maxDosis = 0;
-
-            const matchDosisRentang = teksDosis.match(/(\d+(?:\.\d+)?)\s*[-–to]\s*(\d+(?:\.\d+)?)/i);
-            if (matchDosisRentang) {
-                minDosis = parseFloat(matchDosisRentang[1]);
-                maxDosis = parseFloat(matchDosisRentang[2]);
-            } else {
-                const matchDosisSingle = teksDosis.match(/(\d+(?:\.\d+)?)/);
-                if (matchDosisSingle) {
-                    minDosis = parseFloat(matchDosisSingle[1]);
-                    maxDosis = minDosis;
-                }
-            }
-
-            if (!mgSediaan) mgSediaan = 120;
-            if (!minDosis) minDosis = 10;
-            if (!maxDosis) maxDosis = minDosis;
-
-            selectedObatCalc.parsed_min = minDosis;
-            selectedObatCalc.parsed_max = maxDosis;
-            selectedObatCalc.parsed_mg = mgSediaan;
-            selectedObatCalc.parsed_ml = mlSediaan;
-
-            infoAturan.innerHTML = `
-                <div><b>Kekuatan Sediaan:</b> ${teksKekuatan || (mgSediaan + ' mg / ' + mlSediaan + ' mL')}</div>
-                <div><b>Rentang Dosis Referensi:</b> ${teksDosis || (minDosis + ' s.d ' + maxDosis + ' mg/kgBB')}</div>
-            `;
-
-            hitungDosisOtomatis();
         }
 
-        function hitungDosisOtomatis() {
-            const bbInput = document.getElementById('calc-bb');
-            const bb = parseFloat(bbInput ? bbInput.value : 0);
-            const hasilBox = document.getElementById('calc-hasil-box');
-
-            if (!bb || bb <= 0 || !selectedObatCalc) {
-                if (hasilBox) hasilBox.classList.add('hidden');
-                return;
-            }
-
-            const minDosis = selectedObatCalc.parsed_min || 10;
-            const maxDosis = selectedObatCalc.parsed_max || 15;
-            const mgSediaan = selectedObatCalc.parsed_mg || 120;
-            const mlSediaan = selectedObatCalc.parsed_ml || 5;
-
-            const totalMinMg = bb * minDosis;
-            const totalMaxMg = bb * maxDosis;
-            const totalMinMl = (totalMinMg / mgSediaan) * mlSediaan;
-            const totalMaxMl = (totalMaxMg / mgSediaan) * mlSediaan;
-
-            document.getElementById('calc-res-mg').innerText = `${totalMinMg.toFixed(1)} mg - ${totalMaxMg.toFixed(1)} mg`;
-            document.getElementById('calc-res-ml').innerText = `± ${totalMinMl.toFixed(1)} mL - ${totalMaxMl.toFixed(1)} mL`;
-
-            if (hasilBox) hasilBox.classList.remove('hidden');
-        }
-// ==========================================
-        // FUNGSI PENUTUP MODAL KALKULATOR DOSIS
-        // ==========================================
         function tutupKalkulatorDosis() {
             const modal = document.getElementById('modal-kalkulator-dosis');
             if (modal) {
                 modal.classList.add('hidden');
-                modal.style.display = 'none'; // Memastikan modal benar-benar tersembunyi
-            }
-        } 
-        // ==========================================
-        // 2. Fitur Edit Master Obat
-        // ==========================================
-        function editObat(encodedName) {
-            const namaCari = decodeURIComponent(encodedName).trim().toLowerCase();
-            const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
-            
-            const obat = masterObat.find(o => {
-                const namaDb = String(o.nama_obat || o.nama || '').trim().toLowerCase();
-                return namaDb === namaCari;
-            });
-
-            if (!obat) {
-                alert("Data obat tidak ditemukan di database!");
-                return;
-            }
-
-            const inputEditId = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
-            if (inputEditId) inputEditId.value = obat.id || '';
-
-            document.getElementById('input-nama-master').value = obat.nama_obat || obat.nama || '';
-            document.getElementById('input-kekuatan-master').value = obat.kekuatan || obat.kekuatan_mg || '';
-            document.getElementById('input-indikasi-master').value = obat.indikasi || '';
-            document.getElementById('input-efek-master').value = obat.efek_samping || obat.efekSamping || '';
-            document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || obat.dosis_min || '';
-            document.getElementById('input-fda-master').value = obat.fda || obat.kategoriFda || 'B';
-            
-            const inputLiteratur = document.getElementById('input-literatur-master');
-            if (inputLiteratur) inputLiteratur.value = obat.literatur || '';
-
-            const modalTitle = document.getElementById('modal-obat-title');
-            if (modalTitle) modalTitle.innerText = 'Edit Data Obat';
-
-            const modal = document.getElementById('modal-master-obat');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
+                modal.style.display = 'none';
             }
         }
 
+        function pilihObatKalkulator(namaObat) {
+    const infoAturan = document.getElementById('calc-info-aturan');
+    const hasilBox = document.getElementById('calc-hasil-box');
+
+    if (!namaObat) {
+        infoAturan.innerHTML = 'Belum ada obat yang dipilih. Silakan pilih obat terlebih dahulu.';
+        if (hasilBox) hasilBox.classList.add('hidden');
+        selectedObatCalc = null;
+        return;
+    }
+
+    const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
+    selectedObatCalc = masterObat.find(o => (o.nama_obat || o.nama || '').toLowerCase() === namaObat.toLowerCase());
+
+    if (!selectedObatCalc) {
+        infoAturan.innerHTML = `<div class="text-rose-600 font-semibold">⚠️ Obat tidak ditemukan di Master Obat.</div>`;
+        if (hasilBox) hasilBox.classList.add('hidden');
+        selectedObatCalc = null;
+        return;
+    }
+
+    const teksKekuatan = String(selectedObatCalc.kekuatan || selectedObatCalc.kekuatan_mg || '');
+    const teksDosis = String(selectedObatCalc.dosis_kgbb || selectedObatCalc.dosis || selectedObatCalc.dosis_min || '');
+
+    // Deteksi apakah aturan dosis mengandung unsur "kgBB" atau murni teks/usia
+    const isBerbasisBB = /kgbb|kg\s*bb/i.test(teksDosis);
+
+    selectedObatCalc.is_berbasis_bb = isBerbasisBB;
+    selectedObatCalc.teks_dosis_asli = teksDosis;
+    selectedObatCalc.teks_kekuatan = teksKekuatan;
+
+    // Parsing kekuatan sediaan untuk jaga-jaga jika dibutuhkan
+    let mgSediaan = 0, mlSediaan = 5;
+    const matchMg = teksKekuatan.match(/(\d+)\s*mg/i);
+    const matchMl = teksKekuatan.match(/(\d+)\s*ml/i);
+    if (matchMg) mgSediaan = parseFloat(matchMg[1]);
+    if (matchMl) mlSediaan = parseFloat(matchMl[1]);
+    selectedObatCalc.parsed_mg = mgSediaan || 10;
+    selectedObatCalc.parsed_ml = mlSediaan || 5;
+
+    // Jika berbasis BB, parsing angkanya
+    if (isBerbasisBB) {
+        let dosisPerKg = 1;
+        const matchDosisNum = teksDosis.match(/(\d+(?:\.\d+)?)\s*mg/i);
+        if (matchDosisNum) dosisPerKg = parseFloat(matchDosisNum[1]);
+
+        let pembagiMin = 1, pembagiMax = 1;
+        if (/3\s*-\s*4\s*kali/i.test(teksDosis)) {
+            pembagiMin = 3; pembagiMax = 4;
+        } else if (/3\s*kali/i.test(teksDosis)) {
+            pembagiMin = 3; pembagiMax = 3;
+        } else if (/4\s*kali/i.test(teksDosis)) {
+            pembagiMin = 4; pembagiMax = 4;
+        }
+
+        selectedObatCalc.dosis_per_kg = dosisPerKg;
+        selectedObatCalc.freq_min = pembagiMin;
+        selectedObatCalc.freq_max = pembagiMax;
+    }
+
+    infoAturan.innerHTML = `
+        <div><b>Kekuatan Sediaan:</b> ${teksKekuatan}</div>
+        <div><b>Aturan Dosis Referensi:</b> ${teksDosis}</div>
+    `;
+
+    hitungDosisOtomatis();
+}
+
+function hitungDosisOtomatis() {
+    const bbInput = document.getElementById('calc-bb');
+    const bb = parseFloat(bbInput ? bbInput.value : 0);
+    const hasilBox = document.getElementById('calc-hasil-box');
+
+    if (!bb || bb <= 0 || !selectedObatCalc) {
+        if (hasilBox) hasilBox.classList.add('hidden');
+        return;
+    }
+
+    if (hasilBox) hasilBox.classList.remove('hidden');
+
+    // KONDISI 1: JIKA OBAT BERBASIS USIA / TEKS DESKRIPTIF (Bukan kgBB)
+    if (!selectedObatCalc.is_berbasis_bb) {
+        document.getElementById('calc-res-mg').innerText = "Berdasarkan Usia (Cek Brosur)";
+        document.getElementById('calc-res-ml').innerText = "Ikuti Aturan Pakai Pabrik";
+        return;
+    }
+
+    // KONDISI 2: JIKA OBAT BERBASIS BERAT BADAN (mg/kgBB)
+    const dosisKg = selectedObatCalc.dosis_per_kg || 1;
+    const freqMin = selectedObatCalc.freq_min || 1;
+    const freqMax = selectedObatCalc.freq_max || freqMin;
+    const mgSediaan = selectedObatCalc.parsed_mg || 10;
+    const mlSediaan = selectedObatCalc.parsed_ml || 5;
+
+    const totalHarian = bb * dosisKg;
+    const dosisSekaliMin = totalHarian / freqMax;
+    const dosisSekaliMax = totalHarian / freqMin;
+
+    const mlMin = (dosisSekaliMin / mgSediaan) * mlSediaan;
+    const mlMax = (dosisSekaliMax / mgSediaan) * mlSediaan;
+
+    document.getElementById('calc-res-mg').innerText = `${dosisSekaliMin.toFixed(1)} mg - ${dosisSekaliMax.toFixed(1)} mg`;
+    document.getElementById('calc-res-ml').innerText = `± ${mlMin.toFixed(2)} mL - ${mlMax.toFixed(2)} mL`;
+} 
+
+        // ==========================================
+        // 3. Fungsi Pendukung Menu Lainnya (jika ada)
+        // ==========================================
+        function toggleApotekMenu() {
+            // Pastikan fungsi ini tersedia agar tidak error ReferenceError
+            const menu = document.getElementById('apotek-menu-dropdown');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+// Fungsi untuk membuka/menutup menu apotek secara toggle
+function toggleApotekMenu() {
+    const menuDropdown = document.getElementById('apotek-menu-dropdown'); // Sesuaikan ID elemen dropdown menu Anda
+    if (menuDropdown) {
+        menuDropdown.classList.toggle('hidden');
+    } else {
+        console.warn("Elemen dropdown menu apotek tidak ditemukan di HTML.");
+    }
+}
         // Inisialisasi Utama Aplikasi
         window.onload = initApp;
     </script>
