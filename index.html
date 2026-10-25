@@ -429,30 +429,32 @@
                             </button>
                         </div>
 
-                        <!-- Tabel Tunggal Master Obat (9 Kolom Lengkap) -->
-                        <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200 shadow-sm mt-3">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold border-b border-slate-200">
-                                    <tr>
-                                        <th class="px-4 py-3 text-center w-12">No</th>
-                                        <th class="px-4 py-3">Nama Obat</th>
-                                        <th class="px-4 py-3">Kekuatan</th>
-                                        <th class="px-4 py-3">Indikasi</th>
-                                        <th class="px-4 py-3">Efek Samping</th>
-                                        <th class="px-4 py-3">Dosis/kgBB</th>
-                                        <th class="px-4 py-3 text-center">FDA</th>
-                                        <th class="px-4 py-3">Literatur</th>
-                                        <th class="px-4 py-3 text-center w-24">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabel-master-obat-body" class="divide-y divide-slate-100">
-                                    <!-- Data obat dirender otomatis oleh JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </div>
-                </div>
+                        
+                        <!-- Pastikan kode struktur tabel ini ADA di dalam file HTML Anda -->
+<div class="overflow-x-auto bg-white rounded-2xl border border-slate-200 shadow-sm mt-3">
+    <table class="w-full text-left border-collapse">
+        <!-- HEADER TABEL (HARUS PERSIS 10 KOLOM) -->
+        <thead class="bg-slate-50 text-slate-600 text-xs font-semibold border-b border-slate-200">
+            <tr>
+                <th class="px-4 py-3 text-center w-12">No</th>
+                <th class="px-4 py-3">Nama Obat</th>
+                <th class="px-4 py-3">Nappza</th>
+                <th class="px-4 py-3">Komposisi</th>
+                <th class="px-4 py-3">Indikasi</th>
+                <th class="px-4 py-3">Efek Samping</th>
+                <th class="px-4 py-3">Dosis/kgBB</th>
+                <th class="px-4 py-3 text-center">FDA</th>
+                <th class="px-4 py-3">Literatur</th>
+                <th class="px-4 py-3 text-center w-24">Aksi</th>
+            </tr>
+        </thead>
+        
+        <!-- BODY TEMPAT DATA DIRENDER -->
+        <tbody id="tabel-master-obat-body" class="divide-y divide-slate-100">
+            <!-- Data obat dari Supabase akan masuk otomatis ke sini -->
+        </tbody>
+    </table>
+</div>
 				<!-- TAB SURAT PESANAN -->
 <div id="tab-surat-pesanan" class="tab-content hidden space-y-6">
     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -1018,60 +1020,64 @@
         </div>
 
         <!-- Form Input Field -->
-        <form id="form-master-obat" onsubmit="simpanMasterObat(event)" class="space-y-3 text-xs">
-            <!-- Hidden Input ID untuk Penanda Mode Edit -->
-            <input type="hidden" id="input-edit-index" value="-1">
+<form id="form-master-obat" onsubmit="simpanMasterObat(event)" class="space-y-3 text-xs">
+    <!-- Hidden Input ID untuk Penanda Mode Edit -->
+    <input type="hidden" id="input-edit-index" value="-1">
 
-            <div>
-                <label class="block font-semibold mb-1 text-slate-700">Nama Obat *</label>
-                <input type="text" id="input-nama-master" required placeholder="Contoh: Paracetamol" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block font-semibold mb-1 text-slate-700">Kekuatan</label>
-                    <input type="text" id="input-kekuatan-master" placeholder="Contoh: 500 mg" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block font-semibold mb-1 text-slate-700">Kategori FDA</label>
-                    <select id="input-fda-master" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <option value="A">A</option>
-                        <option value="B" selected>B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                        <option value="X">X</option>
-                        <option value="N/A">N/A</option>
-                    </select>
-                </div>
-            </div>
-
-            <div>
-                <label class="block font-semibold mb-1 text-slate-700">Indikasi</label>
-                <input type="text" id="input-indikasi-master" placeholder="Contoh: Demam, nyeri ringan" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-
-            <div>
-                <label class="block font-semibold mb-1 text-slate-700">Efek Samping</label>
-                <input type="text" id="input-efek-master" placeholder="Contoh: Mual, ruam kulit" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-
-            <div>
-                <label class="block font-semibold mb-1 text-slate-700">Dosis / kgBB</label>
-                <input type="text" id="input-dosis-master" placeholder="Contoh: 10-15 mg/kgBB" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-
-            <div>
-                <label class="block font-semibold mb-1 text-slate-700">Literatur / Referensi Klinis</label>
-                <input type="text" id="input-literatur-master" placeholder="Contoh: Medscape / ISO / BPOM" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
-            </div>
-
-            <div class="flex justify-end space-x-2 pt-3 border-t">
-                <button type="button" onclick="tutupModalObat()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium transition">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition shadow-sm">Simpan Obat</button>
-            </div>
-        </form>
+    <div>
+        <label class="block font-semibold mb-1 text-slate-700">Nama Obat *</label>
+        <input type="text" id="input-nama-master" required placeholder="Contoh: Paracetamol" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
     </div>
-</div>
+
+    <!-- Kolom Nappza / Zat Aktif (Diubah menjadi Input Text) -->
+    <div>
+        <label class="block font-semibold mb-1 text-slate-700">Nappza / Zat Aktif</label>
+        <input type="text" id="input-nappza-master" placeholder="Contoh: Zat aktif / golongan narkotika/psikotropika" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+        <div>
+            <label class="block font-semibold mb-1 text-slate-700">komposisi</label>
+            <input type="text" id="input-komposisi-master" placeholder="Contoh: 500 mg" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+            <label class="block font-semibold mb-1 text-slate-700">Kategori FDA</label>
+            <select id="input-fda-master" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="A">A</option>
+                <option value="B" selected>B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="X">X</option>
+                <option value="N/A">N/A</option>
+            </select>
+        </div>
+    </div>
+
+    <div>
+        <label class="block font-semibold mb-1 text-slate-700">Indikasi</label>
+        <input type="text" id="input-indikasi-master" placeholder="Contoh: Demam, nyeri ringan" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div>
+        <label class="block font-semibold mb-1 text-slate-700">Efek Samping</label>
+        <input type="text" id="input-efek-master" placeholder="Contoh: Mual, ruam kulit" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div>
+        <label class="block font-semibold mb-1 text-slate-700">Dosis / kgBB</label>
+        <input type="text" id="input-dosis-master" placeholder="Contoh: 10-15 mg/kgBB" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div>
+        <label class="block font-semibold mb-1 text-slate-700">Literatur / Referensi Klinis</label>
+        <input type="text" id="input-literatur-master" placeholder="Contoh: Medscape / ISO / BPOM" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+    </div>
+
+    <div class="flex justify-end space-x-2 pt-3 border-t">
+        <button type="button" onclick="tutupModalObat()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium transition">Batal</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition shadow-sm">Simpan Obat</button>
+    </div>
+</form>
 
 <!-- MODAL FORM SURAT PESANAN -->
 <div id="modal-surat-pesanan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden overflow-y-auto p-4">
@@ -1135,7 +1141,7 @@
                             <tr class="bg-slate-100 text-slate-700 text-[11px] font-bold uppercase">
                                 <th class="p-2 text-center w-10">No</th>
                                 <th class="p-2 w-52">Nama Obat (Pencarian Otomatis)</th>
-                                <th class="p-2 w-32">Zat Aktif & Kekuatan</th>
+                                <th class="p-2 w-32">Zat Aktif & komposisi</th>
                                 <th class="p-2 w-28">Bentuk Sediaan</th>
                                 <th class="p-2 w-20 text-center">Jumlah</th>
                                 <th class="p-2 w-24">Satuan</th>
@@ -1771,8 +1777,79 @@ async function loadFromSupabase() {
         console.error("Terjadi kesalahan saat memuat data:", err); 
     }
 } 
+// 1. Fungsi untuk mengambil data dari Supabase
+async function ambilDataMasterObat() {
+    try {
+        const { data, error } = await _supabase
+            .from('master_obat')
+            .select('*');
 
+        if (error) {
+            console.error('Gagal mengambil data master obat:', error.message);
+            return [];
+        }
 
+        return data; 
+    } catch (err) {
+        console.error('Terjadi kesalahan:', err);
+        return [];
+    }
+}
+
+// 2. Fungsi untuk merender/menampilkan data ke tabel HTML Anda
+// Fungsi untuk merender/menampilkan data ke tabel HTML secara presisi
+async function renderTabelMasterObat() {
+    const tbody = document.getElementById('tabel-master-obat-body');
+    if (!tbody) {
+        console.error("Elemen dengan ID 'tabel-master-obat-body' tidak ditemukan di HTML!");
+        return; 
+    }
+
+    // Teks loading sementara
+    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400">Memuat data obat...</td></tr>`;
+
+    const dataObat = await ambilDataMasterObat();
+
+    if (!dataObat || dataObat.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400">Belum ada data di master obat.</td></tr>`;
+        return;
+    }
+
+    // Bersihkan tabel sebelum diisi
+    tbody.innerHTML = '';
+
+    // Masukkan setiap baris data ke tabel dengan urutan kolom yang presisi
+    dataObat.forEach((obat, index) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 border-b border-slate-100 text-slate-700 text-sm';
+
+        tr.innerHTML = `
+            <td class="px-4 py-3 text-center text-slate-400">${index + 1}</td>
+            <td class="px-4 py-3 font-medium text-slate-800">${obat.nama_obat || '-'}</td>
+            <td class="px-4 py-3">${obat.nappza || '-'}</td>
+            <td class="px-4 py-3">${obat.komposisi || '-'}</td>
+            <td class="px-4 py-3">${obat.indikasi || '-'}</td>
+            <td class="px-4 py-3">${obat.efek_samping || '-'}</td>
+            <td class="px-4 py-3">${obat.dosis_kgbb || '-'}</td>
+            <td class="px-4 py-3 text-center">${obat.fda || '-'}</td>
+            <td class="px-4 py-3">${obat.literatur || '-'}</td>
+            <td class="px-4 py-3 text-center">
+                <button onclick="editObat(${obat.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium">Edit</button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    console.log("Render tabel selesai! Total baris:", dataObat.length);
+} 
+
+// 3. Bagian Pemanggil (Wajib ada di paling bawah file JS agar otomatis jalan)
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Halaman dimuat, mulai merender tabel...");
+    await renderTabelMasterObat();
+});
+ 
 // ==========================================
 // FUNGSI EXPORT DATA MASTER OBAT (FLEKSIBEL)
 // ==========================================
@@ -1810,7 +1887,7 @@ async function exportDataObat() {
         // 3. Ambil data dari tabel master_obat
         const { data, error } = await client
             .from('master_obat')
-            .select('nama_obat, kekuatan, indikasi, efek_samping, dosis_kgbb, fda, literatur');
+            .select('nama_obat, komposisi, indikasi, efek_samping, dosis_kgbb, fda, literatur');
 
         if (error) {
             alert('Gagal mengambil data dari Supabase: ' + error.message);
@@ -1826,7 +1903,7 @@ async function exportDataObat() {
         const formattedData = data.map((item, index) => ({
             'No': index + 1,
             'Nama Obat': item.nama_obat || '',
-            'Kekuatan': item.kekuatan || '',
+            'komposisi': item.komposisi || '',
             'Indikasi': item.indikasi || '',
             'Efek Samping': item.efek_samping || '',
             'Dosis/kgBB': item.dosis_kgbb || '',
@@ -4100,7 +4177,7 @@ let masterObatData = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     { 
         id: 1, 
         nama: "Paracetamol", 
-        kekuatan: "500 mg", 
+        komposisi: "500 mg", 
         indikasi: "Demam dan nyeri ringan", 
         efekSamping: "Mual, reaksi alergi ringan", 
         dosisKgBB: "10-15 mg/kgBB", 
@@ -4110,7 +4187,7 @@ let masterObatData = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     { 
         id: 2, 
         nama: "Amoxicillin", 
-        kekuatan: "500 mg", 
+        komposisi: "500 mg", 
         indikasi: "Infeksi bakteri", 
         efekSamping: "Diare, mual, ruam kulit", 
         dosisKgBB: "20-40 mg/kgBB", 
@@ -4152,13 +4229,13 @@ function cariSugestiObat(keyword) {
     hasilFilter.forEach(obat => {
         // Penanganan properti nama_obat vs nama, serta fda vs kategoriFda
         const namaObat = obat.nama_obat || obat.nama || '';
-        const infoKekuatan = obat.kekuatan ? `(${obat.kekuatan})` : '';
+        const infokomposisi = obat.komposisi ? `(${obat.komposisi})` : '';
         const infoFda = obat.fda || obat.kategoriFda || 'FDA';
         
         html += `
-            <div onclick="pilihSugestiObat('${namaObat.replace(/'/g, "\\'")}', '${(obat.kekuatan || '').replace(/'/g, "\\'")}')" 
+            <div onclick="pilihSugestiObat('${namaObat.replace(/'/g, "\\'")}', '${(obat.komposisi || '').replace(/'/g, "\\'")}')" 
                  class="px-3 py-2 text-xs hover:bg-indigo-50 cursor-pointer border-b border-slate-100 flex justify-between items-center transition">
-                <span class="font-medium text-slate-800">${namaObat} <span class="text-slate-500">${infoKekuatan}</span></span>
+                <span class="font-medium text-slate-800">${namaObat} <span class="text-slate-500">${infokomposisi}</span></span>
                 <span class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-semibold">FDA: ${infoFda}</span>
             </div>
         `;
@@ -4169,11 +4246,11 @@ function cariSugestiObat(keyword) {
 }
 
 // 2. Fungsi ketika salah satu obat dari daftar sugesti diklik oleh pengguna
-function pilihSugestiObat(namaObat, kekuatan) {
+function pilihSugestiObat(namaObat, komposisi) {
     const inputField = document.getElementById('input-nama-obat-checker');
     
-    // Masukkan nama dan kekuatan obat ke dalam input teks
-    inputField.value = kekuatan ? `${namaObat} ${kekuatan}` : namaObat;
+    // Masukkan nama dan komposisi obat ke dalam input teks
+    inputField.value = komposisi ? `${namaObat} ${komposisi}` : namaObat;
     
     // Sembunyikan kembali kotak sugesti
     document.getElementById('sugesti-obat-list').classList.add('hidden');
@@ -4461,7 +4538,7 @@ let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     {
         id: 1,
         nama: 'Amlodipine',
-        kekuatan: '5 mg',
+        komposisi: '5 mg',
         indikasi: 'Hipertensi, Angina Pektoris',
         efekSamping: 'Edema perifer, sakit kepala, pusing',
         dosisKgbb: '0.05 - 0.2 mg/kgBB/hari',
@@ -4471,7 +4548,7 @@ let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     {
         id: 2,
         nama: 'Simvastatin',
-        kekuatan: '20 mg',
+        komposisi: '20 mg',
         indikasi: 'Hiperkolesterolemia',
         efekSamping: 'Miopati, peningkatan enzim hati',
         dosisKgbb: 'Dewasa: 10 - 40 mg/hari',
@@ -4481,7 +4558,7 @@ let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     {
         id: 3,
         nama: 'Parasetamol',
-        kekuatan: '500 mg',
+        komposisi: '500 mg',
         indikasi: 'Analgetik, Antipiretik',
         efekSamping: 'Reaksi alergi, hepatotoksisitas dosis tinggi',
         dosisKgbb: '10 - 15 mg/kgBB/kali (3-4 kali/hari)',
@@ -4531,7 +4608,7 @@ function renderTabelMasterObat() {
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
                 <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
                 <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama_obat || obat.nama || '-'}</td>
-                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
+                <td class="px-4 py-2.5">${obat.komposisi || '-'}</td>
                 <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
                 <td class="px-4 py-2.5">${obat.efek_samping || obat.efekSamping || '-'}</td>
                 <td class="px-4 py-2.5">${obat.dosis_kgbb || obat.dosisKgBB || '-'}</td>
@@ -4556,6 +4633,7 @@ function renderTabelMasterObat() {
     tbody.innerHTML = html;
 }   
 // =========================================================
+// =========================================================
 // LOGIKA MASTER OBAT: RENDER, FILTER, EDIT, SIMPAN, HAPUS
 // =========================================================
 
@@ -4567,7 +4645,7 @@ function renderTabelMasterObat(dataArray = null) {
     const dataToRender = dataArray || masterObatData;
 
     if (!dataToRender || dataToRender.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
         return;
     }
 
@@ -4577,7 +4655,8 @@ function renderTabelMasterObat(dataArray = null) {
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
                 <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
                 <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama_obat || obat.nama || '-'}</td>
-                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
+                <td class="px-4 py-2.5">${obat.nappza || '-'}</td>
+                <td class="px-4 py-2.5">${obat.komposisi || '-'}</td>
                 <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
                 <td class="px-4 py-2.5">${obat.efek_samping || obat.efekSamping || '-'}</td>
                 <td class="px-4 py-2.5">${obat.dosis_kgbb || obat.dosisKgBB || '-'}</td>
@@ -4588,8 +4667,8 @@ function renderTabelMasterObat(dataArray = null) {
                 <td class="px-4 py-2.5 text-center">
                     <div class="flex items-center justify-center space-x-1">
                         <button type="button" onclick="editObat('${encodeURIComponent(obat.nama_obat || obat.nama)}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Data">
-    <i class="fa-solid fa-pen-to-square"></i>
-</button>
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
                         <button type="button" onclick="hapusObat(${index})" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Hapus Data">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -4601,29 +4680,31 @@ function renderTabelMasterObat(dataArray = null) {
 
     tbody.innerHTML = html;
 } 
+
 // Fungsi untuk memfilter tabel Master Obat berdasarkan input pencarian
 function filterMasterObat(keyword) {
     const query = (keyword || '').toLowerCase().trim();
     
     if (typeof masterObatData === 'undefined' || !masterObatData) return;
 
-    // Filter data berdasarkan nama obat, indikasi, efek samping, atau literatur
     const filteredData = masterObatData.filter(obat => {
         const nama = (obat.nama_obat || obat.nama || '').toLowerCase();
+        const nappza = (obat.nappza || '').toLowerCase();
         const indikasi = (obat.indikasi || '').toLowerCase();
         const literatur = (obat.literatur || '').toLowerCase();
         const efekSamping = (obat.efek_samping || obat.efekSamping || '').toLowerCase();
 
         return nama.includes(query) || 
+               nappza.includes(query) ||
                indikasi.includes(query) || 
                literatur.includes(query) || 
                efekSamping.includes(query);
     });
 
-    // Render ulang tabel dengan data hasil filter
     renderTabelMasterObat(filteredData);
 } 
-// Fungsi Edit Berbasis Nama Unik (Dijamin 100% Akurat & Tidak Tertukar)
+
+// Fungsi Edit Berbasis Nama Unik
 function editObat(encodedName) {
     const namaCari = decodeURIComponent(encodedName).trim().toLowerCase();
     const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
@@ -4638,13 +4719,16 @@ function editObat(encodedName) {
         return;
     }
 
-    // ✨ SIMPAN ID DATABASE KE INPUT TERSEMBUNYI (PENTING AGAR TIDAK DUPLIKAT)
     const inputEditId = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
-    if (inputEditId) inputEditId.value = obat.id || ''; // Mengambil ID unik dari database Supabase
+    if (inputEditId) inputEditId.value = obat.id || '';
 
-    // Isi nilai input form
+    // Isi nilai input form (Termasuk Nappza)
     document.getElementById('input-nama-master').value = obat.nama_obat || obat.nama || '';
-    document.getElementById('input-kekuatan-master').value = obat.kekuatan || obat.kekuatan_mg || '';
+    
+    const inputNappza = document.getElementById('input-nappza-master');
+    if (inputNappza) inputNappza.value = obat.nappza || '';
+
+    document.getElementById('input-komposisi-master').value = obat.komposisi || obat.komposisi_mg || '';
     document.getElementById('input-indikasi-master').value = obat.indikasi || '';
     document.getElementById('input-efek-master').value = obat.efek_samping || obat.efekSamping || '';
     document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || obat.dosis_min || '';
@@ -4661,32 +4745,53 @@ function editObat(encodedName) {
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
     }
-}   
+}    
 
-// 3. Fungsi Buka Modal Tambah Obat Baru
+// Fungsi Buka Modal Tambah Obat Baru
 function bukaModalObatBaru() {
-    document.getElementById('form-master-obat').reset();
-    document.getElementById('input-edit-index').value = "-1";
-    document.getElementById('modal-obat-title').innerText = 'Tambah Obat Baru';
+    const form = document.getElementById('form-master-obat');
+    if (form) form.reset();
+    
+    const editIndex = document.getElementById('input-edit-index') || document.getElementById('input-edit-id');
+    if (editIndex) editIndex.value = "-1";
+    
+    const modalTitle = document.getElementById('modal-obat-title');
+    if (modalTitle) modalTitle.innerText = 'Tambah Obat Baru';
     
     const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.remove('hidden');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
 }
 
-// 4. Fungsi Tutup Modal
+// 4. Fungsi Tutup Modal (Diperbaiki agar membersihkan inline style.display)
 function tutupModalObat() {
-    const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.add('hidden');
-}
+    const modal = document.getElementById('modal-master-obat'); 
+    if (modal) {
+        modal.classList.add('hidden'); 
+        modal.style.display = 'none'; // Menghapus paksaan flex dari mode edit
+    }
+    
+    const form = document.getElementById('form-master-obat');
+    if (form) {
+        form.reset();
+    }
+    
+    const editIndex = document.getElementById('input-edit-index') || document.getElementById('input-edit-id');
+    if (editIndex) {
+        editIndex.value = "-1";
+    }
+} 
 
-// // 5. Fungsi Menyimpan Data (Menangani Tambah & Edit) - Terintegrasi JSON & Supabase
+// 5. Fungsi Menyimpan Data (Menangani Tambah & Edit)
 async function simpanMasterObat(event) {
     if (event) event.preventDefault();
 
-    // Ambil ID dari input tersembunyi
     const editId = document.getElementById('input-edit-id')?.value || document.getElementById('input-edit-index')?.value;
     const namaInput = document.getElementById('input-nama-master')?.value.trim();
-    const kekuatanInput = document.getElementById('input-kekuatan-master')?.value.trim();
+    const nappzaInput = document.getElementById('input-nappza-master')?.value.trim();
+    const komposisiInput = document.getElementById('input-komposisi-master')?.value.trim();
     const indikasiInput = document.getElementById('input-indikasi-master')?.value.trim();
     const efekInput = document.getElementById('input-efek-master')?.value.trim();
     const dosisInput = document.getElementById('input-dosis-master')?.value.trim();
@@ -4700,7 +4805,8 @@ async function simpanMasterObat(event) {
 
     const payload = {
         nama_obat: namaInput,
-        kekuatan: kekuatanInput,
+        nappza: nappzaInput, // Disertakan ke database Supabase
+        komposisi: komposisiInput,
         indikasi: indikasiInput,
         efek_samping: efekInput,
         dosis_kgbb: dosisInput,
@@ -4708,13 +4814,13 @@ async function simpanMasterObat(event) {
         literatur: literaturInput
     };
 
-    if (editId && editId !== "") {
-        payload.id = isNaN(editId) ? editId : parseInt(editId); // Sesuaikan dengan tipe ID Supabase (UUID / Integer)
+    if (editId && editId !== "" && editId !== "-1") {
+        payload.id = isNaN(editId) ? editId : parseInt(editId); 
     }
 
     try {
         const { error } = await _supabase
-            .from('master_obat') // Sesuaikan nama tabel Anda jika berbeda
+            .from('master_obat') 
             .upsert(payload);
 
         if (error) {
@@ -4722,22 +4828,8 @@ async function simpanMasterObat(event) {
             return;
         }
 
-        // ==========================================
-        // ✨ OTOMATIS TUTUP MODAL & RESET FORM DI SINI
-        // ==========================================
-        const modal = document.getElementById('modal-master-obat');
-        if (modal) {
-            modal.classList.add('hidden');
-            modal.style.display = 'none'; // Memastikan modal benar-benar tertutup
-        }
-
-        // Reset form & kosongkan input ID edit
-        const formObj = document.getElementById('form-master-obat');
-        if (formObj) formObj.reset();
-
-        const inputEditIdField = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
-        if (inputEditIdField) inputEditIdField.value = '';
-        // ==========================================
+        // Tutup modal menggunakan fungsi pembersih
+        tutupModalObat();
 
         // Reload data terbaru dari Supabase / Render ulang tabel
         if (typeof loadMasterObatFromSupabase === 'function') {
@@ -4751,7 +4843,7 @@ async function simpanMasterObat(event) {
     } catch (err) {
         console.error("Error simpanMasterObat:", err);
     }
-}    
+} 
 
 
 // --- LOGIKA SURAT PESANAN ---
@@ -4938,7 +5030,7 @@ function tambahBarisItemPesanan(itemData = {}) {
             <input type="text" list="list-master-obat-sp-${rowId}" value="${itemData.namaObat || ''}" placeholder="Ketik nama obat..." class="input-nama-obat w-full px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-sky-500 outline-none" required oninput="pilihOtomatisMasterObat(this)">
             <datalist id="list-master-obat-sp-${rowId}">${datalistObatOptions}</datalist>
         </td>
-        <td class="p-2"><input type="text" value="${itemData.zatAktif || ''}" placeholder="Zat Aktif & Kekuatan" class="input-zat w-full px-2 py-1.5 border rounded-lg outline-none"></td>
+        <td class="p-2"><input type="text" value="${itemData.zatAktif || ''}" placeholder="Zat Aktif & komposisi" class="input-zat w-full px-2 py-1.5 border rounded-lg outline-none"></td>
         
         <!-- Kolom Bentuk Sediaan dengan Dropdown & Pencarian Otomatis -->
         <td class="p-2 relative">
@@ -4988,7 +5080,7 @@ function pilihOtomatisMasterObat(inputElem) {
     
     const tr = inputElem.closest('tr');
     if (matched && tr) {
-        tr.querySelector('.input-zat').value = matched.kekuatan || '';
+        tr.querySelector('.input-zat').value = matched.komposisi || '';
         tr.querySelector('.input-bentuk').value = 'Tablet'; 
     }
 } 
@@ -5231,7 +5323,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & Kekuatan</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & komposisi</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
@@ -5510,7 +5602,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & Kekuatan</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & komposisi</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
@@ -5830,7 +5922,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const teksKekuatan = String(selectedObatCalc.kekuatan || selectedObatCalc.kekuatan_mg || '');
+    const tekskomposisi = String(selectedObatCalc.komposisi || selectedObatCalc.komposisi_mg || '');
     const teksDosis = String(selectedObatCalc.dosis_kgbb || selectedObatCalc.dosis || selectedObatCalc.dosis_min || '');
 
     // Deteksi apakah aturan dosis mengandung unsur "kgBB" atau murni teks/usia
@@ -5838,12 +5930,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     selectedObatCalc.is_berbasis_bb = isBerbasisBB;
     selectedObatCalc.teks_dosis_asli = teksDosis;
-    selectedObatCalc.teks_kekuatan = teksKekuatan;
+    selectedObatCalc.teks_komposisi = tekskomposisi;
 
-    // Parsing kekuatan sediaan untuk jaga-jaga jika dibutuhkan
+    // Parsing komposisi sediaan untuk jaga-jaga jika dibutuhkan
     let mgSediaan = 0, mlSediaan = 5;
-    const matchMg = teksKekuatan.match(/(\d+)\s*mg/i);
-    const matchMl = teksKekuatan.match(/(\d+)\s*ml/i);
+    const matchMg = tekskomposisi.match(/(\d+)\s*mg/i);
+    const matchMl = tekskomposisi.match(/(\d+)\s*ml/i);
     if (matchMg) mgSediaan = parseFloat(matchMg[1]);
     if (matchMl) mlSediaan = parseFloat(matchMl[1]);
     selectedObatCalc.parsed_mg = mgSediaan || 10;
@@ -5870,7 +5962,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     infoAturan.innerHTML = `
-        <div><b>Kekuatan Sediaan:</b> ${teksKekuatan}</div>
+        <div><b>komposisi Sediaan:</b> ${tekskomposisi}</div>
         <div><b>Aturan Dosis Referensi:</b> ${teksDosis}</div>
     `;
 
