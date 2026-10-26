@@ -4998,18 +4998,41 @@ function tambahBarisItemPesanan(itemData = {}) {
     tbody.appendChild(tr);
 }  
 
-function hapusBarisItemPesanan(rowId) {
+async function hapusBarisItemPesanan(rowId, itemIdSupabase = null) {
     const row = document.getElementById(rowId);
-    if (row) row.remove();
-    reorderRowNumbers();
-}
+    if (!row) return;
 
-function reorderRowNumbers() {
-    const rows = document.querySelectorAll('#container-item-pesanan tr');
-    rows.forEach((tr, idx) => {
-        tr.querySelector('.row-number').innerText = idx + 1;
-    });
-}
+    // Konfirmasi sebelum menghapus (opsional, bisa dilepas jika ingin langsung hapus)
+    if (!confirm("Apakah Anda yakin ingin menghapus baris obat ini?")) {
+        return;
+    }
+
+    try {
+        // Jika item sudah memiliki ID dari Supabase (artinya data sudah tersimpan di database)
+        if (itemIdSupabase) {
+            const { error } = await _supabase
+                .from('item_surat_pesanan')
+                .delete()
+                .eq('id', itemIdSupabase); // Pastikan kolom primary key di database bernama 'id'
+
+            if (error) {
+                alert("Gagal menghapus dari Supabase: " + error.message);
+                return;
+            }
+        }
+
+        // Hapus baris dari tampilan HTML
+        row.remove();
+        
+        // Perbarui nomor urut tabel
+        if (typeof reorderRowNumbers === 'function') {
+            reorderRowNumbers();
+        }
+
+    } catch (err) {
+        console.error("Error saat menghapus baris:", err);
+    }
+} 
 
 // Auto-fill saat nama obat dipilih dari Master Obat
 function pilihOtomatisMasterObat(inputElem) {
