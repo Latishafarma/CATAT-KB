@@ -1746,7 +1746,7 @@ async function loadFromSupabase() {
                 }
                 groupedMap[row.nomor_sp].items.push({
                     namaObat: row.nama_obat,
-                    zatAktif: row.zat_aktif || '',
+                    zatAktif: row.nappza || '',
                     bentukSediaan: row.bentuk_sediaan || '',
                     jumlah: row.jumlah,
                     satuan: row.satuan,
@@ -5062,17 +5062,17 @@ async function simpanSuratPesananKeSupabase(dataSP) {
     try {
         // Map setiap item obat agar sesuai dengan kolom tabel item_surat_pesanan di Supabase
         const payload = dataSP.items.map(item => ({
-            nomor_sp: dataSP.nomor,
-            jenis_sp: dataSP.jenis,
-            tanggal: dataSP.tanggal,
-            supplier_nama: dataSP.supplierNama,
-            nama_obat: item.namaObat,
-            zat_aktif: item.zatAktif || '',
-            bentuk_sediaan: item.bentukSediaan || '',
-            jumlah: parseInt(item.jumlah) || 0,
-            satuan: item.satuan,
-            ket: item.ket || '-'
-        }));
+    nomor_sp: dataSP.nomor,
+    jenis_sp: dataSP.jenis,
+    tanggal: dataSP.tanggal,
+    supplier_nama: dataSP.supplierNama,
+    nama_obat: item.namaObat,
+    nappza: item.nappza || item.zatAktif || '', // <-- Diperbaiki agar membaca property nappza juga
+    bentuk_sediaan: item.bentukSediaan || '',
+    jumlah: parseInt(item.jumlah) || 0,
+    satuan: item.satuan,
+    ket: item.ket || '-'
+}));
 
         // Lakukan insert ke tabel item_surat_pesanan di Supabase
         // (Pastikan variabel klien Supabase Anda bernama _supabase atau supabase, sesuaikan jika berbeda)
@@ -5353,7 +5353,7 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
             tanggal: dataSP.tanggal,
             supplier_nama: dataSP.supplierNama,
             nama_obat: item.namaObat,
-            zat_aktif: item.zatAktif || '',
+            nappza: item.nappza || '',
             bentuk_sediaan: item.bentukSediaan || '',
             jumlah: parseInt(item.jumlah) || 0,
             satuan: item.satuan,
