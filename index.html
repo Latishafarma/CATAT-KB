@@ -5415,7 +5415,6 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
     }
 }
 
-// 2. Simpan Surat Pesanan (Terintegrasi Supabase & LocalStorage)
 async function simpanSuratPesanan(e) {
     e.preventDefault();
     const editIndex = parseInt(document.getElementById('sp-edit-index').value);
@@ -5440,10 +5439,11 @@ async function simpanSuratPesanan(e) {
         return;
     }
 
+    const nomorSp = document.getElementById('sp-nomor').value.trim();
     const dataSP = {
         id: editIndex >= 0 ? suratPesananData[editIndex].id : Date.now(),
         jenis: document.getElementById('sp-jenis').value,
-        nomor: document.getElementById('sp-nomor').value.trim(),
+        nomor: nomorSp,
         tanggal: document.getElementById('sp-tanggal').value,
         supplierNama: selectSup.value,
         supplierAlamat: selectedOption.getAttribute('data-alamat') || '-',
@@ -5451,7 +5451,7 @@ async function simpanSuratPesanan(e) {
         items: items
     };
 
-    // Kirim data ke Supabase
+    // Kirim data & sinkronisasi ke Supabase
     const suksesSupabase = await simpanSuratPesananKeSupabase(dataSP, items);
     if (!suksesSupabase) return;
 
@@ -5462,11 +5462,98 @@ async function simpanSuratPesanan(e) {
     }
 
     localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
-    renderTabelSuratPesanan();
+    
+    if (typeof renderTabelSuratPesanan === 'function') {
+        renderTabelSuratPesanan();
+    }
+    
     tutupModalSuratPesanan();
-    alert("Surat Pesanan berhasil disimpan ke Supabase & lokal!");
+    alert("Surat Pesanan berhasil disimpan dan disinkronkan ke Supabase!");
 }
 
+// Fungsi pembantu untuk eksekusi Supabase
+async function simpanSuratPesananKeSupabase(dataSP, items) {
+    try {
+        // ✨ LANGKAH 1: Hapus item lama berdasarkan nomor_sp (Membersihkan item yang dihapus saat edit)
+        const { error: deleteError } = await _supabase
+            .from('item_surat_pesanan')
+            .delete()
+            .eq('nomor_sp', dataSP.nomor);
+
+        if (deleteError) {
+            alert("Gagal memperbarui item lama di Supabase: " + deleteError.message);
+            return false;
+        }
+
+        // ✨ LANGKAH 2: Format ulang item baru untuk dimasukkan ke Supabase
+        const payloadItems = items.map(item => ({
+            nomor_sp: dataSP.nomor,
+            jenis_sp: dataSP.jenis,
+            tanggal: dataSP.tanggal,
+            supplier_nama: dataSP.supplierNama,
+            nama_obat: item.namaObat,
+            nappza: item.nappza,
+            bentuk_sediaan: item.bentukSediaan,
+            jumlah: parseInt(item.jumlah) || 1,
+            satuan: item.satuan,
+            ket: item.ket
+        }));
+
+        // ✨ LANGKAH 3: Masukkan data item yang baru
+        const { error: insertError } = await _supabase
+            .from('item_surat_pesanan')
+            .insert(payloadItems);
+
+        if (insertError) {
+            alert("Gagal menyimpan item ke Supabase: " + insertError.message);
+            return false;
+        }
+
+        return true;
+    } catch (err) {
+        console.error("Error simpanSuratPesananKeSupabase:", err);
+        alert("Terjadi kesalahan sistem saat sinkronisasi Supabase.");
+        return false;
+    }
+} 
+async function hapusSuratPesananSupabase(nomorSp) {
+    if (!confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan Nomor: ${nomorSp} dari sistem dan database Supabase?`)) {
+        return;
+    }
+
+    try {
+        // Hapus semua data item surat pesanan di Supabase berdasarkan nomor_sp
+        const { error } = await _supabase
+            .from('item_surat_pesanan')
+            .delete()
+            .eq('nomor_sp', nomorSp);
+
+        if (error) {
+            alert("Gagal menghapus dari Supabase: " + error.message);
+            return;
+        }
+
+        // Hapus juga dari array lokal / localStorage jika ada
+        if (typeof suratPesananData !== 'undefined') {
+            const index = suratPesananData.findIndex(sp => sp.nomor === nomorSp);
+            if (index >= 0) {
+                suratPesananData.splice(index, 1);
+                localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
+            }
+        }
+
+        // Refresh tabel tampilan web
+        if (typeof renderTabelSuratPesanan === 'function') {
+            renderTabelSuratPesanan();
+        }
+
+        alert("Surat Pesanan berhasil dihapus secara permanen dari database!");
+
+    } catch (err) {
+        console.error("Error hapusSuratPesananSupabase:", err);
+        alert("Terjadi kesalahan saat menghapus data.");
+    }
+} 
 // 3. Edit Surat Pesanan
 function editSuratPesanan(index) {
     const sp = suratPesananData[index];
