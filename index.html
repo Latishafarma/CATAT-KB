@@ -499,7 +499,6 @@
                         <th class="py-3.5 px-4">No. SP & Tanggal</th>
                         <th class="py-3.5 px-4">Jenis SP</th>
                         <th class="py-3.5 px-4">Supplier / Distributor</th>
-                        <th class="py-3.5 px-4">Daftar Obat Dipesan</th>
                         <th class="py-3.5 px-4 text-center w-36">Aksi</th>
                     </tr>
                 </thead>
@@ -1099,7 +1098,8 @@
     <option value="Reguler">Reguler</option>
     <option value="Prekursor">Prekursor</option>
     <option value="OOT" selected>Obat-Obat Tertentu (OOT)</option>
-    <option value="Psikotropik/Narkotik">Psikotropik / Narkotik</option>
+    <option value="Psikotropik">Psikotropik</option>
+	<option value="Narkotik">Narkotik</option>
     <option value="Alkes">Alat Kesehatan (Alkes)</option>
 </select>
                 </div>
@@ -1140,7 +1140,7 @@
                             <tr class="bg-slate-100 text-slate-700 text-[11px] font-bold uppercase">
                                 <th class="p-2 text-center w-10">No</th>
                                 <th class="p-2 w-52">Nama Obat (Pencarian Otomatis)</th>
-                                <th class="p-2 w-32">Zat Aktif & komposisi</th>
+                                <th class="p-2 w-32">NAPZZA</th>
                                 <th class="p-2 w-28">Bentuk Sediaan</th>
                                 <th class="p-2 w-20 text-center">Jumlah</th>
                                 <th class="p-2 w-24">Satuan</th>
@@ -1746,7 +1746,7 @@ async function loadFromSupabase() {
                 }
                 groupedMap[row.nomor_sp].items.push({
                     namaObat: row.nama_obat,
-                    zatAktif: row.zat_aktif || '',
+                    nappza: row.nappza || '',
                     bentukSediaan: row.bentuk_sediaan || '',
                     jumlah: row.jumlah,
                     satuan: row.satuan,
@@ -4798,8 +4798,10 @@ function generateNomorSuratPesanan(jenisSP) {
         kodeJenis = "PRE";
     } else if (jenisSP === "OOT") {
         kodeJenis = "OOT";
-    } else if (jenisSP === "Psikotropik/Narkotik") {
-        kodeJenis = "NP";
+    } else if (jenisSP === "Psikotropik") {
+        kodeJenis = "Psi";
+	} else if (jenisSP === "Narkotik") {
+	     kodeJenis = "Nar";
     } else if (jenisSP === "Alkes") {
         kodeJenis = "ALK";
     }
@@ -4968,7 +4970,11 @@ function tambahBarisItemPesanan(itemData = {}) {
             <input type="text" list="list-master-obat-sp-${rowId}" value="${itemData.namaObat || ''}" placeholder="Ketik nama obat..." class="input-nama-obat w-full px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-sky-500 outline-none" required oninput="pilihOtomatisMasterObat(this)">
             <datalist id="list-master-obat-sp-${rowId}">${datalistObatOptions}</datalist>
         </td>
-        <td class="p-2"><input type="text" value="${itemData.zatAktif || ''}" placeholder="Zat Aktif & komposisi" class="input-zat w-full px-2 py-1.5 border rounded-lg outline-none"></td>
+        
+        <!-- ✨ DIPERBAIKI: Menggunakan class "input-nappza" dan properti "itemData.nappza" -->
+        <td class="p-2">
+            <input type="text" value="${itemData.nappza || ''}" placeholder="NAPZZA" class="input-nappza w-full px-2 py-1.5 border rounded-lg outline-none bg-slate-50" readonly>
+        </td>
         
         <!-- Kolom Bentuk Sediaan dengan Dropdown & Pencarian Otomatis -->
         <td class="p-2 relative">
@@ -5017,9 +5023,26 @@ function pilihOtomatisMasterObat(inputElem) {
     });
     
     const tr = inputElem.closest('tr');
-    if (matched && tr) {
-        tr.querySelector('.input-zat').value = matched.komposisi || '';
-        tr.querySelector('.input-bentuk').value = 'Tablet'; 
+    if (tr) {
+        // Ambil elemen input Nappza di baris ini
+        const inputNappza = tr.querySelector('.input-nappza');
+        const inputBentuk = tr.querySelector('.input-bentuk');
+
+        if (matched) {
+            // ✨ Isi otomatis dengan data NAPPZA dari master obat
+            if (inputNappza) {
+                inputNappza.value = matched.nappza || '-';
+            }
+            // Opsional: Isi bentuk sediaan jika ada di master obat
+            if (inputBentuk && matched.bentuk_sediaan) {
+                inputBentuk.value = matched.bentuk_sediaan;
+            }
+        } else {
+            // Jika diketik manual atau tidak ada di master, isi default
+            if (inputNappza) {
+                inputNappza.value = '-';
+            }
+        }
     }
 } 
 
@@ -5033,7 +5056,7 @@ async function simpanSuratPesananKeSupabase(dataSP) {
             tanggal: dataSP.tanggal,
             supplier_nama: dataSP.supplierNama,
             nama_obat: item.namaObat,
-            zat_aktif: item.zatAktif || '',
+            nappza: item.nappza || '',
             bentuk_sediaan: item.bentukSediaan || '',
             jumlah: parseInt(item.jumlah) || 0,
             satuan: item.satuan,
@@ -5072,7 +5095,7 @@ async function simpanSuratPesanan(e) {
     document.querySelectorAll('.item-pesanan-row').forEach(tr => {
         items.push({
             namaObat: tr.querySelector('.input-nama-obat').value.trim(),
-            zatAktif: tr.querySelector('.input-zat').value.trim(),
+            nappza: tr.querySelector('.input-nappza').value.trim(),
             bentukSediaan: tr.querySelector('.input-bentuk').value.trim(),
             jumlah: tr.querySelector('.input-jumlah').value.trim(),
             satuan: tr.querySelector('.input-satuan').value.trim(),
@@ -5177,7 +5200,7 @@ function cetakSuratPesanan(index) {
             <tr>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
                 <td style="border: 1px solid #000; padding: 4px; font-weight: bold;">${it.namaObat}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.zatAktif || '-'}</td>
+                <td style="border: 1px solid #000; padding: 4px;">${it.nappza || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px;">${it.bentukSediaan || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.jumlah}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.satuan}</td>
@@ -5261,7 +5284,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & komposisi</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">NAPZZA</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
@@ -5319,7 +5342,7 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
             tanggal: dataSP.tanggal,
             supplier_nama: dataSP.supplierNama,
             nama_obat: item.namaObat,
-            zat_aktif: item.zatAktif || '',
+            zat_aktif: item.nappza || '',
             bentuk_sediaan: item.bentukSediaan || '',
             jumlah: parseInt(item.jumlah) || 0,
             satuan: item.satuan,
@@ -5356,7 +5379,7 @@ async function simpanSuratPesanan(e) {
     document.querySelectorAll('.item-pesanan-row').forEach(tr => {
         items.push({
             namaObat: tr.querySelector('.input-nama-obat').value.trim(),
-            zatAktif: tr.querySelector('.input-zat').value.trim(),
+            nappza: tr.querySelector('.input-nappza').value.trim(),
             bentukSediaan: tr.querySelector('.input-bentuk').value.trim(),
             jumlah: tr.querySelector('.input-jumlah').value.trim(),
             satuan: tr.querySelector('.input-satuan').value.trim(),
@@ -5457,7 +5480,7 @@ function cetakSuratPesanan(index) {
             <tr>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
                 <td style="border: 1px solid #000; padding: 4px; font-weight: bold;">${it.namaObat}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.zatAktif || '-'}</td>
+                <td style="border: 1px solid #000; padding: 4px;">${it.nappza || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px;">${it.bentukSediaan || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.jumlah}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.satuan}</td>
@@ -5540,7 +5563,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & komposisi</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">NAPZZA</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
