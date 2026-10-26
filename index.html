@@ -436,8 +436,7 @@
                                     <tr>
                                         <th class="px-4 py-3 text-center w-12">No</th>
                                         <th class="px-4 py-3">Nama Obat</th>
-										 <th class="px-4 py-3 text-emerald-700 bg-emerald-50/50">NAPPZA</th>
-                                        <th class="px-4 py-3">komposisi</th>
+                                        <th class="px-4 py-3">Kekuatan</th>
                                         <th class="px-4 py-3">Indikasi</th>
                                         <th class="px-4 py-3">Efek Samping</th>
                                         <th class="px-4 py-3">Dosis/kgBB</th>
@@ -499,6 +498,7 @@
                         <th class="py-3.5 px-4">No. SP & Tanggal</th>
                         <th class="py-3.5 px-4">Jenis SP</th>
                         <th class="py-3.5 px-4">Supplier / Distributor</th>
+                        <th class="py-3.5 px-4">Daftar Obat Dipesan</th>
                         <th class="py-3.5 px-4 text-center w-36">Aksi</th>
                     </tr>
                 </thead>
@@ -1026,15 +1026,11 @@
                 <label class="block font-semibold mb-1 text-slate-700">Nama Obat *</label>
                 <input type="text" id="input-nama-master" required placeholder="Contoh: Paracetamol" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
-			<div>
-    <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori NAPPZA (Prekursor/OOT/Psiko/Narko)</label>
-    <input type="text" id="input-nappza" placeholder="Contoh: Psikotropika / Prekursor" class="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500">
-</div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block font-semibold mb-1 text-slate-700">komposisi</label>
-                    <input type="text" id="input-komposisi-master" placeholder="Contoh: 500 mg" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <label class="block font-semibold mb-1 text-slate-700">Kekuatan</label>
+                    <input type="text" id="input-kekuatan-master" placeholder="Contoh: 500 mg" class="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
                 <div>
                     <label class="block font-semibold mb-1 text-slate-700">Kategori FDA</label>
@@ -1098,8 +1094,7 @@
     <option value="Reguler">Reguler</option>
     <option value="Prekursor">Prekursor</option>
     <option value="OOT" selected>Obat-Obat Tertentu (OOT)</option>
-    <option value="Psikotropik">Psikotropik</option>
-	<option value="Narkotik">Narkotik</option>
+    <option value="Psikotropik/Narkotik">Psikotropik / Narkotik</option>
     <option value="Alkes">Alat Kesehatan (Alkes)</option>
 </select>
                 </div>
@@ -1140,7 +1135,7 @@
                             <tr class="bg-slate-100 text-slate-700 text-[11px] font-bold uppercase">
                                 <th class="p-2 text-center w-10">No</th>
                                 <th class="p-2 w-52">Nama Obat (Pencarian Otomatis)</th>
-                                <th class="p-2 w-32">NAPZZA</th>
+                                <th class="p-2 w-32">Zat Aktif & Kekuatan</th>
                                 <th class="p-2 w-28">Bentuk Sediaan</th>
                                 <th class="p-2 w-20 text-center">Jumlah</th>
                                 <th class="p-2 w-24">Satuan</th>
@@ -1746,7 +1741,7 @@ async function loadFromSupabase() {
                 }
                 groupedMap[row.nomor_sp].items.push({
                     namaObat: row.nama_obat,
-                    nappza: row.nappza || '',
+                    zatAktif: row.zat_aktif || '',
                     bentukSediaan: row.bentuk_sediaan || '',
                     jumlah: row.jumlah,
                     satuan: row.satuan,
@@ -1777,25 +1772,7 @@ async function loadFromSupabase() {
     }
 } 
 
-// --- SIMPAN FUNGSI INI DI BAGIAN MANA SAJA DALAM FILE JS ANDA ---
-async function ambilDataMasterObat() {
-    try {
-        const { data, error } = await _supabase
-            .from('master_obat')
-            .select('*');
 
-        if (error) {
-            console.error('Gagal mengambil data master obat:', error.message);
-            return [];
-        }
-
-        console.log('Data master obat berhasil dimuat:', data);
-        return data; 
-    } catch (err) {
-        console.error('Terjadi kesalahan:', err);
-        return [];
-    }
-} 
 // ==========================================
 // FUNGSI EXPORT DATA MASTER OBAT (FLEKSIBEL)
 // ==========================================
@@ -1833,7 +1810,7 @@ async function exportDataObat() {
         // 3. Ambil data dari tabel master_obat
         const { data, error } = await client
             .from('master_obat')
-            .select('nama_obat, nappza, komposisi, indikasi, efek_samping, dosis_kgbb, fda, literatur');
+            .select('nama_obat, kekuatan, indikasi, efek_samping, dosis_kgbb, fda, literatur');
 
         if (error) {
             alert('Gagal mengambil data dari Supabase: ' + error.message);
@@ -1849,8 +1826,7 @@ async function exportDataObat() {
         const formattedData = data.map((item, index) => ({
             'No': index + 1,
             'Nama Obat': item.nama_obat || '',
-			'Nama Obat': item.nappza || '',
-            'komposisi': item.komposisi || '',
+            'Kekuatan': item.kekuatan || '',
             'Indikasi': item.indikasi || '',
             'Efek Samping': item.efek_samping || '',
             'Dosis/kgBB': item.dosis_kgbb || '',
@@ -4124,7 +4100,7 @@ let masterObatData = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     { 
         id: 1, 
         nama: "Paracetamol", 
-        komposisi: "500 mg", 
+        kekuatan: "500 mg", 
         indikasi: "Demam dan nyeri ringan", 
         efekSamping: "Mual, reaksi alergi ringan", 
         dosisKgBB: "10-15 mg/kgBB", 
@@ -4134,7 +4110,7 @@ let masterObatData = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     { 
         id: 2, 
         nama: "Amoxicillin", 
-        komposisi: "500 mg", 
+        kekuatan: "500 mg", 
         indikasi: "Infeksi bakteri", 
         efekSamping: "Diare, mual, ruam kulit", 
         dosisKgBB: "20-40 mg/kgBB", 
@@ -4176,13 +4152,13 @@ function cariSugestiObat(keyword) {
     hasilFilter.forEach(obat => {
         // Penanganan properti nama_obat vs nama, serta fda vs kategoriFda
         const namaObat = obat.nama_obat || obat.nama || '';
-        const infokomposisi = obat.komposisi ? `(${obat.komposisi})` : '';
+        const infoKekuatan = obat.kekuatan ? `(${obat.kekuatan})` : '';
         const infoFda = obat.fda || obat.kategoriFda || 'FDA';
         
         html += `
-            <div onclick="pilihSugestiObat('${namaObat.replace(/'/g, "\\'")}', '${(obat.komposisi || '').replace(/'/g, "\\'")}')" 
+            <div onclick="pilihSugestiObat('${namaObat.replace(/'/g, "\\'")}', '${(obat.kekuatan || '').replace(/'/g, "\\'")}')" 
                  class="px-3 py-2 text-xs hover:bg-indigo-50 cursor-pointer border-b border-slate-100 flex justify-between items-center transition">
-                <span class="font-medium text-slate-800">${namaObat} <span class="text-slate-500">${infokomposisi}</span></span>
+                <span class="font-medium text-slate-800">${namaObat} <span class="text-slate-500">${infoKekuatan}</span></span>
                 <span class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-semibold">FDA: ${infoFda}</span>
             </div>
         `;
@@ -4193,11 +4169,11 @@ function cariSugestiObat(keyword) {
 }
 
 // 2. Fungsi ketika salah satu obat dari daftar sugesti diklik oleh pengguna
-function pilihSugestiObat(namaObat, komposisi) {
+function pilihSugestiObat(namaObat, kekuatan) {
     const inputField = document.getElementById('input-nama-obat-checker');
     
-    // Masukkan nama dan komposisi obat ke dalam input teks
-    inputField.value = komposisi ? `${namaObat} ${komposisi}` : namaObat;
+    // Masukkan nama dan kekuatan obat ke dalam input teks
+    inputField.value = kekuatan ? `${namaObat} ${kekuatan}` : namaObat;
     
     // Sembunyikan kembali kotak sugesti
     document.getElementById('sugesti-obat-list').classList.add('hidden');
@@ -4485,7 +4461,7 @@ let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     {
         id: 1,
         nama: 'Amlodipine',
-        komposisi: '5 mg',
+        kekuatan: '5 mg',
         indikasi: 'Hipertensi, Angina Pektoris',
         efekSamping: 'Edema perifer, sakit kepala, pusing',
         dosisKgbb: '0.05 - 0.2 mg/kgBB/hari',
@@ -4495,7 +4471,7 @@ let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     {
         id: 2,
         nama: 'Simvastatin',
-        komposisi: '20 mg',
+        kekuatan: '20 mg',
         indikasi: 'Hiperkolesterolemia',
         efekSamping: 'Miopati, peningkatan enzim hati',
         dosisKgbb: 'Dewasa: 10 - 40 mg/hari',
@@ -4505,7 +4481,7 @@ let dataObatMaster = JSON.parse(localStorage.getItem('apotek_master_obat')) || [
     {
         id: 3,
         nama: 'Parasetamol',
-        komposisi: '500 mg',
+        kekuatan: '500 mg',
         indikasi: 'Analgetik, Antipiretik',
         efekSamping: 'Reaksi alergi, hepatotoksisitas dosis tinggi',
         dosisKgbb: '10 - 15 mg/kgBB/kali (3-4 kali/hari)',
@@ -4555,7 +4531,7 @@ function renderTabelMasterObat() {
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
                 <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
                 <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama_obat || obat.nama || '-'}</td>
-                <td class="px-4 py-2.5">${obat.komposisi || '-'}</td>
+                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
                 <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
                 <td class="px-4 py-2.5">${obat.efek_samping || obat.efekSamping || '-'}</td>
                 <td class="px-4 py-2.5">${obat.dosis_kgbb || obat.dosisKgBB || '-'}</td>
@@ -4591,7 +4567,7 @@ function renderTabelMasterObat(dataArray = null) {
     const dataToRender = dataArray || masterObatData;
 
     if (!dataToRender || dataToRender.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-slate-400 text-xs italic">Belum ada data obat.</td></tr>`;
         return;
     }
 
@@ -4601,8 +4577,7 @@ function renderTabelMasterObat(dataArray = null) {
             <tr class="border-b border-slate-100 hover:bg-slate-50/80 text-xs text-slate-700 transition-colors">
                 <td class="px-4 py-2.5 text-center font-medium text-slate-500">${index + 1}</td>
                 <td class="px-4 py-2.5 font-semibold text-slate-800">${obat.nama_obat || obat.nama || '-'}</td>
-                <td class="px-4 py-2.5 font-medium text-slate-600">${obat.nappza || '-'}</td>
-                <td class="px-4 py-2.5">${obat.komposisi || '-'}</td>
+                <td class="px-4 py-2.5">${obat.kekuatan || '-'}</td>
                 <td class="px-4 py-2.5">${obat.indikasi || '-'}</td>
                 <td class="px-4 py-2.5">${obat.efek_samping || obat.efekSamping || '-'}</td>
                 <td class="px-4 py-2.5">${obat.dosis_kgbb || obat.dosisKgBB || '-'}</td>
@@ -4630,19 +4605,17 @@ function renderTabelMasterObat(dataArray = null) {
 // Fungsi untuk memfilter tabel Master Obat berdasarkan input pencarian
 function filterMasterObat(keyword) {
     const query = (keyword || '').toLowerCase().trim();
-    
+
     if (typeof masterObatData === 'undefined' || !masterObatData) return;
 
-    // Filter data berdasarkan nama obat, nappza, indikasi, efek samping, atau literatur
+    // Filter data berdasarkan nama obat, indikasi, efek samping, atau literatur
     const filteredData = masterObatData.filter(obat => {
         const nama = (obat.nama_obat || obat.nama || '').toLowerCase();
-        const nappza = (obat.nappza || '').toLowerCase();
         const indikasi = (obat.indikasi || '').toLowerCase();
         const literatur = (obat.literatur || '').toLowerCase();
         const efekSamping = (obat.efek_samping || obat.efekSamping || '').toLowerCase();
 
         return nama.includes(query) || 
-               nappza.includes(query) ||
                indikasi.includes(query) || 
                literatur.includes(query) || 
                efekSamping.includes(query);
@@ -4656,7 +4629,7 @@ function filterMasterObat(keyword) {
 function editObat(encodedName) {
     const namaCari = decodeURIComponent(encodedName).trim().toLowerCase();
     const masterObat = typeof masterObatData !== 'undefined' ? masterObatData : (JSON.parse(localStorage.getItem('apotek_master_obat')) || []);
-    
+
     const obat = masterObat.find(o => {
         const namaDb = String(o.nama_obat || o.nama || '').trim().toLowerCase();
         return namaDb === namaCari;
@@ -4667,23 +4640,18 @@ function editObat(encodedName) {
         return;
     }
 
-    // ✨ SIMPAN ID DATABASE KE INPUT TERSEMBUNYI (PENTING AGAR TIDAK DUPLIKAT)
+    // SIMPAN ID DATABASE KE INPUT TERSEMBUNYI
     const inputEditId = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
-    if (inputEditId) inputEditId.value = obat.id || ''; // Mengambil ID unik dari database Supabase
+    if (inputEditId) inputEditId.value = obat.id || ''; 
 
     // Isi nilai input form
     document.getElementById('input-nama-master').value = obat.nama_obat || obat.nama || '';
-    
-    // Input Nappza manual
-    const inputNappza = document.getElementById('input-nappza-master');
-    if (inputNappza) inputNappza.value = obat.nappza || '';
-
-    document.getElementById('input-komposisi-master').value = obat.komposisi || obat.komposisi_mg || '';
+    document.getElementById('input-kekuatan-master').value = obat.kekuatan || obat.kekuatan_mg || '';
     document.getElementById('input-indikasi-master').value = obat.indikasi || '';
     document.getElementById('input-efek-master').value = obat.efek_samping || obat.efekSamping || '';
     document.getElementById('input-dosis-master').value = obat.dosis_kgbb || obat.dosisKgBB || obat.dosis_min || '';
     document.getElementById('input-fda-master').value = obat.fda || obat.kategoriFda || 'B';
-    
+
     const inputLiteratur = document.getElementById('input-literatur-master');
     if (inputLiteratur) inputLiteratur.value = obat.literatur || '';
 
@@ -4697,31 +4665,64 @@ function editObat(encodedName) {
     }
 }    
 
-// 3. Fungsi Buka Modal Tambah Obat Baru
+// 3. Fungsi Buka Modal Tambah Obat Baru (Diperbaiki agar mereset form & membuka display)
 function bukaModalObatBaru() {
-    document.getElementById('form-master-obat').reset();
-    document.getElementById('input-edit-index').value = "-1";
-    document.getElementById('modal-obat-title').innerText = 'Tambah Obat Baru';
-    
     const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.remove('hidden');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+
+    // Reset form agar bersih untuk data baru
+    const form = document.getElementById('form-master-obat');
+    if (form) {
+        form.reset();
+    }
+
+    // Kosongkan ID edit agar terbaca sebagai data baru (Tambah)
+    const editIdField = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
+    if (editIdField) {
+        editIdField.value = '';
+    }
+
+    // Set judul modal
+    const modalTitle = document.getElementById('modal-obat-title');
+    if (modalTitle) {
+        modalTitle.innerText = 'Tambah Data Obat';
+    }
 }
 
-// 4. Fungsi Tutup Modal
+// Fungsi Global untuk Menutup Modal
 function tutupModalObat() {
     const modal = document.getElementById('modal-master-obat');
-    if (modal) modal.classList.add('hidden');
-}
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none'; 
+    }
 
-// 5. Fungsi Menyimpan Data (Menangani Tambah & Edit) - Terintegrasi JSON & Supabase
+    const form = document.getElementById('form-master-obat');
+    if (form) {
+        form.reset();
+    }
+
+    const editIdField = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
+    if (editIdField) {
+        editIdField.value = '';
+    }
+
+    const modalTitle = document.getElementById('modal-obat-title');
+    if (modalTitle) {
+        modalTitle.innerText = 'Tambah / Edit Data Obat';
+    }
+}  
+
+// 5. Fungsi Menyimpan Data (Menangani Tambah & Edit) - Terintegrasi Supabase
 async function simpanMasterObat(event) {
     if (event) event.preventDefault();
 
-    // Ambil ID dari input tersembunyi
     const editId = document.getElementById('input-edit-id')?.value || document.getElementById('input-edit-index')?.value;
     const namaInput = document.getElementById('input-nama-master')?.value.trim();
-    const nappzaInput = document.getElementById('input-nappza-master')?.value.trim(); // <-- Input Nappza Manual
-    const komposisiInput = document.getElementById('input-komposisi-master')?.value.trim();
+    const kekuatanInput = document.getElementById('input-kekuatan-master')?.value.trim();
     const indikasiInput = document.getElementById('input-indikasi-master')?.value.trim();
     const efekInput = document.getElementById('input-efek-master')?.value.trim();
     const dosisInput = document.getElementById('input-dosis-master')?.value.trim();
@@ -4735,8 +4736,7 @@ async function simpanMasterObat(event) {
 
     const payload = {
         nama_obat: namaInput,
-        nappza: nappzaInput, // <-- Disimpan ke payload
-        komposisi: komposisiInput,
+        kekuatan: kekuatanInput,
         indikasi: indikasiInput,
         efek_samping: efekInput,
         dosis_kgbb: dosisInput,
@@ -4744,11 +4744,13 @@ async function simpanMasterObat(event) {
         literatur: literaturInput
     };
 
+    // Jika ada ID (Artinya mode Edit/Update, bukan Tambah Baru)
     if (editId && editId !== "") {
-        payload.id = isNaN(editId) ? editId : parseInt(editId); // Sesuaikan dengan tipe ID Supabase (UUID / Integer)
+        payload.id = isNaN(editId) ? editId : parseInt(editId); 
     }
 
     try {
+        // Menggunakan upsert agar otomatis menambah data baru jika ID kosong, atau mengupdate jika ID sudah ada di Supabase
         const { error } = await _supabase
             .from('master_obat') 
             .upsert(payload);
@@ -4758,30 +4760,23 @@ async function simpanMasterObat(event) {
             return;
         }
 
-        const modal = document.getElementById('modal-master-obat');
-        if (modal) {
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
-        }
+        // Tutup modal dan bersihkan form menggunakan fungsi global yang benar
+        tutupModalObat();
 
-        const formObj = document.getElementById('form-master-obat');
-        if (formObj) formObj.reset();
-
-        const inputEditIdField = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
-        if (inputEditIdField) inputEditIdField.value = '';
-
+        // Reload data terbaru dari Supabase / Render ulang tabel
         if (typeof loadMasterObatFromSupabase === 'function') {
             await loadMasterObatFromSupabase();
         } else if (typeof renderTabelMasterObat === 'function') {
             renderTabelMasterObat();
         }
 
-        alert("Data obat berhasil disimpan!");
+        alert("Data obat berhasil disimpan ke Supabase!");
 
     } catch (err) {
         console.error("Error simpanMasterObat:", err);
+        alert("Terjadi kesalahan sistem saat menyimpan data.");
     }
-}    
+}     
 
 
 // --- LOGIKA SURAT PESANAN ---
@@ -4798,10 +4793,8 @@ function generateNomorSuratPesanan(jenisSP) {
         kodeJenis = "PRE";
     } else if (jenisSP === "OOT") {
         kodeJenis = "OOT";
-    } else if (jenisSP === "Psikotropik") {
-        kodeJenis = "Psi";
-	} else if (jenisSP === "Narkotik") {
-	     kodeJenis = "Nar";
+    } else if (jenisSP === "Psikotropik/Narkotik") {
+        kodeJenis = "NP";
     } else if (jenisSP === "Alkes") {
         kodeJenis = "ALK";
     }
@@ -4970,11 +4963,7 @@ function tambahBarisItemPesanan(itemData = {}) {
             <input type="text" list="list-master-obat-sp-${rowId}" value="${itemData.namaObat || ''}" placeholder="Ketik nama obat..." class="input-nama-obat w-full px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-sky-500 outline-none" required oninput="pilihOtomatisMasterObat(this)">
             <datalist id="list-master-obat-sp-${rowId}">${datalistObatOptions}</datalist>
         </td>
-        
-        <!-- ✨ DIPERBAIKI: Menggunakan class "input-nappza" dan properti "itemData.nappza" -->
-        <td class="p-2">
-            <input type="text" value="${itemData.nappza || ''}" placeholder="NAPZZA" class="input-nappza w-full px-2 py-1.5 border rounded-lg outline-none bg-slate-50" readonly>
-        </td>
+        <td class="p-2"><input type="text" value="${itemData.zatAktif || ''}" placeholder="Zat Aktif & Kekuatan" class="input-zat w-full px-2 py-1.5 border rounded-lg outline-none"></td>
         
         <!-- Kolom Bentuk Sediaan dengan Dropdown & Pencarian Otomatis -->
         <td class="p-2 relative">
@@ -4992,73 +4981,25 @@ function tambahBarisItemPesanan(itemData = {}) {
 
         <td class="p-2"><input type="text" value="${itemData.ket || '-'}" placeholder="Ket" class="input-ket w-full px-2 py-1.5 border rounded-lg outline-none"></td>
         <td class="p-2 text-center">
-           <button type="button" onclick="hapusBarisItemPesanan('${rowId}', '${itemData.id || ''}')" class="text-rose-600 hover:text-rose-800 p-1">
-    <i class="fa-solid fa-trash"></i>
-</button>
+            <button type="button" onclick="hapusBarisItemPesanan('${rowId}')" class="text-rose-600 hover:text-rose-800 p-1"><i class="fa-solid fa-trash"></i></button>
+        </td>
     `;
     tbody.appendChild(tr);
 }  
 
-async function hapusBarisItemPesanan(rowId, itemIdSupabase = null) {
+function hapusBarisItemPesanan(rowId) {
     const row = document.getElementById(rowId);
-    if (!row) return;
+    if (row) row.remove();
+    reorderRowNumbers();
+}
 
-    try {
-        // Jika baris ini berasal dari database Supabase, hapus juga dari database
-        if (itemIdSupabase) {
-            const { error } = await _supabase
-                .from('item_surat_pesanan')
-                .delete()
-                .eq('id', itemIdSupabase);
+function reorderRowNumbers() {
+    const rows = document.querySelectorAll('#container-item-pesanan tr');
+    rows.forEach((tr, idx) => {
+        tr.querySelector('.row-number').innerText = idx + 1;
+    });
+}
 
-            if (error) {
-                alert("Gagal menghapus dari Supabase: " + error.message);
-                return;
-            }
-        }
-
-        // Hapus baris dari tampilan tabel HTML
-        row.remove();
-        
-        // Rapikan kembali nomor urut baris
-        if (typeof reorderRowNumbers === 'function') {
-            reorderRowNumbers();
-        }
-
-    } catch (err) {
-        console.error("Error saat menghapus baris item:", err);
-    }
-} 
-async function hapusSuratPesananSupabase(nomorSp) {
-    if (!confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan dengan Nomor: ${nomorSp}?`)) {
-        return;
-    }
-
-    try {
-        // Menghapus semua baris item surat pesanan di Supabase berdasarkan nomor_sp
-        const { error } = await _supabase
-            .from('item_surat_pesanan')
-            .delete()
-            .eq('nomor_sp', nomorSp);
-
-        if (error) {
-            alert("Gagal menghapus Surat Pesanan dari Supabase: " + error.message);
-            return;
-        }
-
-        // Reload data dari Supabase untuk memperbarui tampilan tabel riwayat SP
-        if (typeof loadDataSuratPesananFromSupabase === 'function') {
-            await loadDataSuratPesananFromSupabase();
-        } else if (typeof loadFromSupabase === 'function') {
-            await loadFromSupabase();
-        }
-
-        alert("Surat Pesanan berhasil dihapus dari database!");
-
-    } catch (err) {
-        console.error("Error hapusSuratPesananSupabase:", err);
-    }
-} 
 // Auto-fill saat nama obat dipilih dari Master Obat
 function pilihOtomatisMasterObat(inputElem) {
     const val = inputElem.value.trim().toLowerCase();
@@ -5071,26 +5012,9 @@ function pilihOtomatisMasterObat(inputElem) {
     });
     
     const tr = inputElem.closest('tr');
-    if (tr) {
-        // Ambil elemen input Nappza di baris ini
-        const inputNappza = tr.querySelector('.input-nappza');
-        const inputBentuk = tr.querySelector('.input-bentuk');
-
-        if (matched) {
-            // ✨ Isi otomatis dengan data NAPPZA dari master obat
-            if (inputNappza) {
-                inputNappza.value = matched.nappza || '-';
-            }
-            // Opsional: Isi bentuk sediaan jika ada di master obat
-            if (inputBentuk && matched.bentuk_sediaan) {
-                inputBentuk.value = matched.bentuk_sediaan;
-            }
-        } else {
-            // Jika diketik manual atau tidak ada di master, isi default
-            if (inputNappza) {
-                inputNappza.value = '-';
-            }
-        }
+    if (matched && tr) {
+        tr.querySelector('.input-zat').value = matched.kekuatan || '';
+        tr.querySelector('.input-bentuk').value = 'Tablet'; 
     }
 } 
 
@@ -5104,7 +5028,7 @@ async function simpanSuratPesananKeSupabase(dataSP) {
             tanggal: dataSP.tanggal,
             supplier_nama: dataSP.supplierNama,
             nama_obat: item.namaObat,
-            nappza: item.nappza || '',
+            zat_aktif: item.zatAktif || '',
             bentuk_sediaan: item.bentukSediaan || '',
             jumlah: parseInt(item.jumlah) || 0,
             satuan: item.satuan,
@@ -5143,7 +5067,7 @@ async function simpanSuratPesanan(e) {
     document.querySelectorAll('.item-pesanan-row').forEach(tr => {
         items.push({
             namaObat: tr.querySelector('.input-nama-obat').value.trim(),
-            nappza: tr.querySelector('.input-nappza').value.trim(),
+            zatAktif: tr.querySelector('.input-zat').value.trim(),
             bentukSediaan: tr.querySelector('.input-bentuk').value.trim(),
             jumlah: tr.querySelector('.input-jumlah').value.trim(),
             satuan: tr.querySelector('.input-satuan').value.trim(),
@@ -5248,7 +5172,7 @@ function cetakSuratPesanan(index) {
             <tr>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
                 <td style="border: 1px solid #000; padding: 4px; font-weight: bold;">${it.namaObat}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.nappza || '-'}</td>
+                <td style="border: 1px solid #000; padding: 4px;">${it.zatAktif || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px;">${it.bentukSediaan || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.jumlah}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.satuan}</td>
@@ -5332,7 +5256,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">NAPZZA</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & Kekuatan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
@@ -5384,30 +5308,42 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
             return false;
         }
 
+        // 1. HAPUS item lama berdasarkan nomor_sp terlebih dahulu (agar update & hapus baris sinkron)
+        const { error: deleteError } = await _supabase
+            .from('item_surat_pesanan')
+            .delete()
+            .eq('nomor_sp', dataSP.nomor);
+
+        if (deleteError) {
+            console.error("Gagal membersihkan item lama di Supabase:", deleteError.message);
+            alert("Gagal memperbarui data lama di Supabase: " + deleteError.message);
+            return false;
+        }
+
+        // 2. MASUKKAN item obat yang baru / terbaru
         const payload = itemsArray.map(item => ({
             nomor_sp: dataSP.nomor,
             jenis_sp: dataSP.jenis,
             tanggal: dataSP.tanggal,
             supplier_nama: dataSP.supplierNama,
             nama_obat: item.namaObat,
-            zat_aktif: item.nappza || '',
+            zat_aktif: item.zatAktif || '',
             bentuk_sediaan: item.bentukSediaan || '',
             jumlah: parseInt(item.jumlah) || 0,
             satuan: item.satuan,
             ket: item.ket || '-'
         }));
 
-        const { data, error } = await _supabase
+        const { error: insertError } = await _supabase
             .from('item_surat_pesanan')
             .insert(payload);
 
-        if (error) {
-            console.error("Gagal menyimpan ke Supabase:", error.message);
-            alert("Gagal sinkronisasi ke Supabase: " + error.message);
+        if (insertError) {
+            console.error("Gagal menyimpan ke Supabase:", insertError.message);
+            alert("Gagal sinkronisasi ke Supabase: " + insertError.message);
             return false;
         }
 
-        console.log("Berhasil disimpan ke Supabase:", data);
         return true;
     } catch (err) {
         console.error("Terjadi kesalahan koneksi Supabase:", err);
@@ -5421,12 +5357,11 @@ async function simpanSuratPesanan(e) {
     const selectSup = document.getElementById('sp-supplier');
     const selectedOption = selectSup.options[selectSup.selectedIndex];
 
-    // Ambil data item obat dari tabel baris dinamis
     let items = [];
     document.querySelectorAll('.item-pesanan-row').forEach(tr => {
         items.push({
             namaObat: tr.querySelector('.input-nama-obat').value.trim(),
-            nappza: tr.querySelector('.input-nappza').value.trim(),
+            zatAktif: tr.querySelector('.input-zat').value.trim(),
             bentukSediaan: tr.querySelector('.input-bentuk').value.trim(),
             jumlah: tr.querySelector('.input-jumlah').value.trim(),
             satuan: tr.querySelector('.input-satuan').value.trim(),
@@ -5439,11 +5374,10 @@ async function simpanSuratPesanan(e) {
         return;
     }
 
-    const nomorSp = document.getElementById('sp-nomor').value.trim();
     const dataSP = {
         id: editIndex >= 0 ? suratPesananData[editIndex].id : Date.now(),
         jenis: document.getElementById('sp-jenis').value,
-        nomor: nomorSp,
+        nomor: document.getElementById('sp-nomor').value.trim(),
         tanggal: document.getElementById('sp-tanggal').value,
         supplierNama: selectSup.value,
         supplierAlamat: selectedOption.getAttribute('data-alamat') || '-',
@@ -5451,7 +5385,6 @@ async function simpanSuratPesanan(e) {
         items: items
     };
 
-    // Kirim data & sinkronisasi ke Supabase
     const suksesSupabase = await simpanSuratPesananKeSupabase(dataSP, items);
     if (!suksesSupabase) return;
 
@@ -5462,98 +5395,11 @@ async function simpanSuratPesanan(e) {
     }
 
     localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
-    
-    if (typeof renderTabelSuratPesanan === 'function') {
-        renderTabelSuratPesanan();
-    }
-    
+    renderTabelSuratPesanan();
     tutupModalSuratPesanan();
     alert("Surat Pesanan berhasil disimpan dan disinkronkan ke Supabase!");
 }
 
-// Fungsi pembantu untuk eksekusi Supabase
-async function simpanSuratPesananKeSupabase(dataSP, items) {
-    try {
-        // ✨ LANGKAH 1: Hapus item lama berdasarkan nomor_sp (Membersihkan item yang dihapus saat edit)
-        const { error: deleteError } = await _supabase
-            .from('item_surat_pesanan')
-            .delete()
-            .eq('nomor_sp', dataSP.nomor);
-
-        if (deleteError) {
-            alert("Gagal memperbarui item lama di Supabase: " + deleteError.message);
-            return false;
-        }
-
-        // ✨ LANGKAH 2: Format ulang item baru untuk dimasukkan ke Supabase
-        const payloadItems = items.map(item => ({
-            nomor_sp: dataSP.nomor,
-            jenis_sp: dataSP.jenis,
-            tanggal: dataSP.tanggal,
-            supplier_nama: dataSP.supplierNama,
-            nama_obat: item.namaObat,
-            nappza: item.nappza,
-            bentuk_sediaan: item.bentukSediaan,
-            jumlah: parseInt(item.jumlah) || 1,
-            satuan: item.satuan,
-            ket: item.ket
-        }));
-
-        // ✨ LANGKAH 3: Masukkan data item yang baru
-        const { error: insertError } = await _supabase
-            .from('item_surat_pesanan')
-            .insert(payloadItems);
-
-        if (insertError) {
-            alert("Gagal menyimpan item ke Supabase: " + insertError.message);
-            return false;
-        }
-
-        return true;
-    } catch (err) {
-        console.error("Error simpanSuratPesananKeSupabase:", err);
-        alert("Terjadi kesalahan sistem saat sinkronisasi Supabase.");
-        return false;
-    }
-} 
-async function hapusSuratPesananSupabase(nomorSp) {
-    if (!confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan Nomor: ${nomorSp} dari sistem dan database Supabase?`)) {
-        return;
-    }
-
-    try {
-        // Hapus semua data item surat pesanan di Supabase berdasarkan nomor_sp
-        const { error } = await _supabase
-            .from('item_surat_pesanan')
-            .delete()
-            .eq('nomor_sp', nomorSp);
-
-        if (error) {
-            alert("Gagal menghapus dari Supabase: " + error.message);
-            return;
-        }
-
-        // Hapus juga dari array lokal / localStorage jika ada
-        if (typeof suratPesananData !== 'undefined') {
-            const index = suratPesananData.findIndex(sp => sp.nomor === nomorSp);
-            if (index >= 0) {
-                suratPesananData.splice(index, 1);
-                localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
-            }
-        }
-
-        // Refresh tabel tampilan web
-        if (typeof renderTabelSuratPesanan === 'function') {
-            renderTabelSuratPesanan();
-        }
-
-        alert("Surat Pesanan berhasil dihapus secara permanen dari database!");
-
-    } catch (err) {
-        console.error("Error hapusSuratPesananSupabase:", err);
-        alert("Terjadi kesalahan saat menghapus data.");
-    }
-} 
 // 3. Edit Surat Pesanan
 function editSuratPesanan(index) {
     const sp = suratPesananData[index];
@@ -5578,12 +5424,32 @@ function editSuratPesanan(index) {
     document.getElementById('modal-surat-pesanan').classList.remove('hidden');
 }
 
-// 4. Hapus Surat Pesanan
-function hapusSuratPesanan(index) {
-    if (confirm("Apakah Anda yakin ingin menghapus surat pesanan ini?")) {
-        suratPesananData.splice(index, 1);
-        localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
-        renderTabelSuratPesanan();
+async function hapusSuratPesanan(index) {
+    const sp = suratPesananData[index];
+    if (!sp) return;
+
+    if (confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan Nomor: ${sp.nomor} dari sistem dan database Supabase?`)) {
+        try {
+            // Hapus data item di Supabase berdasarkan nomor_sp
+            const { error } = await _supabase
+                .from('item_surat_pesanan')
+                .delete()
+                .eq('nomor_sp', sp.nomor);
+
+            if (error) {
+                alert("Gagal menghapus dari Supabase: " + error.message);
+                return;
+            }
+
+            // Hapus dari array lokal dan localStorage
+            suratPesananData.splice(index, 1);
+            localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
+            renderTabelSuratPesanan();
+            
+            alert("Surat Pesanan berhasil dihapus secara permanen!");
+        } catch (err) {
+            console.error("Error hapusSuratPesanan:", err);
+        }
     }
 }
 
@@ -5615,7 +5481,7 @@ function cetakSuratPesanan(index) {
             <tr>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
                 <td style="border: 1px solid #000; padding: 4px; font-weight: bold;">${it.namaObat}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.nappza || '-'}</td>
+                <td style="border: 1px solid #000; padding: 4px;">${it.zatAktif || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px;">${it.bentukSediaan || '-'}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.jumlah}</td>
                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.satuan}</td>
@@ -5698,7 +5564,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">NAPZZA</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">Zat Aktif & Kekuatan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
@@ -6018,7 +5884,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const tekskomposisi = String(selectedObatCalc.komposisi || selectedObatCalc.komposisi_mg || '');
+    const teksKekuatan = String(selectedObatCalc.kekuatan || selectedObatCalc.kekuatan_mg || '');
     const teksDosis = String(selectedObatCalc.dosis_kgbb || selectedObatCalc.dosis || selectedObatCalc.dosis_min || '');
 
     // Deteksi apakah aturan dosis mengandung unsur "kgBB" atau murni teks/usia
@@ -6026,12 +5892,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     selectedObatCalc.is_berbasis_bb = isBerbasisBB;
     selectedObatCalc.teks_dosis_asli = teksDosis;
-    selectedObatCalc.teks_komposisi = tekskomposisi;
+    selectedObatCalc.teks_kekuatan = teksKekuatan;
 
-    // Parsing komposisi sediaan untuk jaga-jaga jika dibutuhkan
+    // Parsing kekuatan sediaan untuk jaga-jaga jika dibutuhkan
     let mgSediaan = 0, mlSediaan = 5;
-    const matchMg = tekskomposisi.match(/(\d+)\s*mg/i);
-    const matchMl = tekskomposisi.match(/(\d+)\s*ml/i);
+    const matchMg = teksKekuatan.match(/(\d+)\s*mg/i);
+    const matchMl = teksKekuatan.match(/(\d+)\s*ml/i);
     if (matchMg) mgSediaan = parseFloat(matchMg[1]);
     if (matchMl) mlSediaan = parseFloat(matchMl[1]);
     selectedObatCalc.parsed_mg = mgSediaan || 10;
@@ -6058,7 +5924,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     infoAturan.innerHTML = `
-        <div><b>komposisi Sediaan:</b> ${tekskomposisi}</div>
+        <div><b>Kekuatan Sediaan:</b> ${teksKekuatan}</div>
         <div><b>Aturan Dosis Referensi:</b> ${teksDosis}</div>
     `;
 
