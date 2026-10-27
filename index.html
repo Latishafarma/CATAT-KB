@@ -1744,14 +1744,14 @@ async function loadFromSupabase() {
                     };
                 }
                 groupedMap[row.nomor_sp].items.push({
-                    namaObat: row.nama_obat,
-                    nappza: row.nappza || '',
-                    bentukSediaan: row.bentuk_sediaan || '',
-                    jumlah: row.jumlah,
-                    satuan: row.satuan,
-                    ket: row.ket || '-'
-                });
-            });
+    id: row.id, // <-- Pastikan ID unik Supabase ikut disimpan di sini
+    namaObat: row.nama_obat,
+    nappza: row.nappza || '',
+    bentukSediaan: row.bentuk_sediaan || '',
+    jumlah: row.jumlah,
+    satuan: row.satuan,
+    ket: row.ket || '-'
+}); 
 
             suratPesananData = Object.values(groupedMap);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
@@ -5091,12 +5091,12 @@ async function simpanSuratPesananKeSupabase(dataSP) {
     tanggal: dataSP.tanggal,
     supplier_nama: dataSP.supplierNama,
     nama_obat: item.namaObat,
-    nappza: item.nappza || item.nappza || '', // <-- Diperbaiki agar membaca property nappza juga
+    nappza: item.nappza || '',
     bentuk_sediaan: item.bentukSediaan || '',
     jumlah: parseInt(item.jumlah) || 0,
     satuan: item.satuan,
     ket: item.ket || '-'
-}));
+})); 
 
         // Lakukan insert ke tabel item_surat_pesanan di Supabase
         // (Pastikan variabel klien Supabase Anda bernama _supabase atau supabase, sesuaikan jika berbeda)
@@ -5204,37 +5204,25 @@ function editSuratPesanan(index) {
         const targetSP = suratPesananData[index];
         const nomorSpTarget = targetSP.nomor || targetSP.nomor_sp;
 
-        // CEK 1: Apakah nomor SP terbaca dengan benar di console browser?
-        console.log("Nomor SP yang akan dihapus:", nomorSpTarget);
-
         try {
-            const { data, error } = await _supabase
+            const { error } = await _supabase
                 .from('item_surat_pesanan')
                 .delete()
-                .eq('nomor_sp', nomorSpTarget)
-                .select(); // Tambahkan .select() untuk melihat baris mana yang terhapus
+                .eq('nomor_sp', nomorSpTarget);
 
-            // CEK 2: Apakah ada error dari Supabase?
-            if (error) {
-                console.error("Detail Error Supabase:", error);
-                throw error;
-            }
-
-            console.log("Data yang berhasil dihapus dari Supabase:", data);
+            if (error) throw error;
 
             suratPesananData.splice(index, 1);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
             renderTabelSuratPesanan();
-            
-            alert("Surat pesanan berhasil dihapus dari database dan web.");
 
+            alert("Surat pesanan berhasil dihapus dari database dan web.");
         } catch (err) {
             console.error("Gagal menghapus dari Supabase:", err.message);
             alert("Gagal menghapus data dari database: " + err.message);
         }
     }
 } 
-
 // 6. Cetak Surat Pesanan (Dengan perbaikan lebar kontainer agar rapat dan proporsional)
 function cetakSuratPesanan(index) {
     const sp = suratPesananData[index];
