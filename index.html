@@ -1744,14 +1744,14 @@ async function loadFromSupabase() {
                     };
                 }
                 groupedMap[row.nomor_sp].items.push({
-    id: row.id, // <-- Pastikan ID unik Supabase ikut disimpan di sini
-    namaObat: row.nama_obat,
-    nappza: row.nappza || '',
-    bentukSediaan: row.bentuk_sediaan || '',
-    jumlah: row.jumlah,
-    satuan: row.satuan,
-    ket: row.ket || '-'
-}); 
+                    namaObat: row.nama_obat,
+                    nappza: row.nappza || '',
+                    bentukSediaan: row.bentuk_sediaan || '',
+                    jumlah: row.jumlah,
+                    satuan: row.satuan,
+                    ket: row.ket || '-'
+                });
+            });
 
             suratPesananData = Object.values(groupedMap);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
