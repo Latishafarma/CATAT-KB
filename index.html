@@ -5019,24 +5019,49 @@ function tambahBarisItemPesanan(itemData = {}) {
 
         <td class="p-2"><input type="text" value="${itemData.ket || '-'}" placeholder="Ket" class="input-ket w-full px-2 py-1.5 border rounded-lg outline-none"></td>
         <td class="p-2 text-center">
-            <button type="button" onclick="hapusBarisItemPesanan('${rowId}')" class="text-rose-600 hover:text-rose-800 p-1"><i class="fa-solid fa-trash"></i></button>
-        </td>
+<button type="button" onclick="hapusBarisItemPesanan(${itemData.id || 'null'}, '${rowId}')" class="text-rose-600 hover:text-rose-800 p-1">
+    <i class="fa-solid fa-trash"></i>
+</button>
     `;
     tbody.appendChild(tr);
 }  
 
-function hapusBarisItemPesanan(rowId) {
-    const row = document.getElementById(rowId);
-    if (row) row.remove();
-    reorderRowNumbers();
-}
+async function hapusBarisItemPesanan(itemId, rowId) {
+    if (!confirm("Apakah Anda yakin ingin menghapus baris obat ini?")) return;
+
+    try {
+        // Jika baris sudah tersimpan di Supabase (memiliki ID database), hapus dari Supabase
+        if (itemId && itemId !== 'null') {
+            const { error } = await _supabase
+                .from('item_surat_pesanan')
+                .delete()
+                .eq('id', itemId);
+
+            if (error) throw error;
+        }
+
+        // Hapus elemen baris dari tampilan web (DOM)
+        const row = document.getElementById(rowId);
+        if (row) row.remove();
+
+        // Rapikan kembali nomor urut baris
+        reorderRowNumbers();
+
+        console.log("Baris obat berhasil dihapus dari web dan database.");
+
+    } catch (err) {
+        console.error("Gagal menghapus baris dari Supabase:", err.message);
+        alert("Gagal menghapus data: " + err.message);
+    }
+} 
 
 function reorderRowNumbers() {
     const rows = document.querySelectorAll('#container-item-pesanan tr');
     rows.forEach((tr, idx) => {
-        tr.querySelector('.row-number').innerText = idx + 1;
+        const rowNumEl = tr.querySelector('.row-number');
+        if (rowNumEl) rowNumEl.innerText = idx + 1;
     });
-}
+} 
 
 // Auto-fill saat nama obat dipilih dari Master Obat
 function pilihOtomatisMasterObat(inputElem) {
@@ -5174,19 +5199,28 @@ function editSuratPesanan(index) {
     document.getElementById('modal-surat-pesanan').classList.remove('hidden');
 }
 
-async function hapusSuratPesanan(index) {
+ async function hapusSuratPesanan(index) {
     if (confirm("Apakah Anda yakin ingin menghapus surat pesanan ini?")) {
         const targetSP = suratPesananData[index];
         const nomorSpTarget = targetSP.nomor || targetSP.nomor_sp;
 
+        // CEK 1: Apakah nomor SP terbaca dengan benar di console browser?
+        console.log("Nomor SP yang akan dihapus:", nomorSpTarget);
+
         try {
-            // Menggunakan '_supabase' sesuai dengan inisialisasi di kode Anda
-            const { error } = await _supabase
+            const { data, error } = await _supabase
                 .from('item_surat_pesanan')
                 .delete()
-                .eq('nomor_sp', nomorSpTarget);
+                .eq('nomor_sp', nomorSpTarget)
+                .select(); // Tambahkan .select() untuk melihat baris mana yang terhapus
 
-            if (error) throw error;
+            // CEK 2: Apakah ada error dari Supabase?
+            if (error) {
+                console.error("Detail Error Supabase:", error);
+                throw error;
+            }
+
+            console.log("Data yang berhasil dihapus dari Supabase:", data);
 
             suratPesananData.splice(index, 1);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
