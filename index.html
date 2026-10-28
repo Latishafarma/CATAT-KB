@@ -5218,10 +5218,7 @@ async function hapusSuratPesanan(index) {
         return;
     }
 
-    // Ambil nomor SP dan bersihkan dari spasi ekstra di awal/akhir
     const nomorSpTarget = String(targetSP.nomor || targetSP.nomor_sp || "").trim();
-
-    console.log("Mencoba menghapus nomor_sp di Supabase:", JSON.stringify(nomorSpTarget));
 
     if (!nomorSpTarget) {
         alert("Gagal menghapus: Nomor Surat Pesanan kosong!");
@@ -5230,34 +5227,32 @@ async function hapusSuratPesanan(index) {
 
     if (confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan nomor: ${nomorSpTarget}?`)) {
         try {
-            // Gunakan .select() untuk mengembalikan data baris yang berhasil dihapus
-            const { data, error } = await _supabase
+            console.log("Sedang menghapus di Supabase untuk nomor_sp:", nomorSpTarget);
+
+            // Eksekusi hapus di Supabase
+            const { error: deleteError } = await _supabase
                 .from('item_surat_pesanan')
                 .delete()
-                .eq('nomor_sp', nomorSpTarget)
-                .select(); 
+                .eq('nomor_sp', nomorSpTarget);
 
-            if (error) {
-                throw error;
+            if (deleteError) {
+                throw deleteError;
             }
 
-            console.log("Data yang berhasil dihapus dari Supabase:", data);
+            console.log("Berhasil terhapus di Supabase, memperbarui web...");
 
-            // Cek apakah Supabase benar-benar menemukan dan menghapus data
-            if (!data || data.length === 0) {
-                console.warn("Tidak ada baris di tabel Supabase yang cocok dengan nomor_sp:", nomorSpTarget);
-            }
-
-            // Hapus dari array lokal
+            // Hapus data dari array lokal
             suratPesananData.splice(index, 1);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
             
-            // Render ulang tabel di web
+            // Render ulang tabel
             renderTabelSuratPesanan();
 
+            // Notifikasi sukses
             alert("Surat pesanan berhasil dihapus dari web dan database Supabase.");
+            
         } catch (err) {
-            console.error("Gagal menghapus dari Supabase:", err.message);
+            console.error("Terjadi error saat menghapus:", err.message);
             alert("Gagal menghapus data dari database: " + err.message);
         }
     }
@@ -5418,296 +5413,6 @@ function cetakSuratPesanan(index) {
     printWin.document.close();
 }
 
-// 1. Fungsi pembantu untuk mengirim data item obat ke Supabase
-async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
-    try {
-        if (!itemsArray || !Array.isArray(itemsArray) || itemsArray.length === 0) {
-            console.error("Data item obat kosong atau tidak valid.");
-            return false;
-        }
-
-        // 1. HAPUS terlebih dahulu data item lama di Supabase berdasarkan nomor_sp.
-        // Langkah ini krusial untuk mencegah duplikasi saat melakukan Edit / Pembaruan Surat Pesanan.
-        const { error: deleteError } = await _supabase
-            .from('item_surat_pesanan')
-            .delete()
-            .eq('nomor_sp', dataSP.nomor);
-
-        if (deleteError) {
-            console.error("Gagal membersihkan data lama di Supabase:", deleteError.message);
-        }
-
-        // 2. Siapkan payload baru dari array item obat yang diinput pengguna
-        const payload = itemsArray.map(item => ({
-            nomor_sp: dataSP.nomor,
-            jenis_sp: dataSP.jenis,
-            tanggal: dataSP.tanggal,
-            supplier_nama: dataSP.supplierNama,
-            nama_obat: item.namaObat,
-            nappza: item.nappza || '',
-            bentuk_sediaan: item.bentukSediaan || '',
-            jumlah: parseInt(item.jumlah) || 0,
-            satuan: item.satuan,
-            ket: item.ket || '-'
-        }));
-
-        // 3. INSERT data terbaru ke tabel item_surat_pesanan
-        const { data, error } = await _supabase
-            .from('item_surat_pesanan')
-            .insert(payload);
-
-        if (error) {
-            console.error("Gagal menyimpan ke Supabase:", error.message);
-            alert("Gagal sinkronisasi ke Supabase: " + error.message);
-            return false;
-        }
-
-        console.log("Berhasil sinkronisasi item surat pesanan ke Supabase:", data);
-        return true;
-    } catch (err) {
-        console.error("Terjadi kesalahan koneksi Supabase:", err);
-        return false;
-    }
-} 
-
-// 2. Simpan Surat Pesanan (Terintegrasi Supabase & LocalStorage)
-async function simpanSuratPesanan(e) {
-    e.preventDefault();
-    const editIndex = parseInt(document.getElementById('sp-edit-index').value);
-    const selectSup = document.getElementById('sp-supplier');
-    const selectedOption = selectSup.options[selectSup.selectedIndex];
-
-    // Ambil data item obat dari tabel baris dinamis
-    let items = [];
-    document.querySelectorAll('.item-pesanan-row').forEach(tr => {
-        items.push({
-            namaObat: tr.querySelector('.input-nama-obat').value.trim(),
-            nappza: tr.querySelector('.input-nappza').value.trim(),
-            bentukSediaan: tr.querySelector('.input-bentuk').value.trim(),
-            jumlah: tr.querySelector('.input-jumlah').value.trim(),
-            satuan: tr.querySelector('.input-satuan').value.trim(),
-            ket: tr.querySelector('.input-ket').value.trim()
-        });
-    });
-
-    if (items.length === 0) {
-        alert("Harap masukkan minimal 1 item obat pada surat pesanan.");
-        return;
-    }
-
-    const dataSP = {
-        id: editIndex >= 0 ? suratPesananData[editIndex].id : Date.now(),
-        jenis: document.getElementById('sp-jenis').value,
-        nomor: document.getElementById('sp-nomor').value.trim(),
-        tanggal: document.getElementById('sp-tanggal').value,
-        supplierNama: selectSup.value,
-        supplierAlamat: selectedOption.getAttribute('data-alamat') || '-',
-        supplierTelp: selectedOption.getAttribute('data-telp') || '-',
-        items: items
-    };
-
-    // Kirim data ke Supabase
-    const suksesSupabase = await simpanSuratPesananKeSupabase(dataSP, items);
-    if (!suksesSupabase) return;
-
-    if (editIndex >= 0) {
-        suratPesananData[editIndex] = dataSP;
-    } else {
-        suratPesananData.push(dataSP);
-    }
-
-    localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
-    renderTabelSuratPesanan();
-    tutupModalSuratPesanan();
-    alert("Surat Pesanan berhasil disimpan ke Supabase & lokal!");
-}
-
-// 3. Edit Surat Pesanan
-function editSuratPesanan(index) {
-    const sp = suratPesananData[index];
-    if (!sp) return;
-
-    document.getElementById('sp-edit-index').value = index;
-    document.getElementById('modal-sp-title').innerText = "Edit Surat Pesanan";
-    document.getElementById('sp-jenis').value = sp.jenis || 'OOT';
-    document.getElementById('sp-nomor').value = sp.nomor || '';
-    document.getElementById('sp-tanggal').value = sp.tanggal || '';
-    
-    muatDropdownSupplier(sp.supplierNama);
-
-    const tbody = document.getElementById('container-item-pesanan');
-    tbody.innerHTML = '';
-    if (sp.items && sp.items.length > 0) {
-        sp.items.forEach(item => tambahBarisItemPesanan(item));
-    } else {
-        tambahBarisItemPesanan();
-    }
-
-    document.getElementById('modal-surat-pesanan').classList.remove('hidden');
-}
-
-// 4. Hapus Surat Pesanan
-function hapusSuratPesanan(index) {
-    if (confirm("Apakah Anda yakin ingin menghapus surat pesanan ini?")) {
-        suratPesananData.splice(index, 1);
-        localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
-        renderTabelSuratPesanan();
-    }
-}
-
-// 5. Cetak Surat Pesanan
-function cetakSuratPesanan(index) {
-    const sp = suratPesananData[index];
-    if (!sp) return;
-
-    const paperSize = document.getElementById('sp-print-paper')?.value || 'A5';
-    const orientation = document.getElementById('sp-print-orient')?.value || 'portrait';
-
-    const dimensions = {
-        'A5': { portrait: '148mm 210mm', landscape: '210mm 148mm' },
-        'A4': { portrait: '210mm 297mm', landscape: '297mm 210mm' },
-        'Legal': { portrait: '216mm 356mm', landscape: '356mm 216mm' },
-        'Letter': { portrait: '216mm 279mm', landscape: '279mm 216mm' }
-    };
-
-    const targetPageCss = dimensions[paperSize] ? dimensions[paperSize][orientation] : `${paperSize} ${orientation}`;
-
-    const fApoteker = db.faskes?.kepala || "apt. Mardin, S.Farm";
-    const fSipa = db.faskes?.nip || "KS.02.02/13/SIPA/IV.14/MSJ/2023";
-    const fAlamatFaskes = db.faskes?.alamat || "Jl. Poros KTM Tanjung Mas Makmur Kec. Mesuji Timur, Kab. Mesuji";
-    const currentDateFormatted = new Date(sp.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    let itemRowsHTML = '';
-    (sp.items || []).forEach((it, idx) => {
-        itemRowsHTML += `
-            <tr>
-                <td style="border: 1px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
-                <td style="border: 1px solid #000; padding: 4px; font-weight: bold;">${it.namaObat}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.nappza || '-'}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.bentukSediaan || '-'}</td>
-                <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.jumlah}</td>
-                <td style="border: 1px solid #000; padding: 4px; text-align: center;">${it.satuan}</td>
-                <td style="border: 1px solid #000; padding: 4px;">${it.ket || '-'}</td>
-            </tr>
-        `;
-    });
-
-    const printWin = window.open('', '_blank', 'width=900,height=700');
-    printWin.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Cetak Surat Pesanan - ${sp.nomor}</title>
-            <style>
-                @page { 
-                    size: ${targetPageCss}; 
-                    margin: 5mm; 
-                }
-                body { 
-                    margin: 0;
-                    padding: 0;
-                    background: #fff;
-                    color: #000;
-                    font-family: 'Inter', Arial, sans-serif;
-                    font-size: ${paperSize === 'A5' ? '8.5pt' : '9.5pt'};
-                    line-height: 1.35;
-                }
-                .sheet {
-                    width: 100%;
-                    max-width: 100%;
-                    margin: 0 auto;
-                    box-sizing: border-box;
-                    padding: 2mm; 
-                }
-                table { 
-                    width: 100%; 
-                    border-collapse: collapse; 
-                }
-                .info-table td {
-                    padding: 2px 0;
-                    vertical-align: top;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="sheet">
-                <div style="text-align: center; margin-bottom: 10px;">
-                    <div style="font-weight: bold; font-size: ${paperSize === 'A5' ? '10pt' : '11pt'}; text-transform: uppercase; margin-bottom: 2px;">
-                        SURAT PESANAN ${sp.jenis.toUpperCase()} FARMASI
-                    </div>
-                    <div>No : <b>${sp.nomor}</b></div>
-                </div>
-                
-                <div style="margin-top: 6px;">
-                    Yang bertanda tangan dibawah ini :
-                    <table class="info-table" style="margin-top: 2px;">
-                        <tr><td style="width: 110px;">Nama</td><td style="width: 10px;">:</td><td>${fApoteker}</td></tr>
-                        <tr><td>Jabatan</td><td>:</td><td>Apoteker Penanggungjawab</td></tr>
-                        <tr><td>Alamat</td><td>:</td><td>${fAlamatFaskes}</td></tr>
-                        <tr><td>No. SIPA</td><td>:</td><td>${fSipa}</td></tr>
-                    </table>
-                </div>
-
-                <div style="margin-top: 6px;">
-                    Mengajukan Pesanan ${sp.jenis} Farmasi kepada :
-                    <table class="info-table" style="margin-top: 2px;">
-                        <tr><td style="width: 110px;">Nama distributor</td><td style="width: 10px;">:</td><td><b>${sp.supplierNama}</b></td></tr>
-                        <tr><td>Alamat</td><td>:</td><td>${sp.supplierAlamat}</td></tr>
-                        <tr><td>No. Tlp</td><td>:</td><td>${sp.supplierTelp}</td></tr>
-                    </table>
-                </div>
-
-                <div style="margin-top: 5px;">
-                    Dengan jenis ${sp.jenis} Farmasi yang dipesan sebagai berikut :
-                </div>
-
-                <table style="margin-top: 5px; font-size: ${paperSize === 'A5' ? '8pt' : '9pt'};">
-                    <thead>
-                        <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
-                            <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">NAPZZA</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 11%;">Ket</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemRowsHTML}
-                    </tbody>
-                </table>
-
-                <div style="margin-top: 6px;">
-                    ${sp.jenis} Farmasi tersebut akan dipergunakan untuk :
-                    <table class="info-table" style="margin-top: 2px;">
-                        <tr><td style="width: 110px;">Nama sarana</td><td style="width: 10px;">:</td><td>APOTEK LATISHA FARMA</td></tr>
-                        <tr><td style="width: 110px;">Alamat sarana</td><td style="width: 10px;">:</td><td>Jl.Poros KTM Tanjung Mas Makmur Mesuji Timur Kab. Mesuji-Lampung</td></tr>
-                        <tr><td style="width: 110px;">No. Izin</td><td style="width: 10px;">:</td><td>400.7.5.4/256/SIPA/IV.13/MSJ/2026</td></tr>
-                    </table>
-                </div>
-
-                <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
-                    <div style="text-align: center; width: 190px;">
-                        <div>Mesuji, ${currentDateFormatted}</div>
-                        <div style="font-weight: bold; margin-bottom: 30px;">Apoteker Penanggungjawab</div>
-                        <div style="font-weight: bold; text-decoration: underline;">${fApoteker}</div>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                window.onload = function() {
-                    window.focus();
-                    window.print();
-                    window.onafterprint = function() { window.close(); };
-                };
-			<\/script>
-        </body>
-        </html>
-    `);
-    printWin.document.close();
-}
 
 // --- LOGIKA DATA SUPPLIER ---
 let supplierData = JSON.parse(localStorage.getItem('apotek_supplier_db')) || [
