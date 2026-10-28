@@ -1929,7 +1929,7 @@ async function exportDataObat() {
             document.getElementById('f-nip').value = db.faskes.nip || '';
         }
 
-        function switchTab(tabId) {
+        async function switchTab(tabId) {
     // 1. Sembunyikan SEMUA elemen tab utama DAN tab apotek (termasuk Master Obat)
     document.querySelectorAll('.tab-content, .tab-apotek-content').forEach(el => el.classList.add('hidden'));
 
@@ -1940,7 +1940,6 @@ async function exportDataObat() {
     }
 
     // 3. Tampilkan hanya tab target yang dipilih
-    // Cek apakah tab target menggunakan format ID standar 'tab-' atau prefiks khusus apotek 'tab-apotek-'
     let activeTabElement = document.getElementById('tab-' + targetTabId);
     if (!activeTabElement) {
         activeTabElement = document.getElementById('tab-apotek-' + targetTabId);
@@ -1957,15 +1956,15 @@ async function exportDataObat() {
         activeNav.classList.add('bg-slate-800', 'text-white', 'shadow');
     }
 
-    // 5. Perbarui Judul Halaman di Header atas (Tambahkan judul untuk Master Obat di sini)
+    // 5. DEKLARASIKAN OBJEK TITLES DI SINI AGAR TIDAK UNDEFINED
     const titles = {
         dashboard: ["Dashboard Utama", "Ringkasan Pelayanan"],
         pasien: ["Data Pasien", "Kelola data pasien terdaftar"],
         akseptor: ["Data Akseptor KB", "Kelola data peserta KB aktif"],
         kunjungan: ["Transaksi Kunjungan", "Catat pelayanan dan obat KB"],
-        'master-obat': ["Master Data Obat", "Kelola informasi obat, indikasi klinis, dosis per KgBB, dan kategori kehamilan FDA."], // <--- TAMBAHKAN INI
-		'surat-pesanan': ["Surat Pesanan", "Kelola dokumen pemesanan sediaan farmasi ke distributor"],
-		'supplier': ["Data Supplier", "Kelola informasi pemasok dan distributor obat"],
+        'master-obat': ["Master Data Obat", "Kelola informasi obat, indikasi klinis, dosis per KgBB, dan kategori kehamilan FDA."],
+        'surat-pesanan': ["Surat Pesanan", "Kelola dokumen pemesanan sediaan farmasi ke distributor"],
+        'supplier': ["Data Supplier", "Kelola informasi pemasok dan distributor obat"],
         'farmasi-konseling': ["Konseling Obat", "Dokumentasi konseling obat pasien"],
         'farmasi-pio': ["PIO (Formulir 8)", "Pelayanan Informasi Obat"],
         'farmasi-pto': ["PTO (Formulir 9)", "Pemantauan Terapi Obat"],
@@ -1981,7 +1980,6 @@ async function exportDataObat() {
         laporan: ["Laporan", "Arsip klinis dan cetak laporan"],
         faskes: ["Data Profil Apotek", "Profil Apotek Latisha Farma"],
         backup: ["Backup & Restore DB", "Cadangkan data JSON"]
-		
     };
 
     if (titles[targetTabId]) {
@@ -1989,16 +1987,21 @@ async function exportDataObat() {
         document.getElementById('page-subtitle').innerText = titles[targetTabId][1];
     }
 
-    // 6. Refresh data pada tab aktif
+    // 6. Tarik data terbaru dari Supabase secara otomatis khusus jika membuka Surat Pesanan
+    if (tabId === 'surat-pesanan') {
+        await loadFromSupabase();
+    }
+
+    // 7. Refresh data pada tab aktif
     if (typeof refreshCurrentActiveTab === 'function') {
         refreshCurrentActiveTab();
     }
 
-    // 7. Tutup sidebar otomatis di layar kecil (Mobile)
+    // 8. Tutup sidebar otomatis di layar kecil (Mobile)
     if (window.innerWidth < 768) {
         document.getElementById('sidebar').classList.add('-translate-x-full');
     }
-}
+} 
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
 // Fungsi untuk membuka/menutup dropdown menu Apotek di sidebar
@@ -5387,6 +5390,18 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
             return false;
         }
 
+        // 1. HAPUS terlebih dahulu data item lama di Supabase berdasarkan nomor_sp.
+        // Langkah ini krusial untuk mencegah duplikasi saat melakukan Edit / Pembaruan Surat Pesanan.
+        const { error: deleteError } = await _supabase
+            .from('item_surat_pesanan')
+            .delete()
+            .eq('nomor_sp', dataSP.nomor);
+
+        if (deleteError) {
+            console.error("Gagal membersihkan data lama di Supabase:", deleteError.message);
+        }
+
+        // 2. Siapkan payload baru dari array item obat yang diinput pengguna
         const payload = itemsArray.map(item => ({
             nomor_sp: dataSP.nomor,
             jenis_sp: dataSP.jenis,
@@ -5400,6 +5415,7 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
             ket: item.ket || '-'
         }));
 
+        // 3. INSERT data terbaru ke tabel item_surat_pesanan
         const { data, error } = await _supabase
             .from('item_surat_pesanan')
             .insert(payload);
@@ -5410,13 +5426,13 @@ async function simpanSuratPesananKeSupabase(dataSP, itemsArray) {
             return false;
         }
 
-        console.log("Berhasil disimpan ke Supabase:", data);
+        console.log("Berhasil sinkronisasi item surat pesanan ke Supabase:", data);
         return true;
     } catch (err) {
         console.error("Terjadi kesalahan koneksi Supabase:", err);
         return false;
     }
-}
+} 
 
 // 2. Simpan Surat Pesanan (Terintegrasi Supabase & LocalStorage)
 async function simpanSuratPesanan(e) {
