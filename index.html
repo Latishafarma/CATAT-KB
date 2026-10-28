@@ -1904,7 +1904,15 @@ async function exportDataObat() {
         })
         .subscribe();
 }
-
+_supabase.channel('public:item_surat_pesanan')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'item_surat_pesanan' }, async () => {
+            console.log("Terdeteksi perubahan pada tabel item_surat_pesanan di Supabase. Memuat ulang data...");
+            // Panggil kembali fungsi loadFromSupabase agar data lokal ikut memperbarui diri
+            if (typeof loadFromSupabase === 'function') {
+                await loadFromSupabase();
+            }
+        })
+        .subscribe();
 
         function fetchAbsensiFromCloud() {
             window.handleAbsensiResponse = function(jsonData) {
