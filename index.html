@@ -1904,15 +1904,16 @@ async function exportDataObat() {
         })
         .subscribe();
 }
-_supabase.channel('public:item_surat_pesanan')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'item_surat_pesanan' }, async () => {
-            console.log("Terdeteksi perubahan pada tabel item_surat_pesanan di Supabase. Memuat ulang data...");
-            // Panggil kembali fungsi loadFromSupabase agar data lokal ikut memperbarui diri
-            if (typeof loadFromSupabase === 'function') {
-                await loadFromSupabase();
-            }
-        })
-        .subscribe();
+// Tambahkan baris ini di dalam fungsi setupRealtimeSync()
+_supabase.channel('public:item_surat_pesanan_delete')
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'item_surat_pesanan' }, async (payload) => {
+        console.log("Terdeteksi penghapusan data di Supabase:", payload);
+        // Memuat ulang data dan memperbarui tabel secara otomatis
+        if (typeof loadFromSupabase === 'function') {
+            await loadFromSupabase();
+        }
+    })
+    .subscribe(); 
 
         function fetchAbsensiFromCloud() {
             window.handleAbsensiResponse = function(jsonData) {
@@ -5213,38 +5214,41 @@ function editSuratPesanan(index) {
 async function hapusSuratPesanan(index) {
     const targetSP = suratPesananData[index];
     if (!targetSP) {
-        alert("Data surat pesanan tidak ditemukan pada indeks lokal.");
+        alert("Data surat pesanan tidak ditemukan pada data lokal.");
         return;
     }
 
-    // Ambil nomor SP dan pastikan bentuknya string yang bersih
+    // Ambil nomor SP dan bersihkan dari spasi ekstra di awal/akhir
     const nomorSpTarget = String(targetSP.nomor || targetSP.nomor_sp || "").trim();
 
-    console.log("Indeks yang dipilih:", index);
-    console.log("Objek Surat Pesanan:", targetSP);
-    console.log("Nomor SP Target yang akan dihapus:", nomorSpTarget);
+    console.log("Mencoba menghapus nomor_sp di Supabase:", JSON.stringify(nomorSpTarget));
 
     if (!nomorSpTarget) {
-        alert("Gagal menghapus: Nomor Surat Pesanan tidak valid atau kosong!");
+        alert("Gagal menghapus: Nomor Surat Pesanan kosong!");
         return;
     }
 
     if (confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan nomor: ${nomorSpTarget}?`)) {
         try {
-            // Eksekusi hapus ke Supabase berdasarkan kolom nomor_sp
+            // Gunakan .select() untuk mengembalikan data baris yang berhasil dihapus
             const { data, error } = await _supabase
                 .from('item_surat_pesanan')
                 .delete()
                 .eq('nomor_sp', nomorSpTarget)
-                .select(); // Mengembalikan data yang berhasil dihapus
+                .select(); 
 
             if (error) {
                 throw error;
             }
 
-            console.log("Respon sukses hapus dari Supabase:", data);
+            console.log("Data yang berhasil dihapus dari Supabase:", data);
 
-            // Hapus dari array lokal dan simpan ke localStorage
+            // Cek apakah Supabase benar-benar menemukan dan menghapus data
+            if (!data || data.length === 0) {
+                console.warn("Tidak ada baris di tabel Supabase yang cocok dengan nomor_sp:", nomorSpTarget);
+            }
+
+            // Hapus dari array lokal
             suratPesananData.splice(index, 1);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
             
