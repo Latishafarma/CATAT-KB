@@ -5203,38 +5203,47 @@ function editSuratPesanan(index) {
 }
 
 async function hapusSuratPesanan(index) {
-    if (confirm("Apakah Anda yakin ingin menghapus surat pesanan ini?")) {
-        const targetSP = suratPesananData[index];
-        if (!targetSP) {
-            alert("Data surat pesanan tidak ditemukan di indeks lokal.");
-            return;
-        }
+    const targetSP = suratPesananData[index];
+    if (!targetSP) {
+        alert("Data surat pesanan tidak ditemukan pada indeks lokal.");
+        return;
+    }
 
-        const nomorSpTarget = targetSP.nomor || targetSP.nomor_sp;
-        console.log("Mencoba menghapus Surat Pesanan dengan Nomor:", nomorSpTarget); // Cek nilai ini di Console (F12)
+    // Ambil nomor SP dan pastikan bentuknya string yang bersih
+    const nomorSpTarget = String(targetSP.nomor || targetSP.nomor_sp || "").trim();
 
+    console.log("Indeks yang dipilih:", index);
+    console.log("Objek Surat Pesanan:", targetSP);
+    console.log("Nomor SP Target yang akan dihapus:", nomorSpTarget);
+
+    if (!nomorSpTarget) {
+        alert("Gagal menghapus: Nomor Surat Pesanan tidak valid atau kosong!");
+        return;
+    }
+
+    if (confirm(`Apakah Anda yakin ingin menghapus Surat Pesanan nomor: ${nomorSpTarget}?`)) {
         try {
-            // Eksekusi perintah delete ke Supabase
+            // Eksekusi hapus ke Supabase berdasarkan kolom nomor_sp
             const { data, error } = await _supabase
                 .from('item_surat_pesanan')
                 .delete()
                 .eq('nomor_sp', nomorSpTarget)
-                .select(); // Menggunakan .select() untuk memastikan respons data yang terhapus
+                .select(); // Mengembalikan data yang berhasil dihapus
 
             if (error) {
                 throw error;
             }
 
-            console.log("Berhasil dihapus dari Supabase:", data);
+            console.log("Respon sukses hapus dari Supabase:", data);
 
-            // Hapus dari array lokal
+            // Hapus dari array lokal dan simpan ke localStorage
             suratPesananData.splice(index, 1);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
             
-            // Render ulang tabel
+            // Render ulang tabel di web
             renderTabelSuratPesanan();
 
-            alert("Surat pesanan berhasil dihapus dari database dan web.");
+            alert("Surat pesanan berhasil dihapus dari web dan database Supabase.");
         } catch (err) {
             console.error("Gagal menghapus dari Supabase:", err.message);
             alert("Gagal menghapus data dari database: " + err.message);
