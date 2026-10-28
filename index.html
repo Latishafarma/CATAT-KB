@@ -5202,21 +5202,36 @@ function editSuratPesanan(index) {
     document.getElementById('modal-surat-pesanan').classList.remove('hidden');
 }
 
- async function hapusSuratPesanan(index) {
+async function hapusSuratPesanan(index) {
     if (confirm("Apakah Anda yakin ingin menghapus surat pesanan ini?")) {
         const targetSP = suratPesananData[index];
+        if (!targetSP) {
+            alert("Data surat pesanan tidak ditemukan di indeks lokal.");
+            return;
+        }
+
         const nomorSpTarget = targetSP.nomor || targetSP.nomor_sp;
+        console.log("Mencoba menghapus Surat Pesanan dengan Nomor:", nomorSpTarget); // Cek nilai ini di Console (F12)
 
         try {
-            const { error } = await _supabase
+            // Eksekusi perintah delete ke Supabase
+            const { data, error } = await _supabase
                 .from('item_surat_pesanan')
                 .delete()
-                .eq('nomor_sp', nomorSpTarget);
+                .eq('nomor_sp', nomorSpTarget)
+                .select(); // Menggunakan .select() untuk memastikan respons data yang terhapus
 
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
+            console.log("Berhasil dihapus dari Supabase:", data);
+
+            // Hapus dari array lokal
             suratPesananData.splice(index, 1);
             localStorage.setItem('apotek_surat_pesanan_db', JSON.stringify(suratPesananData));
+            
+            // Render ulang tabel
             renderTabelSuratPesanan();
 
             alert("Surat pesanan berhasil dihapus dari database dan web.");
