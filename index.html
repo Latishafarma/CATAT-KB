@@ -4876,17 +4876,24 @@ async function simpanMasterObat(event) {
         const inputEditIdField = document.getElementById('input-edit-id') || document.getElementById('input-edit-index');
         if (inputEditIdField) inputEditIdField.value = '';
 
-        if (typeof loadMasterObatFromSupabase === 'function') {
-            await loadMasterObatFromSupabase();
-        } else if (typeof renderTabelMasterObat === 'function') {
-            renderTabelMasterObat();
+       if (typeof loadFromSupabase === 'function') {
+            await loadFromSupabase(); // Sinkronkan ulang semua data dari database cloud
+        } else {
+            // Fallback manual jika fungsi global tidak ada
+            const { data: obatData } = await _supabase.from('master_obat').select('*');
+            if (obatData) {
+                masterObatData = obatData;
+                renderTabelMasterObat();
+            }
         }
+
         alert("Data obat berhasil disimpan!");
 
     } catch (err) {
         console.error("Error simpanMasterObat:", err);
+        alert("Terjadi kesalahan saat menyimpan data.");
     }
-}    
+} 
 
 
 // --- LOGIKA SURAT PESANAN ---
@@ -4980,7 +4987,7 @@ function renderTabelSuratPesanan() {
 } 
 
 // 2. Buka Modal Surat Pesanan Baru
-function bukaModalSuratPesananBaru() { 
+async function bukaModalSuratPesananBaru() { 
     // 1. Reset form terlebih dahulu agar kembali bersih
     document.getElementById('form-surat-pesanan').reset();
     
@@ -4996,13 +5003,34 @@ function bukaModalSuratPesananBaru() {
     // 4. Muat dropdown supplier dari data supplier yang tersimpan
     muatDropdownSupplier();
     
+    // =========================================================================
+    // 🌟 TAMBAHAN: Segarkan data master obat seketika saat modal SP dibuka
+    // =========================================================================
+    try {
+        if (typeof _supabase !== 'undefined') {
+            const { data: obatData, error } = await _supabase.from('master_obat').select('*');
+            if (!error && obatData) {
+                masterObatData = obatData; // Perbarui variabel global master obat
+            }
+        } else {
+            // Fallback ke LocalStorage jika Supabase tidak terjangkau
+            const localData = localStorage.getItem('apotek_master_obat');
+            if (localData) {
+                masterObatData = JSON.parse(localData);
+            }
+        }
+    } catch (err) {
+        console.error("Gagal menyegarkan data obat untuk SP:", err);
+    }
+    // =========================================================================
+
     // 5. Kosongkan dan beri 1 baris kosong awal untuk item obat
     document.getElementById('container-item-pesanan').innerHTML = '';
     tambahBarisItemPesanan();
     
     // 6. Tampilkan modal
     document.getElementById('modal-surat-pesanan').classList.remove('hidden');
-}
+} 
 
 function tutupModalSuratPesanan() {
     document.getElementById('modal-surat-pesanan').classList.add('hidden');
