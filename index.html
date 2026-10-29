@@ -1139,7 +1139,7 @@
                             <tr class="bg-slate-100 text-slate-700 text-[11px] font-bold uppercase">
                                 <th class="p-2 text-center w-10">No</th>
                                 <th class="p-2 w-52">Nama Obat (Pencarian Otomatis)</th>
-                                <th class="p-2 w-32">NAPZZA</th>
+                                <th class="p-2 w-32">nappza</th>
                                 <th class="p-2 w-28">Bentuk Sediaan</th>
                                 <th class="p-2 w-20 text-center">Jumlah</th>
                                 <th class="p-2 w-24">Satuan</th>
@@ -5101,7 +5101,7 @@ function tambahBarisItemPesanan(itemData = {}) {
             <input type="text" list="list-master-obat-sp-${rowId}" value="${itemData.namaObat || ''}" placeholder="Ketik nama obat..." class="input-nama-obat w-full px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-sky-500 outline-none" required oninput="pilihOtomatisMasterObat(this)">
             <datalist id="list-master-obat-sp-${rowId}">${datalistObatOptions}</datalist>
         </td>
-        <td class="p-2"><input type="text" value="${itemData.nappza || ''}" placeholder="NAPZZA" class="input-nappza w-full px-2 py-1.5 border rounded-lg outline-none"></td>
+        <td class="p-2"><input type="text" value="${itemData.nappza || ''}" placeholder="nappza" class="input-nappza w-full px-2 py-1.5 border rounded-lg outline-none"></td>
         
         <!-- Kolom Bentuk Sediaan dengan Dropdown & Pencarian Otomatis -->
         <td class="p-2 relative">
@@ -5457,7 +5457,7 @@ function cetakSuratPesanan(index) {
                         <tr style="background-color: #f1f5f9; text-align: center; font-weight: bold;">
                             <th style="border: 1px solid #000; padding: 4px; width: 6%;">No</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 25%;">Nama Obat</th>
-                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">NAPZZA</th>
+                            <th style="border: 1px solid #000; padding: 4px; width: 22%;">nappza</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 15%;">Bentuk Sediaan</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 10%;">Jumlah</th>
                             <th style="border: 1px solid #000; padding: 4px; width: 11%;">Satuan</th>
