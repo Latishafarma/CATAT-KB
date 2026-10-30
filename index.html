@@ -3591,19 +3591,52 @@ function togglePasienSort() {
             renderPasienTable();
         }
 
-        function renderPasienTable() {
-            const q = (document.getElementById('search-pasien').value || '').toLowerCase();
-            const tb = document.getElementById('table-pasien-body'); if(!tb) return;
-            tb.innerHTML = '';
-            if(!db.pasien) db.pasien = [];
-            let filtered = db.pasien.filter(p => p.nama.toLowerCase().includes(q) || p.nik.includes(q));
-            filtered.sort((a,b) => pasienSortOrder === 'asc' ? a.nama.localeCompare(b.nama) : b.nama.localeCompare(a.nama));
-            
-            if(filtered.length === 0) { tb.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">Tidak ada data pasien.</td></tr>`; return; }
-            filtered.forEach(p => {
-                let idx = db.pasien.indexOf(p);
-                tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-3 px-4 font-mono">${p.nik}</td><td class="py-3 px-4 font-semibold text-slate-800">${p.nama}</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-bold ${p.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${p.jk || 'L/P'}</span></td><td class="py-3 px-4">${p.tglLahir} (${calculateAge(p.tglLahir)})</td><td class="py-3 px-4">${p.alamat}</td><td class="py-3 px-4">${p.telp}</td><td class="py-3 px-4 text-center space-x-1"><button onclick="editPasien(${idx})" class="text-blue-600 p-1.5"><i class="fa-solid fa-pen"></i></button><button onclick="deletePasien(${idx})" class="text-red-600 p-1.5"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+       function renderPasienTable() {
+            const keyword = (document.getElementById('search-pasien')?.value || "").toLowerCase().trim();
+            const tbody = document.getElementById('table-pasien-body');
+            if (!tbody) return;
+
+            let listPasien = db.pasien || [];
+
+            // Filter pencarian dengan pengaman agar tidak error jika ada data kosong (undefined)
+            if (keyword) {
+                listPasien = listPasien.filter(p => {
+                    const nik = String(p.nik || "").toLowerCase();
+                    const nama = String(p.nama_pasien || p.nama || "").toLowerCase(); // Mendukung format nama_pasien atau nama
+                    const alamat = String(p.alamat || "").toLowerCase();
+                    const telp = String(p.no_telp || p.telp || "").toLowerCase();
+
+                    return nik.includes(keyword) || nama.includes(keyword) || alamat.includes(keyword) || telp.includes(keyword);
+                });
+            }
+
+            if (listPasien.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400 italic">Belum ada data pasien.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            listPasien.forEach((p, idx) => {
+                const namaTampil = p.nama_pasien || p.nama || '-';
+                const tglUsiaTampil = p.tgl_lahir_usia || p.tglLahir || '-';
+                const telpTampil = p.no_telp || p.telp || '-';
+
+                html += `
+                    <tr class="border-b hover:bg-slate-50 text-xs">
+                        <td class="py-3 px-4 font-mono font-bold">${p.nik || '-'}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${namaTampil}</td>
+                        <td class="py-3 px-4">${p.jk || '-'}</td>
+                        <td class="py-3 px-4">${tglUsiaTampil}</td>
+                        <td class="py-3 px-4">${p.alamat || '-'}</td>
+                        <td class="py-3 px-4">${telpTampil}</td>
+                        <td class="py-3 px-4 text-center space-x-1">
+                            <button onclick="editPasien(${idx})" class="text-indigo-600 hover:text-indigo-800 p-1" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="hapusPasien(${idx})" class="text-rose-600 hover:text-rose-800 p-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
+            tbody.innerHTML = html;
         }
 
         function openPasienModal(idx = null) {
@@ -3626,14 +3659,53 @@ function togglePasienSort() {
             }
         }
         function closePasienModal() { document.getElementById('modal-pasien').classList.add('hidden'); }
-        function savePasien(e) {
+        async function savePasien(e) {
             e.preventDefault();
             let idx = document.getElementById('pasien-index').value;
-            let data = { nik: document.getElementById('p-nik').value, nama: document.getElementById('p-nama').value, jk: document.getElementById('p-jk').value, tglLahir: document.getElementById('p-tgl').value, alamat: document.getElementById('p-alamat').value, telp: document.getElementById('p-telp').value };
+            
+            let tglLahirVal = document.getElementById('p-tgl').value;
+            let usiaFormat = tglLahirVal;
+            
+            // Otomatis hitung usia jika tanggal lahir diisi (Format: YYYY-MM-DD (XX Thn))
+            if (tglLahirVal) {
+                let tahunLahir = new Date(tglLahirVal).getFullYear();
+                let tahunSekarang = new Date().getFullYear();
+                let usia = tahunSekarang - tahunLahir;
+                usiaFormat = `${tglLahirVal} (${usia} Thn)`;
+            }
+
+            let dataPasien = { 
+                nik: document.getElementById('p-nik').value, 
+                nama_pasien: document.getElementById('p-nama').value, 
+                jk: document.getElementById('p-jk').value, 
+                tgl_lahir_usia: usiaFormat, 
+                alamat: document.getElementById('p-alamat').value, 
+                no_telp: document.getElementById('p-telp').value 
+            };
+
+            // Simpan ke penyimpanan lokal/state aplikasi Anda (jika masih digunakan)
             if(!db.pasien) db.pasien = [];
-            if(idx === "") db.pasien.push(data); else db.pasien[idx] = data;
-            saveDB(); closePasienModal();
+            if(idx === "") {
+                db.pasien.push(dataPasien);
+            } else {
+                db.pasien[idx] = dataPasien;
+            }
+            saveDB();
+
+            // SIMPAN KE SUPABASE (Agar sinkron dengan POS Kasir V4.0)
+            try {
+                if (typeof _supabase !== 'undefined' && _supabase) {
+                    const { error } = await _supabase.from('data_pasien').upsert(dataPasien);
+                    if (error) throw error;
+                }
+            } catch (err) {
+                console.error("Gagal sinkron ke Supabase:", err.message);
+            }
+
+            closePasienModal();
+            renderPasienTable(); // Refresh tabel pasien di layar
         }
+
         function editPasien(idx) { openPasienModal(idx); }
         function deletePasien(idx) { if(confirm("Hapus data pasien ini?")) { db.pasien.splice(idx,1); saveDB(); } }
         function exportPasienExcel() {
